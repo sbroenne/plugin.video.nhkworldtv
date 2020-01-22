@@ -34,10 +34,20 @@ xbmc.log('Base Url: {0}'.format(base_url), level=LOGLEVEL)
 # Query excution mode and url
 args = urlparse.parse_qs(sys.argv[2][1:])
 # urlparse.parse_qs returns the dictionary values as a list - so need to always get the first [0] element
-mode = args.get('mode', None)[0]
-xbmc.log('Exectution mode: {0}'.format(mode), level=LOGLEVEL)
-url = args.get('url', None)[0]
-xbmc.log('Target Url: {0}'.format(url), level=LOGLEVEL)
+
+
+if 'mode' in args:
+    mode = args['mode'][0]
+    xbmc.log('Exectution mode: {0}'.format(mode), level=LOGLEVEL)
+else:
+    mode=None
+
+
+if 'url' in args:
+    url = args['url'][0]
+    xbmc.log('Target Url: {0}'.format(url), level=LOGLEVEL)
+else:
+    url = None
 
 # Excute main logic loop
 main.run(url, mode, args)
