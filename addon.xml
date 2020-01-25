@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.1" provider-name="sbroenne">
-      <requires>
-            <import addon="xbmc.python" version="2.20.0"/>
-            <import addon="script.module.requests" version="2.22.0"/>
-      </requires>
-      <extension point="xbmc.python.pluginsource" library="default.py">
-            <provides>video</provides>
-      </extension>
-      <extension point="xbmc.addon.metadatlsa">
-            <platform>all</platform>
-            <language></language>
-            <summary>NHK World TV</summary>
-            <description>Watch NHK World Japan - live stream and on-demand programs in HD.</description>
-            <news>Ver. 1.0.1
-                  Completely rewritten version
-            </news>
-      </extension>
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.1" provider-name="sbroenne">
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.request" version="2.22.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="main.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Watch NHK World TV in HD - live stream and on-demand programs</summary>
+        <description lang="en_GB"></description>
+        <language></language>
+        <platform>all</platform>
+        <license>GPL-3.0</license>
+        <forum></forum>
+        <website>www.kodi.tv</website>
+        <email>stefan_broenner@yahoo.com</email>
+        <source></source>
+        <news></news>
+        <disclaimer></disclaimer>
+        <assets>
+            <icon>resources/icon.png</icon>
+        </assets>
+    </extension>
 </addon>
