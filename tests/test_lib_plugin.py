@@ -36,19 +36,19 @@ class Test_Test_VOD_Episode_List(unittest.TestCase):
 
     def test_get_programs_episodelist(self):
         test_url='https://api.nhk.or.jp/nhkworld/vodesdlist/v7/program/closeup/en/all/all.json'
-        vid_id = vod_episode_list(test_url, True, False)
+        vid_id = vod_episode_list(test_url, 1, 0)
         #print(vid_id)
         self.assertIsNotNone(vid_id)
     
     def test_get_categories_episodes(self):
         test_url='https://api.nhk.or.jp/nhkworld/vodesdlist/v7/category/18/en/all/all.json'
-        vid_id = vod_episode_list(test_url, False, False)
+        vid_id = vod_episode_list(test_url, 0, 0)
         #print(vid_id)
         self.assertIsNotNone(vid_id)
 
     def test_get_playlists_episodes(self):
         test_url='https://api.nhk.or.jp/nhkworld/vodplaylist/v7/en/8.json'
-        vid_id = vod_episode_list(test_url, False, True)
+        vid_id = vod_episode_list(test_url, 0, 1)
         #print(vid_id)
         self.assertIsNotNone(vid_id)
 

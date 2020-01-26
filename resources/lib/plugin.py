@@ -7,11 +7,11 @@ import kodiutils
 import kodilogging
 from xbmcgui import ListItem
 from xbmcplugin import addDirectoryItem, endOfDirectory, setContent, addSortMethod, SORT_METHOD_TITLE
-from utils import get_json, get_NHK_website_url, get_url, route_encode_url, route_decode_url
+from utils import get_json, get_NHK_website_url, get_url
 from nhk_api import *
 from datetime import datetime
 import re
-import urllib
+
 
 ADDON = xbmcaddon.Addon()
 nhk_icon = ADDON.getAddonInfo('icon')  # icon.png in addon directory
@@ -69,11 +69,11 @@ def vod_index():
     addDirectoryItem(plugin.handle, plugin.url_for(
         vod_playlists), ListItem("Playlists", iconImage=nhk_icon), True)
     addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, False, False, route_encode_url(rest_url['get_latest_episodes'])), ListItem("Latest Episodes", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_latest_episodes'], 0, 0), ListItem("Latest Episodes", iconImage=nhk_icon), True)
     addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, False, False, route_encode_url(rest_url['get_most_watched_episodes'])), ListItem("Most Watched", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_most_watched_episodes'],0, 0), ListItem("Most Watched", iconImage=nhk_icon), True)
     addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, False, False, route_encode_url(rest_url['get_all_episodes'])), ListItem("All Episodes", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_all_episodes'], 0, 0), ListItem("All Episodes", iconImage=nhk_icon), True)
     endOfDirectory(plugin.handle)
     return(True)
 
@@ -108,7 +108,7 @@ def vod_programs():
                 api_url, title.encode('ascii', 'ignore')))
 
             addDirectoryItem(plugin.handle, plugin.url_for(
-                vod_episode_list, True, False, route_encode_url(api_url)), li, True)
+                vod_episode_list, api_url, 1, 0), li, True)
 
     endOfDirectory(plugin.handle)
     setContent(plugin.handle, 'videos')
@@ -148,7 +148,7 @@ def vod_categories():
             logger.debug('Creating Directory Item {0} - {1}'.format(
                 api_url, title.encode('ascii', 'ignore')))
             addDirectoryItem(plugin.handle, plugin.url_for(
-                vod_episode_list, False, False, route_encode_url(api_url)), li, True)
+                vod_episode_list, api_url, 0, 0), li, True)
 
     endOfDirectory(plugin.handle)
     setContent(plugin.handle, 'videos')
@@ -190,8 +190,7 @@ def vod_playlists():
                 api_url, title.encode('ascii', 'ignore')))
 
             addDirectoryItem(plugin.handle, plugin.url_for(
-                vod_episode_list, False, True, route_encode_url(api_url)), li, True)
-
+                vod_episode_list, api_url, 0, 1), li, True)
     endOfDirectory(plugin.handle)
     setContent(plugin.handle, 'videos')
     addSortMethod(plugin.handle, SORT_METHOD_TITLE)
@@ -204,13 +203,12 @@ def vod_playlists():
 
 
 # Video On Demand - Episode List
-@plugin.route('/vod/episode_list/<show_only_subtitle>/<is_from_playlist>/<route_encoded_api_url>/')
-def vod_episode_list(show_only_subtitle, is_from_playlist, route_encoded_api_url):
-    api_url = route_decode_url(route_encoded_api_url)
-    logger.debug('Displaying Episode List for URL: {0}'.format(
-        api_url))
+@plugin.route('/vod/episode_list/<path:api_url>/<show_only_subtitle>/<is_from_playlist>')
+def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
+    logger.debug('Displaying Episode List for URL: {0} - {1} - {2}'.format(
+        api_url, show_only_subtitle, is_from_playlist))
     api_result_json = get_json(api_url)
-    if (is_from_playlist):
+    if (int(is_from_playlist) == 1):
         program_json = api_result_json['data']['playlist'][0]['track']
     else:
         program_json = api_result_json['data']['episodes']
@@ -221,7 +219,7 @@ def vod_episode_list(show_only_subtitle, is_from_playlist, route_encoded_api_url
         title = row['title_clean']
         subtitle = row['sub_title_clean']
 
-        if (show_only_subtitle or len(title) == 0):
+        if ((int(show_only_subtitle)==1) or (len(title) == 0)):
             episode = u'{0}'.format(subtitle)
         else:
             episode = u'{0} - {1}'.format(title, subtitle)
