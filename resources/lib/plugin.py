@@ -6,7 +6,7 @@ import xbmcaddon
 import kodiutils
 import kodilogging
 from xbmcgui import ListItem
-from xbmcplugin import addDirectoryItem, endOfDirectory, setContent, addSortMethod, SORT_METHOD_TITLE
+from xbmcplugin import addDirectoryItem, endOfDirectory, setContent, addSortMethod, SORT_METHOD_TITLE, setResolvedUrl
 from utils import get_json, get_NHK_website_url, get_url
 from nhk_api import *
 from datetime import datetime
@@ -255,9 +255,9 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
             {'thumb': thumb_image, 'poster': promoImage, 'fanart': largeImaga})
         li.setInfo('video', {'mediatype': 'episode', 'title': fullEpisodeName, 'plot': plot,
                              'duration': duration, 'episode': pgm_no, 'year': year, 'dateadded': dateadded})
-
+        li.setProperty('IsPlayable','true')                             
         addDirectoryItem(plugin.handle, plugin.url_for(show_episode, title=title, vid_id=vid_id,
-                                                       plot=plot, duration=duration, episode=episode, year=year, dateadded=dateadded), li, True)
+                                                       plot=plot, duration=duration, episode=episode, year=year, dateadded=dateadded), li, False)
 
     endOfDirectory(plugin.handle)
     setContent(plugin.handle, 'videos')
@@ -290,7 +290,7 @@ def show_episode(title, vid_id, plot, duration, episode, year, dateadded):
         logger.debug('Episode Akamai URL: {0}'.format(episode_url))
         poster_image = vod_program['posterUrl']
         thumb_image = vod_program['thumbnailUrl']
-        li = ListItem('Watch {0}'.format(title))
+        li = ListItem(path = episode_url)
         li.setArt({'thumb': thumb_image, 'poster': poster_image,
                    'fanart': poster_image})
         video_info = {
@@ -301,9 +301,9 @@ def show_episode(title, vid_id, plot, duration, episode, year, dateadded):
         li.addStreamInfo('video', video_info)
         li.setInfo('video', {'mediatype': 'episode', 'title': title, 'plot': plot,
                              'duration': duration, 'episode': episode, 'year': year, 'dateadded': dateadded})
-        addDirectoryItem(handle=plugin.handle, url=episode_url,
-                         listitem=li, isFolder=False)
-        endOfDirectory(plugin.handle)
+    
+        li.setProperty('IsPlayable','true')
+        setResolvedUrl(plugin.handle, True, li)
         return(episode_url)
     else:
         logger.fatal('Could not retrieve Akamai URL for VID_ID {0}'.format(
