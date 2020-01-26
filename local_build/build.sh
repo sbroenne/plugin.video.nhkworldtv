@@ -10,7 +10,7 @@ cp ../changelog.txt plugin.video.nhkworldtv
 cp ../LICENSE plugin.video.nhkworldtv
 cp ../main.py plugin.video.nhkworldtv
 cp -r ../resources plugin.video.nhkworldtv
-7za a -tzip plugin.video.nhkworldtv-0.0.3.zip plugin.video.nhkworldtv
+7za a -tzip plugin.video.nhkworldtv-0.0.4.zip plugin.video.nhkworldtv
 
 cp ../addon.xml ../../zips/plugin.video.nhkworldtv/
 cp ../changelog.txt ../../zips/plugin.video.nhkworldtv/
