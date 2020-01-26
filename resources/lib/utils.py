@@ -42,12 +42,18 @@ def get_url(url, withAPIKey = False):
                 current_try = +1
 
 
-
-def build_url(base_url, query):
-    return u'{0}?{1}'.format(base_url,urllib.urlencode(query))
-
 # Return a full URL from the partial URLs in the JSON results
 def get_NHK_website_url(url):
     nhk_website = 'https://www3.nhk.or.jp/'
     return nhk_website[:-1]+url
+
+# Encode & decode URL so it will work with the kodi route add-on - please see https://forum.kodi.tv/showthread.php?tid=342314
+# This should eventually be fixed
+
+def route_encode_url(url):
+    return(urllib.quote(urllib.quote(url)))
+
+def route_decode_url(encoded_url):
+    return(urllib.unquote(urllib.unquote(encoded_url)))
+
     
