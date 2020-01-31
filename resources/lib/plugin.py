@@ -34,7 +34,7 @@ def index():
 
 def add_live_stream():
 
-    livestream_url = 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp/index_4M.m3u8'
+    livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
     title = 'NHK World Live Stream'
     poster_image = nhk_icon
@@ -272,21 +272,18 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
 # Video On Demand - Display Episode
 @plugin.route('/vod/show_episode/<title>/<vid_id>/<plot>/<duration>/<episode>/<year>/<dateadded>')
 def show_episode(title, vid_id, plot, duration, episode, year, dateadded):
-    r = get_url(
-        'https://movie-s.nhk.or.jp/v/refid/nhkworld/prefid/{0}?embed=js&targetId=videoplayer&de-responsive=true&de-callback-method=nwCustomCallback&de-appid={1}&de-subtitle-on=false'.format(vid_id, vid_id))
+    r = get_url(rest_url['player_url'].format(vid_id, vid_id))
     playerJS = r.text
     # Parse the output of the Player JS file for the UUID of the episode
     match = re.compile("'data-de-program-uuid','(.+?)'").findall(playerJS)
     if (match.count > 0):
         p_uuid = match[0].replace("['", "").replace("']", "")
-        video_url = 'https://movie-s.nhk.or.jp/ws/ws_program/api/67f5b750-b419-11e9-8a16-0e45e8988f42/apiv/5/mode/json?v={0}'.format(
-            p_uuid)
+        video_url = rest_url['video_url'].format(p_uuid)
         api_result_json = get_json(video_url)
         vod_program = api_result_json['response']['WsProgramResponse']['program']
         reference_file_json = vod_program['asset']['referenceFile']
         play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
-        episode_url = 'https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/definst/{0}/chunklist.m3u8'.format(
-            play_path)
+        episode_url = rest_url['episode_url'].format(play_path)
         logger.debug('Episode Akamai URL: {0}'.format(episode_url))
         poster_image = vod_program['posterUrl']
         thumb_image = vod_program['thumbnailUrl']

@@ -12,7 +12,7 @@ class Test_Test_Livestream(unittest.TestCase):
 
     def test_add_live_stream(self):
         
-        self.assertTrue(add_live_stream)
+        self.assertTrue(add_live_stream())
 
 class Test_Test_VOD_Menus(unittest.TestCase):
 
