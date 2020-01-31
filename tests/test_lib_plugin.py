@@ -1,5 +1,5 @@
 import unittest   # The test framework
-from resources.lib.plugin import index, add_live_stream, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs
+from lib.plugin import index, add_live_stream, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs
 
 class Test_Test_Navigation_Menus(unittest.TestCase):
     def test_main_menu(self):

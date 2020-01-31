@@ -1,5 +1,5 @@
 import unittest   # The test framework
-from resources.lib.nhk_api import rest_url
+from lib.nhk_api import rest_url
 
 class Test_Test_nhk_api(unittest.TestCase):
     def test_nhk_api_episodes(self):

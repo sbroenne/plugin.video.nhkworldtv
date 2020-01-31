@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from resources.lib import kodilogging
-from resources.lib import plugin
+from lib import kodilogging
+from lib import plugin
 
 import logging
 import xbmcaddon
