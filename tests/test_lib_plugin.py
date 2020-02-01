@@ -34,7 +34,7 @@ class Test_Test_VOD_Menus(unittest.TestCase):
 
 class Test_Test_VOD_Episode_List(unittest.TestCase):
 
-    def test_get_programs_episodelist(self):
+    def test_get_programs_episodes(self):
         test_url='https://api.nhk.or.jp/nhkworld/vodesdlist/v7/program/closeup/en/all/all.json'
         vid_id = vod_episode_list(test_url, 1, 0)
         #print(vid_id)
@@ -58,8 +58,6 @@ class Test_Test_VOD_Episode_Play(unittest.TestCase):
         
         episode_url = show_episode(  'UnitTest Episode', 
                                         'nw_vod_v_en_4002_764_20200118003000_01_1579277219',
-                                        "UnitTest Plot",
-                                        '180',
                                         '1',
                                         '2019',
                                         '2020-01-01 12:00:00'

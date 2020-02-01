@@ -9,12 +9,16 @@ from xbmcgui import ListItem
 from xbmcplugin import addDirectoryItem, endOfDirectory, setContent, addSortMethod, SORT_METHOD_TITLE, setResolvedUrl
 from utils import get_json, get_NHK_website_url, get_url
 from nhk_api import *
-from datetime import datetime
+from datetime import datetime, timedelta
+from pytz import timezone
+import pytz
+from tzlocal import get_localzone
 import re
 
 
 ADDON = xbmcaddon.Addon()
 nhk_icon = ADDON.getAddonInfo('icon')  # icon.png in addon directory
+fanart_image = ADDON.getAddonInfo('fanart')  # icon.png in addon directory
 logger = logging.getLogger(ADDON.getAddonInfo('id'))
 kodilogging.config()
 plugin = routing.Plugin()
@@ -23,8 +27,20 @@ plugin = routing.Plugin()
 @plugin.route('/')
 def index():
     logger.debug('Creating Main Menu')
+    title = 'NHK World On Demand'
+    plot = 'Watch NHK World On Demand'
+    li = ListItem(title)
+    li.setArt({'thumb': nhk_icon,
+               'fanart': fanart_image})
+    video_info = {
+        'aspect': '1.78',
+        'width': '1920',
+        'height': '1080'
+    }
+    li.addStreamInfo('video', video_info)
+    li.setInfo('video', {'mediatype': 'episode', 'plot': plot})
     addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_index), ListItem("NHK World On Demand", iconImage=nhk_icon), True)
+        vod_index), li, True)
     add_live_stream()
     endOfDirectory(plugin.handle)
     return (True)
@@ -37,19 +53,17 @@ def add_live_stream():
     livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
     title = 'NHK World Live Stream'
-    poster_image = nhk_icon
-    thumb_image = nhk_icon
     li = ListItem(title)
-    plot = title
-    li.setArt({'thumb': thumb_image, 'poster': poster_image,
-               'fanart': poster_image})
+    plot = 'Watch NHK World Live Stream'
+    li.setArt({'thumb': nhk_icon,
+               'fanart': fanart_image})
     video_info = {
         'aspect': '1.78',
         'width': '1920',
         'height': '1080'
     }
     li.addStreamInfo('video', video_info)
-    li.setInfo('video', {'mediatype': 'episode', 'title': title, 'plot': plot})
+    li.setInfo('video', {'mediatype': 'episode', 'plot': plot})
     addDirectoryItem(handle=plugin.handle, url=livestream_url,
                      listitem=li, isFolder=False)
     return(True)
@@ -220,47 +234,62 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
         subtitle = row['sub_title_clean']
 
         if ((int(show_only_subtitle)==1) or (len(title) == 0)):
-            episode = u'{0}'.format(subtitle)
+            episode_name = u'{0}'.format(subtitle)
         else:
-            episode = u'{0} - {1}'.format(title, subtitle)
+            episode_name = u'{0} - {1}'.format(title, subtitle)
 
         if (len(title) == 0):
-            fullEpisodeName = u'{0}'.format(subtitle)
+            full_episode_name = episode_name = u'{0}'.format(subtitle)
         else:
-            fullEpisodeName = u'{0} - {1}'.format(title, subtitle)
+            full_episode_name = u'{0} - {1}'.format(title, subtitle)
 
+        
         plot = row['description_clean']
         largeImaga = get_NHK_website_url(row['image_l'])
         thumb_image = get_NHK_website_url(row['image'])
         promoImage = get_NHK_website_url(row['image_promo'])
         vid_id = row['vod_id']
-        pgm_id = row['pgm_id']
+        #pgm_id = row['pgm_id']
         pgm_no = row['pgm_no']
         duration = row['movie_duration']
 
         # Check if we have an aired date
-        onair = row['onair']
-        if (onair is not None):
-            utc_time = datetime.utcfromtimestamp(onair/1000)
-            plot = u'Aired: {0} ({1}-{2})\n\n{3}'.format(
-                utc_time.strftime('%Y-%m-%d'), pgm_id, pgm_no, plot)
-            year = int(utc_time.strftime('%Y'))
-            dateadded = utc_time.strftime('%Y-%m-%d %H:%M:%S')
+        broadcast_start_timestamp = row['onair']
+        broadcast_end_timestamp = row['vod_to']
+
+        if (broadcast_start_timestamp is not None):
+            broadcast_start_timestamp = broadcast_start_timestamp/1000
+            broadcast_end_timestamp = broadcast_end_timestamp/1000
+
+            # Convert from JST to local timezone
+            tokyo_tz = timezone('Asia/Tokyo')
+            local_tz = get_localzone()
+            
+            # Parse it as JST
+            broadcast_start_tokyo = tokyo_tz.localize(datetime.fromtimestamp(broadcast_start_timestamp))
+            broadcast_end_tokyo  = tokyo_tz.localize(datetime.fromtimestamp(broadcast_end_timestamp))
+
+            # Convert to local time
+            broadcast_start_local = broadcast_start_tokyo.astimezone(local_tz)
+            broadcast_end_local = broadcast_end_tokyo.astimezone(local_tz)
+
+            plot = u'Broadcast on: {0} / Available until: {1}\n\n{2}'.format(
+                broadcast_start_local.strftime('%Y-%m-%d'), broadcast_end_local.strftime('%Y-%m-%d'), plot)
+            year = int(broadcast_start_local.strftime('%Y'))
+            date_added_info_label = broadcast_start_local.strftime('%Y-%m-%d %H:%M:%S')
         else:
             year = 0
-            dateadded = ''
+            date_added_info_label=''
 
-        li = ListItem(episode)
+        li = ListItem(episode_name)
         li.setArt(
             {'thumb': thumb_image, 'poster': promoImage, 'fanart': largeImaga})
-        li.setInfo('video', {'mediatype': 'episode', 'title': fullEpisodeName, 'plot': plot,
-                             'duration': duration, 'episode': pgm_no, 'year': year, 'dateadded': dateadded})
+        li.setInfo('video', {'mediatype': 'episode', 'plot': plot,
+                             'duration': duration, 'episode': pgm_no, 'year': year, 'dateadded': date_added_info_label})
         li.setProperty('IsPlayable','true')                             
-        addDirectoryItem(plugin.handle, plugin.url_for(show_episode, title=title, vid_id=vid_id,
-                                                       plot=plot, duration=duration, episode=episode, year=year, dateadded=dateadded), li, False)
+        addDirectoryItem(plugin.handle, plugin.url_for(show_episode, title=full_episode_name, vid_id=vid_id, episode=pgm_no, year=year, dateadded=date_added_info_label), li, False)
 
     endOfDirectory(plugin.handle)
-    setContent(plugin.handle, 'videos')
     addSortMethod(plugin.handle, SORT_METHOD_TITLE)
     # Used for unit testing - only successfull if we processed at least one episode
     if (row_count > 0):
@@ -270,8 +299,8 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
 
 
 # Video On Demand - Display Episode
-@plugin.route('/vod/show_episode/<title>/<vid_id>/<plot>/<duration>/<episode>/<year>/<dateadded>')
-def show_episode(title, vid_id, plot, duration, episode, year, dateadded):
+@plugin.route('/vod/show_episode/<title>/<vid_id>/<episode>/<year>/<dateadded>')
+def show_episode(title, vid_id, episode, year, dateadded):
     r = get_url(rest_url['player_url'].format(vid_id, vid_id))
     playerJS = r.text
     # Parse the output of the Player JS file for the UUID of the episode
@@ -281,15 +310,13 @@ def show_episode(title, vid_id, plot, duration, episode, year, dateadded):
         video_url = rest_url['video_url'].format(p_uuid)
         api_result_json = get_json(video_url)
         vod_program = api_result_json['response']['WsProgramResponse']['program']
+        plot = vod_program['Description']
+        duration = float(vod_program['duration'])/10
         reference_file_json = vod_program['asset']['referenceFile']
         play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
         episode_url = rest_url['episode_url'].format(play_path)
         logger.debug('Episode Akamai URL: {0}'.format(episode_url))
-        poster_image = vod_program['posterUrl']
-        thumb_image = vod_program['thumbnailUrl']
         li = ListItem(path = episode_url)
-        li.setArt({'thumb': thumb_image, 'poster': poster_image,
-                   'fanart': poster_image})
         video_info = {
             'aspect': reference_file_json['aspectRatio'],
             'width': reference_file_json['videoWidth'],
@@ -299,7 +326,6 @@ def show_episode(title, vid_id, plot, duration, episode, year, dateadded):
         li.setInfo('video', {'mediatype': 'episode', 'title': title, 'plot': plot,
                              'duration': duration, 'episode': episode, 'year': year, 'dateadded': dateadded})
     
-        li.setProperty('IsPlayable','true')
         setResolvedUrl(plugin.handle, True, li)
         return(episode_url)
     else:
