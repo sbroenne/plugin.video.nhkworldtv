@@ -1,5 +1,6 @@
 import unittest   # The test framework
 from lib.plugin import index, add_live_stream, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs
+from xbmcplugin import SORT_METHOD_TITLE, SORT_METHOD_DATE
 
 class Test_Test_Navigation_Menus(unittest.TestCase):
     def test_main_menu(self):
@@ -36,19 +37,19 @@ class Test_Test_VOD_Episode_List(unittest.TestCase):
 
     def test_get_programs_episodes(self):
         test_url='https://api.nhk.or.jp/nhkworld/vodesdlist/v7/program/closeup/en/all/all.json'
-        vid_id = vod_episode_list(test_url, 1, 0)
+        vid_id = vod_episode_list(test_url, 1, 0, SORT_METHOD_TITLE)
         #print(vid_id)
         self.assertIsNotNone(vid_id)
     
     def test_get_categories_episodes(self):
         test_url='https://api.nhk.or.jp/nhkworld/vodesdlist/v7/category/18/en/all/all.json'
-        vid_id = vod_episode_list(test_url, 0, 0)
+        vid_id = vod_episode_list(test_url, 0, 0, SORT_METHOD_TITLE)
         #print(vid_id)
         self.assertIsNotNone(vid_id)
 
     def test_get_playlists_episodes(self):
         test_url='https://api.nhk.or.jp/nhkworld/vodplaylist/v7/en/8.json'
-        vid_id = vod_episode_list(test_url, 0, 1)
+        vid_id = vod_episode_list(test_url, 0, 1, SORT_METHOD_TITLE)
         #print(vid_id)
         self.assertIsNotNone(vid_id)
 

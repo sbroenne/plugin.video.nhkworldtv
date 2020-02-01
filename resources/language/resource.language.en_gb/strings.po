@@ -25,3 +25,7 @@ msgstr ""
 msgctxt "#32001"
 msgid "Debug"
 msgstr ""
+
+msgctxt "#32002"
+msgid "Default ViewType"
+msgstr "Allow the plug-in to specify default ViewTypes for each directory (e.g. Programs, Categories, etc.) (only tested for the default Estuary Skin)"

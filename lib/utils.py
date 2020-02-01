@@ -46,4 +46,9 @@ def get_url(url, withAPIKey = False):
 def get_NHK_website_url(url):
     nhk_website = 'https://www3.nhk.or.jp/'
     return nhk_website[:-1]+url
+
+
+# Set the Kodi View Mode
+def set_view_mode(view_mode_id):
+    xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
     

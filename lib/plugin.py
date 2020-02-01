@@ -6,8 +6,8 @@ import xbmcaddon
 import kodiutils
 import kodilogging
 from xbmcgui import ListItem
-from xbmcplugin import addDirectoryItem, endOfDirectory, setContent, addSortMethod, SORT_METHOD_TITLE, setResolvedUrl
-from utils import get_json, get_NHK_website_url, get_url
+from xbmcplugin import addDirectoryItem, endOfDirectory, setContent, addSortMethod, SORT_METHOD_TITLE, SORT_METHOD_DATEADDED, setResolvedUrl
+from utils import get_json, get_NHK_website_url, get_url, set_view_mode
 from nhk_api import *
 from datetime import datetime, timedelta
 from pytz import timezone
@@ -23,6 +23,11 @@ logger = logging.getLogger(ADDON.getAddonInfo('id'))
 kodilogging.config()
 plugin = routing.Plugin()
 
+
+# View Modes from the default Estuary skin
+VIEW_MODE_INFOWALL=54
+VIEW_MODE_WALL=500
+VIEW_MODE_WIDELIST=55
 
 @plugin.route('/')
 def index():
@@ -42,6 +47,7 @@ def index():
     addDirectoryItem(plugin.handle, plugin.url_for(
         vod_index), li, True)
     add_live_stream()
+    set_view_mode(VIEW_MODE_WIDELIST)
     endOfDirectory(plugin.handle)
     return (True)
 
@@ -83,11 +89,12 @@ def vod_index():
     addDirectoryItem(plugin.handle, plugin.url_for(
         vod_playlists), ListItem("Playlists", iconImage=nhk_icon), True)
     addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_latest_episodes'], 0, 0), ListItem("Latest Episodes", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_latest_episodes'], 0, 0, SORT_METHOD_DATEADDED), ListItem("Latest Episodes", iconImage=nhk_icon), True)
     addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_most_watched_episodes'],0, 0), ListItem("Most Watched", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_most_watched_episodes'],0, 0, SORT_METHOD_TITLE), ListItem("Most Watched", iconImage=nhk_icon), True)
     addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_all_episodes'], 0, 0), ListItem("All Episodes", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_all_episodes'], 0, 0, SORT_METHOD_TITLE), ListItem("All Episodes", iconImage=nhk_icon), True)
+    set_view_mode(VIEW_MODE_WIDELIST)
     endOfDirectory(plugin.handle)
     return(True)
 
@@ -122,11 +129,12 @@ def vod_programs():
                 api_url, title.encode('ascii', 'ignore')))
 
             addDirectoryItem(plugin.handle, plugin.url_for(
-                vod_episode_list, api_url, 1, 0), li, True)
+                vod_episode_list, api_url, 1, 0, SORT_METHOD_TITLE), li, True)
 
-    endOfDirectory(plugin.handle)
     setContent(plugin.handle, 'videos')
+    set_view_mode(VIEW_MODE_INFOWALL)
     addSortMethod(plugin.handle, SORT_METHOD_TITLE)
+    endOfDirectory(plugin.handle)
     # Return last valid program URL - useful for debugging
     if (row_count > 0):
         return(api_url)
@@ -162,11 +170,13 @@ def vod_categories():
             logger.debug('Creating Directory Item {0} - {1}'.format(
                 api_url, title.encode('ascii', 'ignore')))
             addDirectoryItem(plugin.handle, plugin.url_for(
-                vod_episode_list, api_url, 0, 0), li, True)
+                vod_episode_list, api_url, 0, 0, SORT_METHOD_TITLE), li, True)
 
-    endOfDirectory(plugin.handle)
+    
     setContent(plugin.handle, 'videos')
+    set_view_mode(VIEW_MODE_WALL)
     addSortMethod(plugin.handle, SORT_METHOD_TITLE)
+    endOfDirectory(plugin.handle)
     # Return last valid program URL - useful for debugging
     if (row_count > 0):
         return(api_url)
@@ -204,10 +214,12 @@ def vod_playlists():
                 api_url, title.encode('ascii', 'ignore')))
 
             addDirectoryItem(plugin.handle, plugin.url_for(
-                vod_episode_list, api_url, 0, 1), li, True)
-    endOfDirectory(plugin.handle)
+                vod_episode_list, api_url, 0, 1, SORT_METHOD_TITLE), li, True)
+    
     setContent(plugin.handle, 'videos')
+    set_view_mode(VIEW_MODE_WALL)
     addSortMethod(plugin.handle, SORT_METHOD_TITLE)
+    endOfDirectory(plugin.handle)
 
     # Return last valid program URL - useful for debugging
     if (row_count > 0):
@@ -217,8 +229,8 @@ def vod_playlists():
 
 
 # Video On Demand - Episode List
-@plugin.route('/vod/episode_list/<path:api_url>/<show_only_subtitle>/<is_from_playlist>')
-def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
+@plugin.route('/vod/episode_list/<path:api_url>/<show_only_subtitle>/<is_from_playlist>/<sort_method>/')
+def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method):
     logger.debug('Displaying Episode List for URL: {0} - {1} - {2}'.format(
         api_url, show_only_subtitle, is_from_playlist))
     api_result_json = get_json(api_url)
@@ -289,8 +301,11 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
         li.setProperty('IsPlayable','true')                             
         addDirectoryItem(plugin.handle, plugin.url_for(show_episode, title=full_episode_name, vid_id=vid_id, episode=pgm_no, year=year, dateadded=date_added_info_label), li, False)
 
+    setContent(plugin.handle, 'videos')
+    set_view_mode(VIEW_MODE_INFOWALL)
+    addSortMethod(plugin.handle, int(sort_method))
     endOfDirectory(plugin.handle)
-    addSortMethod(plugin.handle, SORT_METHOD_TITLE)
+
     # Used for unit testing - only successfull if we processed at least one episode
     if (row_count > 0):
         return(vid_id)
@@ -299,7 +314,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist):
 
 
 # Video On Demand - Display Episode
-@plugin.route('/vod/show_episode/<title>/<vid_id>/<episode>/<year>/<dateadded>')
+@plugin.route('/vod/show_episode/<title>/<vid_id>/<episode>/<year>/<dateadded>/')
 def show_episode(title, vid_id, episode, year, dateadded):
     r = get_url(rest_url['player_url'].format(vid_id, vid_id))
     playerJS = r.text
