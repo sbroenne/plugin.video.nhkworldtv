@@ -1,9 +1,14 @@
 import urllib
 import xbmc
+import xbmcgui
+import xbmcaddon
 import requests
+import logging
+import kodilogging
 
-# Loglevel will be overriden at runtime
-LOGLEVEL = xbmc.LOGDEBUG
+ADDON = xbmcaddon.Addon()
+logger = logging.getLogger(ADDON.getAddonInfo('id'))
+kodilogging.config()
 
 # Helper Functions
 # Get JSON object from a URL with improved error handling
@@ -26,29 +31,40 @@ def get_url(url, withAPIKey = False):
             apikey = 'EJfK8jdS57GqlupFgAfAAwr573q01y6k'
             request_params = {'apikey': apikey}
             r = requests.get(url, request_params)
-            xbmc.log('Making API Call {0} ({1} of {2})'.format(r.url, current_try, max_retries), level=LOGLEVEL)
+            logger.debug('Making API Call {0} ({1} of {2})'.format(r.url, current_try, max_retries))
         else:
             r = requests.get(url)
-            xbmc.log('Fetching URL {0} ({1} of {2})'.format(r.url, current_try, max_retries), level=LOGLEVEL)
+            logger.debug('Fetching URL {0} ({1} of {2})'.format(r.url, current_try, max_retries))
         if (r.status_code == 200):
-            xbmc.log('Successfully fetched URL/API: {0} with Status {1}'.format(r.url, r.status_code), level=LOGLEVEL)
+            logger.debug('Successfully fetched URL/API: {0} with Status {1}'.format(r.url, r.status_code))
             return(r)
         else:
             if (current_try == max_retries):
-                xbmc.log('Could not get URL {0} - Last HTTP Status Code {1} - Retries {2}'.format(r.url, r.status_code, max_retries), xbmc.LOGFATAL)
+                logger.debug('Could not get URL {0} - Last HTTP Status Code {1} - Retries {2}'.format(r.url, r.status_code, max_retries))
             else:
                 # Wait for n seconds
-                xbmc.log('Failure fetching URL: {0} with Status {1}'.format(r.url, r.status_code), level=LOGLEVEL)
+                logger.debug('Failure fetching URL: {0} with Status {1}'.format(r.url, r.status_code))
                 current_try = +1
 
 
 # Return a full URL from the partial URLs in the JSON results
 def get_NHK_website_url(url):
-    nhk_website = 'https://www3.nhk.or.jp/'
-    return nhk_website[:-1]+url
+    nhk_website = 'https://www3.nhk.or.jp'
+    return nhk_website+url
 
 
 # Set the Kodi View Mode
 def set_view_mode(view_mode_id):
+    logger.debug('Switching to View Mode {0}'.format(view_mode_id))
     xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
-    
+        
+
+# Set the Kodi Sort Direction
+def set_sort_direction(sort_direction):
+    # Sort Order can be Ascending or Descending
+    current_sort_direction = xbmc.getInfoLabel('Container.SortOrder')
+    logger.debug('Current sort order: {0}'.format(current_sort_direction))
+    #FIXME: Not working right now since Kodi always returns Ascending - need to investigate
+    """   if (current_sort_direction <> sort_direction):
+        xbmc.executebuiltin('Container.SetSortDirection')
+        logger.debug('Toggling sort direction from {0} to {1}'.format(current_sort_direction, sort_direction)) """
