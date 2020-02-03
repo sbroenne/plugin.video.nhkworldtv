@@ -9,7 +9,7 @@ ADDON = xbmcaddon.Addon()
 logger = logging.getLogger(ADDON.getAddonInfo('id'))
 kodilogging.config()
 
-# Helper Functions
+# Helper Functionspi
 # Get JSON object from a URL with improved error handling
 def get_json(url):
     r = get_url(url, True)
