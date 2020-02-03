@@ -1,5 +1,6 @@
 # NHK World API - reverse engineered from api.js
 rest_url = {
+    'api_key':                      'EJfK8jdS57GqlupFgAfAAwr573q01y6k',
     'get_livestream':               'https://api.nhk.or.jp/nhkworld/epg/v7/world/now.json',
     'get_programs':                 'https://api.nhk.or.jp/nhkworld/vodpglist/v7/en/voice/list.json',
     'get_programs_episode_list':    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7/program/{0}/en/all/all.json',
