@@ -3,11 +3,11 @@
 import routing
 import logging
 import xbmcaddon
-import kodiutils
+from kodiutils import get_string, set_view_mode, set_sort_direction
 import kodilogging
 import xbmcgui
 import xbmcplugin
-from utils import get_json, get_NHK_website_url, get_url, set_view_mode, set_sort_direction
+from utils import get_json, get_NHK_website_url, get_url
 from nhk_api import *
 from datetime import datetime, timedelta
 from pytz import timezone
