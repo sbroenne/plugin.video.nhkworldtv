@@ -248,12 +248,6 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
         else:
             episode_name = u'{0} - {1}'.format(title, subtitle)
 
-        if (len(title) == 0):
-            full_episode_name = episode_name = u'{0}'.format(subtitle)
-        else:
-            full_episode_name = u'{0} - {1}'.format(title, subtitle)
-
-        
         plot = row['description_clean']
         largeImaga = get_NHK_website_url(row['image_l'])
         thumb_image = get_NHK_website_url(row['image'])
@@ -297,7 +291,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
         li.setInfo('video', {'mediatype': 'episode', 'plot': plot,
                              'duration': duration, 'episode': pgm_no, 'year': year, 'dateadded': date_added_info_label})
         li.setProperty('IsPlayable','true')                             
-        xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(show_episode, title=full_episode_name, vid_id=vid_id, episode=pgm_no, year=year, dateadded=date_added_info_label), li, False)
+        xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(show_episode, vid_id=vid_id, year=year, dateadded=date_added_info_label), li, False)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     set_view_mode(VIEW_MODE_INFOWALL)
@@ -318,8 +312,8 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
 
 
 # Video On Demand - Display Episode
-@plugin.route('/vod/show_episode/<path:title>/<vid_id>/<episode>/<year>/<dateadded>/')
-def show_episode(title, vid_id, episode, year, dateadded):
+@plugin.route('/vod/show_episode/<vid_id>/<year>/<dateadded>/')
+def show_episode(vid_id, year, dateadded):
     r = get_url(rest_url['player_url'].format(vid_id, vid_id))
     playerJS = r.text
     # Parse the output of the Player JS file for the UUID of the episode
@@ -327,10 +321,18 @@ def show_episode(title, vid_id, episode, year, dateadded):
     if (match.count > 0):
         p_uuid = match[0].replace("['", "").replace("']", "")
         video_url = rest_url['video_url'].format(p_uuid)
+
+        # Get episode detail
+        episode_json = get_json(rest_url['get_episode_detail'].format(vid_id))
+        episode_detail = episode_json['data']['episodes'][0]
+        title = episode_detail['title_clean'] 
+        plot = episode_detail['description_clean']
+        episode = episode_detail['pgm_no']
+        duration = episode_detail['movie_duration']
+        
+        # Get episode URL and video information
         api_result_json = get_json(video_url)
         vod_program = api_result_json['response']['WsProgramResponse']['program']
-        plot = vod_program['Description'].replace('<br />','\n')
-        duration = float(vod_program['duration'])/10
         reference_file_json = vod_program['asset']['referenceFile']
         play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
         episode_url = rest_url['episode_url'].format(play_path)
