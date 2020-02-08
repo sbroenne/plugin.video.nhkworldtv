@@ -317,10 +317,9 @@ def show_episode(vid_id, year, dateadded):
     r = get_url(rest_url['player_url'].format(vid_id, vid_id))
     playerJS = r.text
     # Parse the output of the Player JS file for the UUID of the episode
-    match = re.compile("'data-de-program-uuid','(.+?)'").findall(playerJS)
-    if (match.count > 0):
-        p_uuid = match[0].replace("['", "").replace("']", "")
-        video_url = rest_url['video_url'].format(p_uuid)
+    program_uuid = re.compile("'data-de-program-uuid','(.+?)'").findall(playerJS)
+    if (program_uuid.count > 0):
+        video_url = rest_url['video_url'].format(program_uuid[0])
 
         # Get episode detail
         episode_json = get_json(rest_url['get_episode_detail'].format(vid_id))
