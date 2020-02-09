@@ -7,11 +7,8 @@ from kodiutils import get_string, set_view_mode, set_sort_direction
 import kodilogging
 import xbmcgui
 import xbmcplugin
-from utils import get_json, get_NHK_website_url, get_url
+from utils import get_json, get_NHK_website_url, get_url, to_local_time
 from nhk_api import *
-from datetime import datetime, timedelta
-from pytz import timezone
-from tzlocal import get_localzone
 import re
 
 
@@ -62,13 +59,30 @@ def add_live_stream():
 
     livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
-    logger.debug('Retrieving live-stream fan-art')
-    api_result_json = get_json(rest_url['homepage_live'])
-    fanart_image = get_NHK_website_url(api_result_json['channel']['item'][0]['thumbnail'])
-
+    
     title = 'NHK World Live Stream'
     li = xbmcgui.ListItem(title)
-    plot = 'Watch NHK World Live Stream in HD'
+    
+    logger.debug('Retrieving live stream next shows')
+    api_result_json = get_json(rest_url['get_live_stream_next_shows'])
+    program_json = api_result_json['channel']['item']
+
+    # Currently playing
+    row = program_json[0]
+    fanart_image = get_NHK_website_url(row['thumbnail'])
+
+    # Title and Description
+    plot = '{0}\n\n{1}'.format(row['title'], row['description'])
+
+    #Schedule Information
+    pubDate = int(row['pubDate'])/1000
+    endDate = int(row['endDate'])/1000
+
+    broadcast_start_local = to_local_time(pubDate)
+    broadcast_end_local = to_local_time(endDate)
+    plot = u'{0}-{1}\n\n{2}'.format(
+                broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), plot)
+
     li.setArt({'thumb': nhk_icon,
                'fanart': fanart_image})
     video_info = {
@@ -274,17 +288,9 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
             broadcast_start_timestamp = broadcast_start_timestamp/1000
             broadcast_end_timestamp = broadcast_end_timestamp/1000
 
-            # Convert from JST to local timezone
-            tokyo_tz = timezone('Asia/Tokyo')
-            local_tz = get_localzone()
-            
-            # Parse it as JST
-            broadcast_start_tokyo = tokyo_tz.localize(datetime.fromtimestamp(broadcast_start_timestamp))
-            broadcast_end_tokyo  = tokyo_tz.localize(datetime.fromtimestamp(broadcast_end_timestamp))
-
             # Convert to local time
-            broadcast_start_local = broadcast_start_tokyo.astimezone(local_tz)
-            broadcast_end_local = broadcast_end_tokyo.astimezone(local_tz)
+            broadcast_start_local = to_local_time(broadcast_start_timestamp)
+            broadcast_end_local = to_local_time(broadcast_end_timestamp)
 
             plot = u'Broadcast on: {0} / Available until: {1}\n\n{2}'.format(
                 broadcast_start_local.strftime('%Y-%m-%d'), broadcast_end_local.strftime('%Y-%m-%d'), plot)

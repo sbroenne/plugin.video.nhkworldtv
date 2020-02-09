@@ -4,6 +4,9 @@ import logging
 import kodilogging
 from kodiutils import get_string, get_setting_as_bool
 from nhk_api import rest_url
+from datetime import datetime, timedelta
+from pytz import timezone
+from tzlocal import get_localzone
 
 ADDON = xbmcaddon.Addon()
 logger = logging.getLogger(ADDON.getAddonInfo('id'))
@@ -60,4 +63,16 @@ def get_NHK_website_url(path):
     return nhk_website+path
 
 
-
+# Convert Timezone from UTC to local TZ
+def to_local_time(UTC_timestamp):
+    # Convert from JST to local timezone
+    UTC_tz = timezone('Etc/UTC')
+    local_tz = get_localzone()
+    
+    # Parse it as UTC
+    UTC_datetime = UTC_tz.localize(datetime.fromtimestamp(UTC_timestamp))
+    UTC_datetime = UTC_datetime - timedelta(hours=1)
+    
+    # Convert to local time
+    local_datetime = UTC_datetime.astimezone(local_tz)
+    return (local_datetime)
