@@ -17,7 +17,6 @@ import re
 
 ADDON = xbmcaddon.Addon()
 nhk_icon = ADDON.getAddonInfo('icon')  # icon.png in addon directory
-fanart_image = ADDON.getAddonInfo('fanart')  # icon.png in addon directory
 logger = logging.getLogger(ADDON.getAddonInfo('id'))
 kodilogging.config()
 plugin = routing.Plugin()
@@ -31,8 +30,14 @@ VIEW_MODE_WIDELIST=55
 @plugin.route('/')
 def index():
     logger.debug('Creating Main Menu')
+    
+    # Getting fan art
+    logger.debug('Retrieving on-demand fan-art')
+    api_result_json = get_json(rest_url['homepage_ondemand'])
+    fanart_image = get_NHK_website_url(api_result_json['data']['items'][0]['image_pc'])
+
     title = 'NHK World On Demand'
-    plot = 'Watch NHK World On Demand'
+    plot = 'Watch NHK World On Demand in HD'
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': nhk_icon,
                'fanart': fanart_image})
@@ -57,9 +62,13 @@ def add_live_stream():
 
     livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
+    logger.debug('Retrieving live-stream fan-art')
+    api_result_json = get_json(rest_url['homepage_news'])
+    fanart_image = get_NHK_website_url(api_result_json['data'][0]['thumbnails']['middle'])
+
     title = 'NHK World Live Stream'
     li = xbmcgui.ListItem(title)
-    plot = 'Watch NHK World Live Stream'
+    plot = 'Watch NHK World Live Stream in HD'
     li.setArt({'thumb': nhk_icon,
                'fanart': fanart_image})
     video_info = {
