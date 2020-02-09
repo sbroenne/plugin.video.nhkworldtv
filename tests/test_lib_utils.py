@@ -22,8 +22,8 @@ class Test_Test_utils(unittest.TestCase):
     def test_to_local_time(self):
         converted_time = to_local_time(1581266400000/1000)
         local_tz = get_localzone()
-        local_time = datetime.datetime(year=2020, month=2, day=9, hour=17, minute=40, tzinfo=local_tz)
-        self.assertEqual(local_time.hour, converted_time.hour)
+        local_time = local_tz.localize(datetime.datetime(year=2020, month=2, day=9, hour=17, minute=40))
+        self.assertEqual(local_time, converted_time)
 
       
 if __name__ == '__main__':

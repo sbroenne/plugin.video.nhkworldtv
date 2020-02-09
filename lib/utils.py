@@ -75,4 +75,7 @@ def to_local_time(UTC_timestamp):
     
     # Convert to local time
     local_datetime = UTC_datetime.astimezone(local_tz)
-    return (local_datetime)
+    
+    # Localize time again to get the correct TZINFO
+    dt = local_tz.localize(datetime(local_datetime.year, local_datetime.month, local_datetime.day, local_datetime.hour, local_datetime.minute, local_datetime.second))
+    return (dt)
