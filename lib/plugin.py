@@ -63,8 +63,8 @@ def add_live_stream():
     livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
     logger.debug('Retrieving live-stream fan-art')
-    api_result_json = get_json(rest_url['homepage_news'])
-    fanart_image = get_NHK_website_url(api_result_json['data'][0]['thumbnails']['middle'])
+    api_result_json = get_json(rest_url['homepage_live'])
+    fanart_image = get_NHK_website_url(api_result_json['channel']['item'][0]['thumbnail'])
 
     title = 'NHK World Live Stream'
     li = xbmcgui.ListItem(title)
