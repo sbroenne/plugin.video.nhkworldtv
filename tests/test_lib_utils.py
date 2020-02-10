@@ -8,11 +8,8 @@ from tzlocal import get_localzone
 
 class Test_Test_utils(unittest.TestCase):
     def test_get_HTTPS(self):
-        self.assertIsInstance(get_url('https://www3.nhk.or.jp/nhkworld/', False), requests.Response)
+        self.assertIsInstance(get_url('https://www3.nhk.or.jp/nhkworld/'), requests.Response)
     
-    def test_get_api(self):
-        self.assertIsInstance(get_url(rest_url['get_livestream'], True), requests.Response)
-
     def test_get_JSON(self):
         self.assertIsInstance(get_json(rest_url['get_livestream']), dict)
 

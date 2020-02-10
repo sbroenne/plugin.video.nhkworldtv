@@ -12,10 +12,16 @@ ADDON = xbmcaddon.Addon()
 logger = logging.getLogger(ADDON.getAddonInfo('id'))
 kodilogging.config()
 
+# Instaniate sessions
+s = requests.Session()
+api_key = rest_url['api_key']
+request_params = {'apikey': api_key}
+s.params=request_params
+
 # Helper Functionspi
 # Get JSON object from a URL with improved error handling
 def get_json(url):
-    r = get_url(url, True)
+    r = get_url(url)
     try:
         result = r.json()
         logger.debug(get_string(30900).format(r.url, r.status_code))
@@ -25,22 +31,16 @@ def get_json(url):
         r.raise_for_status()
 
  # Get a URL with automatic retries - NHK sometimes have intermittent problems
-def get_url(url, with_api_key = False):
+def get_url(url):
     # maximum number of retries
     max_retries = 3
     current_try = 1
     while (current_try <= max_retries):
         # Only add the API key for API Calls
-        if (with_api_key):
-            api_key = rest_url['api_key']
-            request_params = {'apikey': api_key}
-            r = requests.get(url, request_params)
-            # Make an API Call
-            logger.debug(get_string(30901).format(r.url, current_try, max_retries))
-        else:
-            r = requests.get(url)
-            # Make a simple HTTP Call
-            logger.debug(get_string(30902).format(r.url, current_try, max_retries))
+        r = s.get(url)
+        # Make an API Call
+        logger.debug(get_string(30901).format(r.url, current_try, max_retries))
+        
         if (r.status_code == 200):
             # Call was successfull
             logger.debug(get_string(30903).format(r.url, r.status_code))
