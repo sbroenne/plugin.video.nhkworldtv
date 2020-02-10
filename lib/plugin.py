@@ -36,7 +36,7 @@ def index():
     thumb_image = get_NHK_website_url(program_json['image_sp'])
     pgm_title = program_json['pgm_title_clean']
 
-    title = 'NHK World On Demand'
+    title = 'Watch on demand >'
     plot = 'Watch NHK World On Demand in HD'
     plot = '{0}\n\nImage from:\n{1}'.format(plot, pgm_title)
     li = xbmcgui.ListItem(title)
@@ -52,6 +52,7 @@ def index():
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
         vod_index), li, True)
     add_live_stream()
+    xbmcplugin.setContent(plugin.handle, 'videos')
     set_view_mode(VIEW_MODE_INFOWALL)
     xbmcplugin.endOfDirectory(plugin.handle)
     return (True)
@@ -64,7 +65,7 @@ def add_live_stream():
     livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
     
-    title = 'NHK World Live Stream'
+    title = 'Watch live now >'
     li = xbmcgui.ListItem(title)
     
     logger.debug('Retrieving live stream next shows')
