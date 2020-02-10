@@ -31,12 +31,16 @@ def index():
     # Getting fan art
     logger.debug('Retrieving on-demand fan-art')
     api_result_json = get_json(rest_url['homepage_ondemand'])
-    fanart_image = get_NHK_website_url(api_result_json['data']['items'][0]['image_pc'])
+    program_json = api_result_json['data']['items'][0]
+    fanart_image = get_NHK_website_url(program_json['image_pc'])
+    thumb_image = get_NHK_website_url(program_json['image_sp'])
+    pgm_title = program_json['pgm_title_clean']
 
     title = 'NHK World On Demand'
     plot = 'Watch NHK World On Demand in HD'
+    plot = '{0}\n\nImage from:\n{1}'.format(plot, pgm_title)
     li = xbmcgui.ListItem(title)
-    li.setArt({'thumb': nhk_icon,
+    li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
     video_info = {
         'aspect': '1.78',
@@ -48,7 +52,7 @@ def index():
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
         vod_index), li, True)
     add_live_stream()
-    set_view_mode(VIEW_MODE_WIDELIST)
+    set_view_mode(VIEW_MODE_INFOWALL)
     xbmcplugin.endOfDirectory(plugin.handle)
     return (True)
 
@@ -70,6 +74,7 @@ def add_live_stream():
     # Currently playing
     row = program_json[0]
     fanart_image = get_NHK_website_url(row['thumbnail'])
+    thumb_image = get_NHK_website_url(row['thumbnail_s'])
 
     # Title and Description
     plot = '{0}\n\n{1}'.format(row['title'], row['description'])
@@ -83,7 +88,7 @@ def add_live_stream():
     plot = u'{0}-{1}\n\n{2}'.format(
                 broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), plot)
 
-    li.setArt({'thumb': nhk_icon,
+    li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
     video_info = {
         'aspect': '1.78',
@@ -285,8 +290,8 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
         broadcast_end_timestamp = row['vod_to']
 
         if (broadcast_start_timestamp is not None):
-            broadcast_start_timestamp = broadcast_start_timestamp/1000
-            broadcast_end_timestamp = broadcast_end_timestamp/1000
+            broadcast_start_timestamp = int(broadcast_start_timestamp)/1000
+            broadcast_end_timestamp = int(broadcast_end_timestamp)/1000
 
             # Convert to local time
             broadcast_start_local = to_local_time(broadcast_start_timestamp)
