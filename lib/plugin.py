@@ -73,22 +73,35 @@ def add_live_stream():
     program_json = api_result_json['channel']['item']
 
     # Currently playing
-    row = program_json[0]
-    fanart_image = get_NHK_website_url(row['thumbnail'])
-    thumb_image = get_NHK_website_url(row['thumbnail_s'])
+    
+    row_count = 0
+    for row in program_json:
+        row_count = row_count+1
 
-    # Title and Description
-    plot = '{0}\n\n{1}'.format(row['title'], row['description'])
+        #Schedule Information
+        pubDate = int(row['pubDate'])/1000
+        endDate = int(row['endDate'])/1000
 
-    #Schedule Information
-    pubDate = int(row['pubDate'])/1000
-    endDate = int(row['endDate'])/1000
+        broadcast_start_local = to_local_time(pubDate)
+        broadcast_end_local = to_local_time(endDate)
+        
+        if (row_count == 1):
+            #Live porgram
+            fanart_image = get_NHK_website_url(row['thumbnail'])
+            thumb_image = get_NHK_website_url(row['thumbnail_s'])
 
-    broadcast_start_local = to_local_time(pubDate)
-    broadcast_end_local = to_local_time(endDate)
-    plot = u'{0}-{1}\n\n{2}'.format(
-                broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), plot)
-
+            # Title and Description
+            full_title = '{0}\n\n{1}'.format(row['title'], row['description'])
+            output = u'{0}-{1}: {2}\n\nUP NEXT:'.format(
+                    broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
+        else:
+            #  Upcoming programs
+            #  Only Title
+            full_title = row['title']
+            plot = u'{0}-{1}: {2}'.format(
+                    broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
+            output = output + '\n\n' + plot
+        
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
     video_info = {
@@ -97,7 +110,7 @@ def add_live_stream():
         'height': '1080'
     }
     li.addStreamInfo('video', video_info)
-    li.setInfo('video', {'mediatype': 'episode', 'plot': plot})
+    li.setInfo('video', {'mediatype': 'episode', 'plot': output})
     xbmcplugin.addDirectoryItem(plugin.handle, livestream_url,li, False)
     return(True)
 
@@ -135,7 +148,7 @@ def vod_programs():
     program_json = api_result_json['vod_programs']['programs']
     row_count = 0
     for row in program_json:
-        row_count = +1
+        row_count = row_count+1
         title = program_json[row]['title_clean']
         plot = program_json[row]['description_clean']
         poster_image = get_NHK_website_url(program_json[row]['image_l'])
@@ -177,7 +190,7 @@ def vod_categories():
     api_result_json = get_json(rest_url['get_categories'])
     row_count = 0
     for row in api_result_json['vod_categories']:
-        row_count = +1
+        row_count = row_count+1
         categoryId = row['category_id']
         title = row['name']
         total_epsiodes = row['count']
@@ -219,7 +232,7 @@ def vod_playlists():
     api_result_json = get_json(rest_url['get_playlists'])
     row_count = 0
     for row in api_result_json['data']['playlist']:
-        row_count = +1
+        row_count = row_count+1
         playlistId = row['playlist_id']
         title = row['title_clean']
         total_epsiodes = row['track_total']
@@ -268,7 +281,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
 
     row_count = 0
     for row in program_json:
-        row_count = +1
+        row_count = row_count+1
         title = row['title_clean']
         subtitle = row['sub_title_clean']
 
