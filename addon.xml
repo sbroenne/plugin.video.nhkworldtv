@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.14" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.15" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.certifi" version="2019.9.11"/>
         <import addon="script.module.requests" version="2.22.0"/>
         <import addon="script.module.routing" version="0.2.3"/>
         <import addon="script.module.pytz" version="2014.2"/>
         <import addon="script.module.tzlocal" version="2.0.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="main.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Watch NHK World TV in HD - live stream and on-demand programs</summary>
-        <description lang="en_GB">
+        <extension point="xbmc.python.pluginsource" library="main.py">
+            <provides>video</provides>
+        </extension>
+        <extension point="xbmc.addon.metadata">
+            <summary lang="en_GB">Watch NHK World TV in HD - live stream and on-demand programs</summary>
+            <description lang="en_GB">
 Watch NHK World TV in HD - live stream and on-demand programs
 
 The plugin is optimized for an Internet connection with at least 10 MBIT. NHK Live is typically about 4 MBIT but the on-demand programs require 10 MBIT.
-        </description>
-        <language></language>
-        <platform>all</platform>
-        <license>GPL-3.0</license>
-        <forum></forum>
-        <website>www.kodi.tv</website>
-        <email>stefan_broenner@yahoo.com</email>
-        <source></source>
-        <news>Added support for request.Sessions</news>
-        <disclaimer></disclaimer>
-        <assets>
-            <icon>resources/icon.png</icon>
-        </assets>
-    </extension>
-</addon>
+            </description>
+            <language></language>
+            <platform>all</platform>
+            <license>GPL-3.0</license>
+            <forum></forum>
+            <website>www.kodi.tv</website>
+            <email>stefan_broenner@yahoo.com</email>
+            <source></source>
+            <news>
+Set reuselanguageinvoker to true
+Added support for request.Sessions</news>
+            <disclaimer></disclaimer>
+            <assets>
+                <icon>resources/icon.png</icon>
+            </assets>
+            <reuselanguageinvoker>true</reuselanguageinvoker>
+        </extension>
+    </addon>
