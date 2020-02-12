@@ -25,6 +25,7 @@ The plugin is optimized for an Internet connection with at least 10 MBIT. NHK Li
         <website>www.kodi.tv</website>
         <email>stefan_broenner@yahoo.com</email>
         <source></source>
+        <news>
 Set reuselanguageinvoker to true
 Added support for request.Sessions</news>
         <disclaimer></disclaimer>
