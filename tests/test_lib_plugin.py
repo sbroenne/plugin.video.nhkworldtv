@@ -1,5 +1,5 @@
 import unittest   # The test framework
-from lib.plugin import index, add_live_stream, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs,rest_url
+from lib.plugin import index, add_top_stories_menu_item, add_on_demand_menu_item, add_live_stream_menu_item, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs,rest_url
 from xbmcplugin import SORT_METHOD_TITLE, SORT_METHOD_DATEADDED, SORT_METHOD_NONE
 
 class Test_Test_Navigation_Menus(unittest.TestCase):
@@ -9,11 +9,16 @@ class Test_Test_Navigation_Menus(unittest.TestCase):
     def test_vod_menu(self):
         self.assertTrue(vod_index())
 
-class Test_Test_Livestream(unittest.TestCase):
+class Test_Test_Main_Menu_items(unittest.TestCase):
+
+    def test_add_top_stories(self):
+       self.assertTrue(add_top_stories_menu_item())
+
+    def test_add_on_demand(self):
+      self.assertTrue(add_on_demand_menu_item())
 
     def test_add_live_stream(self):
-        
-        self.assertTrue(add_live_stream())
+       self.assertTrue(add_live_stream_menu_item())
 
 class Test_Test_VOD_Menus(unittest.TestCase):
 

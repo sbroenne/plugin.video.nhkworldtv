@@ -30,8 +30,55 @@ VIEW_MODE_WIDELIST=55
 def index():
     logger.debug('Creating Main Menu')
     
-    # Getting fan art
-    logger.debug('Retrieving on-demand fan-art')
+    ## Add menus
+    add_top_stories_menu_item()
+    add_on_demand_menu_item()
+    add_live_stream_menu_item()
+
+    # Set-up view
+    xbmcplugin.setContent(plugin.handle, 'videos')
+    set_view_mode(VIEW_MODE_INFOWALL)
+    xbmcplugin.endOfDirectory(plugin.handle)
+    return (True)
+
+#  Add the Top Stories menu
+def add_top_stories_menu_item():
+    logger.debug('Adding top stories menu item')
+    
+    # Getting top story
+    api_result_json = get_json(rest_url['homepage_news'])
+    featured_news = api_result_json['data'][0]
+
+    fanart_image = get_NHK_website_url(featured_news['thumbnails']['middle'])
+    thumb_image = get_NHK_website_url(featured_news['thumbnails']['small'])
+    pgm_title = featured_news['title']
+    pgm_description = featured_news['description']
+    updated_at = int(featured_news['updated_at'])/1000
+    updated_at_local = to_local_time(updated_at)
+
+    title  = 'Top Stories >\n\n'
+    plot = '{0}\n\n{1}\n\nUpdated at: {2}'.format(pgm_title, pgm_description, updated_at_local.strftime('%H:%M'))
+    output = title + plot
+    li = xbmcgui.ListItem(title)
+    li.setArt({'thumb': thumb_image,
+               'fanart': fanart_image})
+    video_info = {
+        'aspect': '1.78',
+        'width': '1920',
+        'height': '1080'
+    }
+    li.addStreamInfo('video', video_info)
+    li.setInfo('video', {'mediatype': 'episode', 'plot': output})
+    xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
+        vod_index), li, True)
+    return(True)
+
+
+# Add on-demand menu item
+def add_on_demand_menu_item():
+    
+    logger.debug('Adding on-demand menu item')
+    # Getting random on-demand episode to show
     api_result_json = get_json(rest_url['homepage_ondemand'])
     featured_episodes = api_result_json['data']['items']
 
@@ -57,17 +104,12 @@ def index():
     li.setInfo('video', {'mediatype': 'episode', 'plot': plot})
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
         vod_index), li, True)
-    add_live_stream()
-    xbmcplugin.setContent(plugin.handle, 'videos')
-    set_view_mode(VIEW_MODE_INFOWALL)
-    xbmcplugin.endOfDirectory(plugin.handle)
-    return (True)
+    return(True)
+    
 
-# Add live stream URL
-
-
-def add_live_stream():
-
+# Add live stream menu item
+def add_live_stream_menu_item():
+    logger.debug('Adding live stream menu item')
     livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
     
@@ -123,9 +165,8 @@ def add_live_stream():
     xbmcplugin.addDirectoryItem(plugin.handle, livestream_url,li, False)
     return(True)
 
-
 #
-# Video On Demand
+# Video On Demand Mennu
 #
 
 @plugin.route('/vod/index')
