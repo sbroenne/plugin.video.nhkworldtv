@@ -10,6 +10,8 @@ import xbmcplugin
 from utils import get_json, get_NHK_website_url, get_url, to_local_time
 from nhk_api import *
 import re
+from datetime import datetime
+import random
 
 
 ADDON = xbmcaddon.Addon()
@@ -31,14 +33,18 @@ def index():
     # Getting fan art
     logger.debug('Retrieving on-demand fan-art')
     api_result_json = get_json(rest_url['homepage_ondemand'])
-    program_json = api_result_json['data']['items'][0]
+    featured_episodes = api_result_json['data']['items']
+
+    no_of_epsisodes = len(featured_episodes)
+    featured_episode = random.randint(0, no_of_epsisodes-1)
+    program_json = featured_episodes[featured_episode]
     fanart_image = get_NHK_website_url(program_json['image_pc'])
     thumb_image = get_NHK_website_url(program_json['image_sp'])
     pgm_title = program_json['pgm_title_clean']
 
     title = 'Watch on demand >'
     plot = 'Watch NHK World On Demand in HD'
-    plot = '{0}\n\nImage from:\n{1}'.format(plot, pgm_title)
+    plot = '{0}\n\nImage from:\n\n{1}'.format(plot, pgm_title)
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
@@ -101,6 +107,9 @@ def add_live_stream():
             plot = u'{0}-{1}: {2}'.format(
                     broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
             output = output + '\n\n' + plot
+
+
+    output = output + '\n\n(Listing last updated: {0})'.format(datetime.now().strftime('%H:%M'))
         
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
