@@ -106,10 +106,10 @@ def add_live_stream():
             full_title = row['title']
             plot = u'{0}-{1}: {2}'.format(
                     broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
-            output = output + '\n\n' + plot
+            output = output + '\n' + plot
 
 
-    output = output + '\n\n(Listing last updated: {0})'.format(datetime.now().strftime('%H:%M'))
+    output = output + '\n\n(Listing generated at: {0})'.format(datetime.now().strftime('%H:%M'))
         
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
