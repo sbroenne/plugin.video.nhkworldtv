@@ -10,7 +10,7 @@ import xbmcplugin
 from utils import get_json, get_NHK_website_url, get_url, to_local_time
 from nhk_api import *
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 
 
@@ -64,13 +64,13 @@ def add_top_stories_menu_item():
                'fanart': fanart_image})
     video_info = {
         'aspect': '1.78',
-        'width': '1920',
-        'height': '1080'
+        'width': '640',
+        'height': '360'
     }
     li.addStreamInfo('video', video_info)
     li.setInfo('video', {'mediatype': 'episode', 'plot': output})
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_index), li, True)
+        top_stories_list), li, True)
     return(True)
 
 
@@ -437,6 +437,74 @@ def show_episode(vid_id, year, dateadded):
             vid_id))
         return (None)
 
+# Top Stories - List
+@plugin.route('/vod/top_stories_list/')
+def top_stories_list():
+    logger.debug('Displaying Top Stories list')
+    api_result_json = get_json(rest_url['homepage_news'])
+    row_count = 0
+    MAX_ROW_COUNT = 9 
+
+    for row in api_result_json['data']:
+        row_count = row_count+1
+        if (row_count <= MAX_ROW_COUNT):
+            fanart_image = get_NHK_website_url(row['thumbnails']['middle'])
+            thumb_image = get_NHK_website_url(row['thumbnails']['small'])
+            vid_id = row['id']
+
+            video_xml_url = rest_url['get_news_xml'].format(vid_id)
+            video_response = get_url(video_xml_url)
+            video_xml = str(video_response.content)
+            start_pos = video_xml.find(vid_id)
+            end_pos = video_xml.find('HQ')
+            video_file = video_xml[start_pos:end_pos]
+            video_url = rest_url['news_url'].format(video_file)
+            title = row['title']
+            plot = row['description']
+            duration =row['videos']['duration']
+            updated_at = int(row['updated_at'])/1000
+            updated_at_local = to_local_time(updated_at)
+            date_added_info_label = updated_at_local.strftime('%Y-%m-%d %H:%M:%S')
+            year = int(updated_at_local.strftime('%Y'))
+
+            time_difference_hours = datetime.now().hour-updated_at_local.hour
+            if (time_difference_hours<=1):
+                time_difference = '{0} hour ago'.format(time_difference_hours)
+            else:
+                time_difference = '{0} hours ago'.format(time_difference_hours)
+
+            minutes = int(duration/60)
+            seconds = duration - (minutes*60)
+            duration_text = '{0}m {1}s'.format(minutes, seconds)
+            plot = u'{0} | {1}\n\n{2}'.format(duration_text, time_difference, plot)
+        
+            li = xbmcgui.ListItem(path = video_url)
+            
+            li.setArt({'thumb': thumb_image,
+                    'fanart': fanart_image})
+            video_info = {
+                'aspect': '1.78',
+                'width': '640',
+                'height': '360'
+            }
+            li.addStreamInfo('video', video_info)
+            li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
+            li.setInfo('video', {'mediatype': 'episode', 'title': title, 'plot': plot,
+                                'duration': duration, 'year': year, 'dateadded': date_added_info_label})
+            li.setProperty('IsPlayable','true')
+            xbmcplugin.addDirectoryItem(plugin.handle, video_url, li, False,totalItems=MAX_ROW_COUNT)
+    
+    xbmcplugin.setContent(plugin.handle, 'videos')
+    set_view_mode(VIEW_MODE_INFOWALL)
+    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_DATEADDED)
+    set_sort_direction('Descending')
+    xbmcplugin.endOfDirectory(plugin.handle)
+
+    # Used for unit testing - only successfull if we processed at least one episode
+    if (row_count > 0):
+        return(vid_id)
+    else:
+        return(None)
 
 def run():
     plugin.run()

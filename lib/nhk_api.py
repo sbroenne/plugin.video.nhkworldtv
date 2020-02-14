@@ -3,6 +3,8 @@ rest_url = {
     'api_key':                      'EJfK8jdS57GqlupFgAfAAwr573q01y6k',
     'homepage_ondemand':            'https://api.nhk.or.jp/nhkworld/vodrecommend/v7/en/list.json',
     'homepage_news':                'https://www3.nhk.or.jp/nhkworld/data/en/news/all.json',
+    'get_news_xml':                 'https://www3.nhk.or.jp/nhkworld/data/en/news/movie/{0}.xml',
+    'news_url':                     'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',
     'get_livestream':               'https://api.nhk.or.jp/nhkworld/epg/v7/world/now.json',
     'get_programs':                 'https://api.nhk.or.jp/nhkworld/vodpglist/v7/en/voice/list.json',
     'get_programs_episode_list':    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7/program/{0}/en/all/all.json',

@@ -1,5 +1,5 @@
 import unittest   # The test framework
-from lib.plugin import index, add_top_stories_menu_item, add_on_demand_menu_item, add_live_stream_menu_item, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs,rest_url
+from lib.plugin import index, add_top_stories_menu_item, add_on_demand_menu_item, add_live_stream_menu_item, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs,rest_url, top_stories_list
 from xbmcplugin import SORT_METHOD_TITLE, SORT_METHOD_DATEADDED, SORT_METHOD_NONE
 
 class Test_Test_Navigation_Menus(unittest.TestCase):
@@ -68,6 +68,12 @@ class Test_Test_VOD_Episode_List(unittest.TestCase):
     def test_get_mostwatched_episodes(self):
         test_url=rest_url['get_most_watched_episodes']
         vid_id = vod_episode_list(test_url, 0, 0, SORT_METHOD_NONE)
+        print(vid_id)
+        self.assertIsNotNone(vid_id)
+
+class Test_Test_Top_Stories(unittest.TestCase):
+    def test_get_top_stories_list(self):
+        vid_id = top_stories_list()
         print(vid_id)
         self.assertIsNotNone(vid_id)
 
