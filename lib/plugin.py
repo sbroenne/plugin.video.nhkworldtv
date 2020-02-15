@@ -53,12 +53,13 @@ def add_top_stories_menu_item():
     thumb_image = get_NHK_website_url(featured_news['thumbnails']['small'])
     pgm_title = featured_news['title']
     pgm_description = featured_news['description']
-    updated_at = int(featured_news['updated_at'])/1000
-    updated_at_local = to_local_time(updated_at)
+    #updated_at = int(featured_news['updated_at'])/1000
+    #updated_at_local = to_local_time(updated_at)
 
     title  = get_string(30010)
     output = get_string(30011)
-    output = output + get_string(30012).format(pgm_title, pgm_description, updated_at_local.strftime('%H:%M'))
+    output = output + get_string(30012).format(pgm_title, pgm_description)
+    #output = output + get_string(30013).format(updated_at_local.strftime('%H:%M'))
 
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': thumb_image,
@@ -88,7 +89,7 @@ def add_on_demand_menu_item():
     program_json = featured_episodes[featured_episode]
     fanart_image = get_NHK_website_url(program_json['image_pc'])
     thumb_image = get_NHK_website_url(program_json['image_sp'])
-    pgm_title = program_json['pgm_title_clean']
+    pgm_title = program_json['pgm_title']
 
     title = get_string(30020)
     output = get_string(30021)

@@ -22,7 +22,11 @@ msgid "Watch Top Stories in SD\n\n"
 msgstr ""
 
 msgctxt "#30012"
-msgid "{0}\n\n{1}\n\n(Last update at: {2})"
+msgid "{0}\n\n{1}\n\n"
+msgstr ""
+
+msgctxt "#30013"
+msgid "Last update at: {0})"
 msgstr ""
 
 #On-Demand Menu Item
