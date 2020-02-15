@@ -15,24 +15,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
+#
 # Settings.xml
+#
 msgctxt "#30001"
 msgid "Plug-in will set default viewmode"
 msgstr ""
 
+#
 #plugin.py
+#
 
-# Top Stories
+# Top Stories Menu Item
 msgctxt "#30010"
-msgid "Top Stories >\n\n"
+msgid "Top Stories >"
 msgstr ""
 
 msgctxt "#30011"
-msgid "{0}\n\n{1}\n\nUpdated at: {2}"
+msgid "Watch Top Stories in SD\n\n"
 msgstr ""
 
-#On-Demand Menu
+msgctxt "#30012"
+msgid "{0}\n\n{1}\n\n(Last update at: {2})"
+msgstr ""
+
+#On-Demand Menu Item
 
 msgctxt "#30020"
 msgid "Watch on demand >"
@@ -45,3 +52,66 @@ msgstr ""
 msgctxt "#30022"
 msgid "Image from:\n{0}"
 msgstr ""
+
+#Live Menu Item
+
+msgctxt "#30030"
+msgid "Watch live now >"
+msgstr ""
+
+msgctxt "#30031"
+msgid "\n\nUP NEXT:"
+msgstr ""
+
+msgctxt "#30032"
+msgid "\n\n(Listing generated at: {0})"
+msgstr ""
+
+#On-Demand Menu
+
+msgctxt "#30040"
+msgid "Programs"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Categories"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Playlists"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Latest Episodes"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Most Watched"
+msgstr ""
+
+msgctxt "#30045"
+msgid "All Episodes"
+msgstr ""
+
+#Episode List
+msgctxt "#30050"
+msgid "Broadcast on: {0} / Available until: {1}\n\n{2}"
+msgstr ""
+
+# Top Stories
+msgctxt "#30060"
+msgid "{0} hour ago"
+msgstr ""
+
+msgctxt "#30061"
+msgid "{0} hours ago"
+msgstr ""
+
+
+
+
+
+
+
+
+

@@ -73,9 +73,9 @@ class Test_Test_VOD_Episode_List(unittest.TestCase):
 
 class Test_Test_Top_Stories(unittest.TestCase):
     def test_get_top_stories_list(self):
-        vid_id = top_stories_list()
-        print(vid_id)
-        self.assertIsNotNone(vid_id)
+        row_count = top_stories_list()
+        print(row_count)
+        self.assertIsNot(row_count,0)
 
 class Test_Test_VOD_Episode_Play(unittest.TestCase):
 

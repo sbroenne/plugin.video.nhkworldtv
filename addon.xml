@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.18" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.19" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -8,27 +8,37 @@
         <import addon="script.module.pytz" version="2014.2"/>
         <import addon="script.module.tzlocal" version="2.0.0"/>
     </requires>
+
+    <extension point="xbmc.addon.repository" name="Kodi NHK World TV plug-in Development Repository">
+        <info compressed="true">https://raw.githubusercontent.com/sbroenne/kodirepo/master/addons.xml.gz</info>
+        <checksum>https://raw.githubusercontent.com/sbroenne/kodirepo/master/addons.xml.gz.md5</checksum>
+        <datadir zip="true">https://raw.githubusercontent.com/sbroenne/kodirepo/master</datadir>
+    </extension>
+
     <extension point="xbmc.python.pluginsource" library="main.py">
         <provides>video</provides>
     </extension>
+
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Watch NHK World TV in HD - live stream and on-demand programs</summary>
         <description lang="en_GB">
-Watch content from https://www3.nhk.or.jp/nhkworld/ in Kodi - includinng Top-Stories, the on-demand prpgrams and the live stream.
+Watch content from https://www3.nhk.or.jp/nhkworld/ in Kodi - including Top-Stories (SD), the on-demand program (HD) and the live stream (HD).
 
 The plugin is optimized for an Internet connection with at least 10 MBIT. The live stream is typically about 4 MBIT but the on-demand programs require 10 MBIT.
 
-Originally based on Misty's Best Of NHK (https://forum.kodi.tv/showthread.php?tid=196657) but contains fewer but optimized content.
+Originally based on Misty's Best Of NHK plug-in (https://forum.kodi.tv/showthread.php?tid=196657) but is optimized (everything HD) for conntent from the NHK World web site.
         </description>
         <disclaimer lang="en_GB">This plug-in is a fan project and not related in any way to NHK!</disclaimer>
-        <language></language>
+        <language>en</language>
         <platform>all</platform>
         <license>GPL-3.0</license>
         <forum></forum>
         <website>www.kodi.tv</website>
         <email>stefan_broenner@yahoo.com</email>
-         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
+        <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <news>
+Added repo information
+Updated localization
 Added screen shots
 Added Top-Stories Section
 Randomize featured episode image on main menu

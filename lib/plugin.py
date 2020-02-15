@@ -57,8 +57,9 @@ def add_top_stories_menu_item():
     updated_at_local = to_local_time(updated_at)
 
     title  = get_string(30010)
-    plot = get_string(30011).format(pgm_title, pgm_description, updated_at_local.strftime('%H:%M'))
-    output = title + plot
+    output = get_string(30011)
+    output = output + get_string(30012).format(pgm_title, pgm_description, updated_at_local.strftime('%H:%M'))
+
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
@@ -90,8 +91,8 @@ def add_on_demand_menu_item():
     pgm_title = program_json['pgm_title_clean']
 
     title = get_string(30020)
-    plot = get_string(30021)
-    output = plot + get_string(30022).format(pgm_title)
+    output = get_string(30021)
+    output = output + get_string(30022).format(pgm_title)
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
@@ -113,7 +114,7 @@ def add_live_stream_menu_item():
     livestream_url = rest_url['live_stream_url']
     logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
     
-    title = 'Watch live now >'
+    title = get_string(30030)
     li = xbmcgui.ListItem(title)
     
     logger.debug('Retrieving live stream next shows')
@@ -140,8 +141,9 @@ def add_live_stream_menu_item():
 
             # Title and Description
             full_title = '{0}\n\n{1}'.format(row['title'], row['description'])
-            output = u'{0}-{1}: {2}\n\nUP NEXT:'.format(
+            plot = u'{0}-{1}: {2}'.format(
                     broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
+            output = plot + get_string(30031)
         else:
             #  Upcoming programs
             #  Only Title
@@ -151,7 +153,7 @@ def add_live_stream_menu_item():
             output = output + '\n' + plot
 
 
-    output = output + '\n\n(Listing generated at: {0})'.format(datetime.now().strftime('%H:%M'))
+    output = output + get_string(30032).format(datetime.now().strftime('%H:%M'))
         
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
@@ -173,17 +175,17 @@ def add_live_stream_menu_item():
 def vod_index():
     logger.debug('Creating Video On Demand Menu')
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_programs), xbmcgui.ListItem("Programs", iconImage=nhk_icon), True)
+        vod_programs), xbmcgui.ListItem(get_string(30040), iconImage=nhk_icon), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_categories), xbmcgui.ListItem("Categories", iconImage=nhk_icon), True)
+        vod_categories), xbmcgui.ListItem(get_string(30041), iconImage=nhk_icon), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_playlists), xbmcgui.ListItem("Playlists", iconImage=nhk_icon), True)
+        vod_playlists), xbmcgui.ListItem(get_string(30042), iconImage=nhk_icon), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_latest_episodes'], 0, 0, xbmcplugin.SORT_METHOD_DATEADDED), xbmcgui.ListItem("Latest Episodes", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_latest_episodes'], 0, 0, xbmcplugin.SORT_METHOD_DATEADDED), xbmcgui.ListItem(get_string(30043), iconImage=nhk_icon), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_most_watched_episodes'],0, 0, xbmcplugin.SORT_METHOD_NONE), xbmcgui.ListItem("Most Watched", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_most_watched_episodes'],0, 0, xbmcplugin.SORT_METHOD_NONE), xbmcgui.ListItem(get_string(30044), iconImage=nhk_icon), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_all_episodes'], 0, 0, xbmcplugin.SORT_METHOD_TITLE), xbmcgui.ListItem("All Episodes", iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_all_episodes'], 0, 0, xbmcplugin.SORT_METHOD_TITLE), xbmcgui.ListItem(get_string(30045), iconImage=nhk_icon), True)
     set_view_mode(VIEW_MODE_WIDELIST)
     xbmcplugin.endOfDirectory(plugin.handle)
     return(True)
@@ -345,7 +347,6 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
         thumb_image = get_NHK_website_url(row['image'])
         promoImage = get_NHK_website_url(row['image_promo'])
         vid_id = row['vod_id']
-        #pgm_id = row['pgm_id']
         pgm_no = row['pgm_no']
         duration = row['movie_duration']
 
@@ -361,7 +362,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
             broadcast_start_local = to_local_time(broadcast_start_timestamp)
             broadcast_end_local = to_local_time(broadcast_end_timestamp)
 
-            plot = u'Broadcast on: {0} / Available until: {1}\n\n{2}'.format(
+            plot = get_string(30050).format(
                 broadcast_start_local.strftime('%Y-%m-%d'), broadcast_end_local.strftime('%Y-%m-%d'), plot)
             year = int(broadcast_start_local.strftime('%Y'))
             date_added_info_label = broadcast_start_local.strftime('%Y-%m-%d %H:%M:%S')
@@ -442,16 +443,19 @@ def show_episode(vid_id, year, dateadded):
 def top_stories_list():
     logger.debug('Displaying Top Stories list')
     api_result_json = get_json(rest_url['homepage_news'])
-    row_count = 0
     MAX_ROW_COUNT = 9 
-
-    for row in api_result_json['data']:
-        row_count = row_count+1
-        if (row_count <= MAX_ROW_COUNT):
+    result_row_count = len(api_result_json['data'])
+    # Only display MAX ROWS
+    if (result_row_count < MAX_ROW_COUNT):
+        MAX_ROW_COUNT = result_row_count
+    
+    for row_count in range(0, MAX_ROW_COUNT-1):
+        row = api_result_json['data'][row_count]
+        if row['videos'] is not None:
+            # Only show top-stories that have a video attached to them
             fanart_image = get_NHK_website_url(row['thumbnails']['middle'])
             thumb_image = get_NHK_website_url(row['thumbnails']['small'])
             vid_id = row['id']
-
             video_xml_url = rest_url['get_news_xml'].format(vid_id)
             video_response = get_url(video_xml_url)
             video_xml = str(video_response.content)
@@ -469,9 +473,9 @@ def top_stories_list():
 
             time_difference_hours = datetime.now().hour-updated_at_local.hour
             if (time_difference_hours<=1):
-                time_difference = '{0} hour ago'.format(time_difference_hours)
+                time_difference = get_string(30060).format(time_difference_hours)
             else:
-                time_difference = '{0} hours ago'.format(time_difference_hours)
+                time_difference = get_string(30061).format(time_difference_hours)
 
             minutes = int(duration/60)
             seconds = duration - (minutes*60)
@@ -493,18 +497,18 @@ def top_stories_list():
                                 'duration': duration, 'year': year, 'dateadded': date_added_info_label})
             li.setProperty('IsPlayable','true')
             xbmcplugin.addDirectoryItem(plugin.handle, video_url, li, False,totalItems=MAX_ROW_COUNT)
-    
+        
     xbmcplugin.setContent(plugin.handle, 'videos')
     set_view_mode(VIEW_MODE_INFOWALL)
     xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_DATEADDED)
     set_sort_direction('Descending')
     xbmcplugin.endOfDirectory(plugin.handle)
 
-    # Used for unit testing - only successfull if we processed at least one episode
+    # Used for unit testing - only successfull if we processed at least top story
     if (row_count > 0):
-        return(vid_id)
+        return(row_count)
     else:
-        return(None)
+        return(0)
 
 def run():
     plugin.run()
