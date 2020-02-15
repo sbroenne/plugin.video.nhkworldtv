@@ -2,7 +2,7 @@ import xbmcaddon
 import requests
 import logging
 import kodilogging
-from kodiutils import get_string, get_setting_as_bool
+from kodiutils import get_setting_as_bool
 from nhk_api import rest_url
 from datetime import datetime, timedelta
 from pytz import timezone
@@ -24,7 +24,7 @@ def get_json(url):
     r = get_url(url)
     try:
         result = r.json()
-        logger.debug(get_string(30900).format(r.url, r.status_code))
+        logger.debug('Successfully loaded JSON from API: {0} with Status {1}'.format(r.url, r.status_code))
         return(result)
     except:
         # Failure - no way to handle - probably an issue with the NHK Website - raise exception
@@ -39,21 +39,21 @@ def get_url(url):
         # Only add the API key for API Calls
         r = s.get(url)
         # Make an API Call
-        logger.debug(get_string(30901).format(r.url, current_try, max_retries))
+        logger.debug('Making API Call {0} ({1} of {2})'.format(r.url, current_try, max_retries))
         
         if (r.status_code == 200):
             # Call was successfull
-            logger.debug(get_string(30903).format(r.url, r.status_code))
+            logger.debug('Successfully fetched URL/API: {0} with Status {1}'.format(r.url, r.status_code))
             return(r)
         else:
             if (current_try == max_retries):
                 # Max retries reached - still could not get url
                 # Failure - no way to handle - probably an issue with the NHK Website - raise exception
-                logger.fatal(get_string(30904).format(r.url, r.status_code, max_retries))
+                logger.fatal('Could not get URL {0} - Last HTTP Status Code {1} - Retries {2}'.format(r.url, r.status_code, max_retries))
                 r.raise_for_status()
             else:
                 # Wait for n seconds and then try again
-                logger.warning(get_string(30905).format(r.url, r.status_code))
+                logger.warning('Failure fetching URL: {0} with Status {1})'.format(r.url, r.status_code))
                 current_try = +1
 
 

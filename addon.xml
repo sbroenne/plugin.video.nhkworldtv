@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.17" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.18" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -14,25 +14,31 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Watch NHK World TV in HD - live stream and on-demand programs</summary>
         <description lang="en_GB">
-Watch NHK World TV in HD - live stream and on-demand programs
+Watch content from https://www3.nhk.or.jp/nhkworld/ in Kodi - includinng Top-Stories, the on-demand prpgrams and the live stream.
 
-The plugin is optimized for an Internet connection with at least 10 MBIT. NHK Live is typically about 4 MBIT but the on-demand programs require 10 MBIT.
+The plugin is optimized for an Internet connection with at least 10 MBIT. The live stream is typically about 4 MBIT but the on-demand programs require 10 MBIT.
+
+Originally based on Misty's Best Of NHK (https://forum.kodi.tv/showthread.php?tid=196657) but contains fewer but optimized content.
         </description>
+        <disclaimer lang="en_GB">This plug-in is a fan project and not related in any way to NHK!</disclaimer>
         <language></language>
         <platform>all</platform>
         <license>GPL-3.0</license>
         <forum></forum>
         <website>www.kodi.tv</website>
         <email>stefan_broenner@yahoo.com</email>
-        <source></source>
+         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <news>
+Added screen shots
 Added Top-Stories Section
 Randomize featured episode image on main menu
 Set reuselanguageinvoker to true
 Added support for request.Sessions</news>
-        <disclaimer></disclaimer>
         <assets>
             <icon>resources/icon.png</icon>
+            <screenshot>resources/screenshot01.jpeg</screenshot>
+            <screenshot>resources/screenshot02.jpeg</screenshot>
+            <screenshot>resources/screenshot03.jpeg</screenshot>
         </assets>
         <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>

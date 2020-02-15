@@ -16,60 +16,32 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#This is a comment
-
-
+# Settings.xml
 msgctxt "#30001"
 msgid "Plug-in will set default viewmode"
 msgstr ""
 
+#plugin.py
 
-
-# Debug strings will start from 30900
-
-# API and HTTP handling
-
-msgctxt "#30900"
-msgid "Successfully loaded JSON from API: {0} with Status {1}"
+# Top Stories
+msgctxt "#30010"
+msgid "Top Stories >\n\n"
 msgstr ""
 
-msgctxt "#30901"
-msgid "Making API Call {0} ({1} of {2})"
+msgctxt "#30011"
+msgid "{0}\n\n{1}\n\nUpdated at: {2}"
 msgstr ""
 
-msgctxt "#30902"
-msgid "Fetching URL {0} ({1} of {2})"
+#On-Demand Menu
+
+msgctxt "#30020"
+msgid "Watch on demand >"
 msgstr ""
 
-msgctxt "#30903"
-msgid "Successfully fetched URL/API: {0} with Status {1}"
+msgctxt "#30021"
+msgid "Watch NHK World On Demand in HD\n\n"
 msgstr ""
 
-msgctxt "#30904"
-msgid "Could not get URL {0} - Last HTTP Status Code {1} - Retries {2}"
+msgctxt "#30022"
+msgid "Image from:\n{0}"
 msgstr ""
-
-msgctxt "#30905"
-msgid "Failure fetching URL: {0} with Status {1}"
-msgstr ""
-
-# View Mode / Sorting /etc
-msgctxt "#30910"
-msgid "Switching to View Mode: {0}"
-msgstr ""
-
-msgctxt "#30911"
-msgid "SETTING NOT ENABLED: View Mode mot changed - requested view mode:{0}"
-msgstr ""
-
-msgctxt "#30911"
-msgid "Current sort order: {0}"
-msgstr ""
-
-
-
-
-
-
-
-

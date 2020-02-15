@@ -56,8 +56,8 @@ def add_top_stories_menu_item():
     updated_at = int(featured_news['updated_at'])/1000
     updated_at_local = to_local_time(updated_at)
 
-    title  = 'Top Stories >\n\n'
-    plot = '{0}\n\n{1}\n\nUpdated at: {2}'.format(pgm_title, pgm_description, updated_at_local.strftime('%H:%M'))
+    title  = get_string(30010)
+    plot = get_string(30011).format(pgm_title, pgm_description, updated_at_local.strftime('%H:%M'))
     output = title + plot
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': thumb_image,
@@ -89,9 +89,9 @@ def add_on_demand_menu_item():
     thumb_image = get_NHK_website_url(program_json['image_sp'])
     pgm_title = program_json['pgm_title_clean']
 
-    title = 'Watch on demand >'
-    plot = 'Watch NHK World On Demand in HD'
-    plot = '{0}\n\nImage from:\n\n{1}'.format(plot, pgm_title)
+    title = get_string(30020)
+    plot = get_string(30021)
+    output = plot + get_string(30022).format(pgm_title)
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
@@ -101,7 +101,7 @@ def add_on_demand_menu_item():
         'height': '1080'
     }
     li.addStreamInfo('video', video_info)
-    li.setInfo('video', {'mediatype': 'episode', 'plot': plot})
+    li.setInfo('video', {'mediatype': 'episode', 'plot': output})
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
         vod_index), li, True)
     return(True)
