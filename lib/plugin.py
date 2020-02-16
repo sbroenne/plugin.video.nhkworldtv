@@ -239,8 +239,17 @@ def live_schedule_index():
         subtitle = row['subtitle']
         description = row['description']
 
-        if len(title) == 0:
-            episode_name = u'{0}'.format(subtitle)
+        vod_id = row['vod_id']
+        playable = False
+        if (len(vod_id) >0):
+            # Can play on-demand
+            playable = True
+
+        if (playable):
+            title = get_string(30070).format(title)
+
+        if len(subtitle) == 0:
+            episode_name = u'{0}'.format(title)
         else:
             episode_name = u'{0} - {1}'.format(title, subtitle)
         
@@ -258,7 +267,7 @@ def live_schedule_index():
                             'year': year, 'dateadded': date_added_info_label})
 
         vod_id = row['vod_id']
-        if (len(vod_id) >0):
+        if (playable):
             # There is a video to play
             li.setProperty('IsPlayable','true')                             
             xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(show_episode, vid_id=vod_id, year=year, dateadded=date_added_info_label), li, False)

@@ -101,6 +101,11 @@ msgctxt "#30061"
 msgid "{0} hours ago"
 msgstr ""
 
+# Live Schedule
+msgctxt "#30070"
+msgid "WATCH NOW: {0}"
+msgstr ""
+
 
 
 
