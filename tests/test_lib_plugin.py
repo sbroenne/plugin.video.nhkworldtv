@@ -1,96 +1,109 @@
 import unittest   # The test framework
-from lib.plugin import index, add_top_stories_menu_item, add_on_demand_menu_item, add_live_stream_menu_item, show_episode, vod_categories, vod_episode_list, vod_index, vod_playlists, vod_programs,rest_url, top_stories_list
+import lib.plugin as plugin
+import lib.nhk_api as nhk_api
 from xbmcplugin import SORT_METHOD_TITLE, SORT_METHOD_DATEADDED, SORT_METHOD_NONE
 
-class Test_Test_Navigation_Menus(unittest.TestCase):
+
+class Test_Navigation_Menus(unittest.TestCase):
     def test_main_menu(self):
-        self.assertTrue(index())
-    
+        self.assertTrue(plugin.index())
+
     def test_vod_menu(self):
-        self.assertTrue(vod_index())
+        self.assertTrue(plugin.vod_index())
 
-class Test_Test_Main_Menu_items(unittest.TestCase):
 
-    def test_add_top_stories(self):
-       self.assertTrue(add_top_stories_menu_item())
+class Test_Main_Menu_Items(unittest.TestCase):
 
-    def test_add_on_demand(self):
-      self.assertTrue(add_on_demand_menu_item())
+    def test_add_top_stories_menu_item(self):
+        self.assertTrue(plugin.add_top_stories_menu_item())
 
-    def test_add_live_stream(self):
-       self.assertTrue(add_live_stream_menu_item())
+    def test_add_on_demandm_menu_item(self):
+        self.assertTrue(plugin.add_on_demand_menu_item())
 
-class Test_Test_VOD_Menus(unittest.TestCase):
+    def test_add_live_stream_menu_item(self):
+        self.assertTrue(plugin.add_live_stream_menu_item())
+
+    def test_add_live_schedule_menu_item(self):
+        self.assertTrue(plugin.add_live_schedule_menu_item())
+
+
+class Test_VOD_Menus(unittest.TestCase):
 
     def test_get_programs(self):
-        detail_url = vod_programs()
+        detail_url = plugin.vod_programs()
         print(detail_url)
         self.assertIsNotNone(detail_url)
-    
+
     def test_get_categories(self):
-        detail_url = vod_categories()
+        detail_url = plugin.vod_categories()
         print(detail_url)
         self.assertIsNotNone(detail_url)
 
     def test_get_playlists(self):
-        detail_url = vod_playlists()
+        detail_url = plugin.vod_playlists()
         print(detail_url)
         self.assertIsNotNone(detail_url)
 
 
-class Test_Test_VOD_Episode_List(unittest.TestCase):
+class Test_VOD_Episode_List(unittest.TestCase):
 
     def test_get_programs_episodes(self):
-        test_url=vod_programs()
-        vid_id = vod_episode_list(test_url, 1, 0, SORT_METHOD_TITLE)
-        #print(vid_id)
+        test_url = plugin.vod_programs()
+        vid_id = plugin.vod_episode_list(test_url, 1, 0, SORT_METHOD_TITLE)
+        # print(vid_id)
         self.assertIsNotNone(vid_id)
-    
+
     def test_get_categories_episodes(self):
-        test_url= vod_categories()
-        vid_id = vod_episode_list(test_url, 0, 0, SORT_METHOD_TITLE)
-        #print(vid_id)
+        test_url = plugin.vod_categories()
+        vid_id = plugin.vod_episode_list(test_url, 0, 0, SORT_METHOD_TITLE)
+        # print(vid_id)
         self.assertIsNotNone(vid_id)
 
     def test_get_playlists_episodes(self):
-        test_url= vod_playlists()
-        vid_id = vod_episode_list(test_url, 0, 1, SORT_METHOD_TITLE)
-        #print(vid_id)
-        self.assertIsNotNone(vid_id)
-    
-    def test_get_latest_episodes(self):
-        test_url=rest_url['get_latest_episodes']
-        vid_id = vod_episode_list(test_url, 0, 0, SORT_METHOD_DATEADDED)
-        #print(vid_id)
+        test_url = plugin.vod_playlists()
+        vid_id = plugin.vod_episode_list(test_url, 0, 1, SORT_METHOD_TITLE)
+        # print(vid_id)
         self.assertIsNotNone(vid_id)
 
-    
+    def test_get_latest_episodes(self):
+        test_url = nhk_api.rest_url['get_latest_episodes']
+        vid_id = plugin.vod_episode_list(test_url, 0, 0, SORT_METHOD_DATEADDED)
+        # print(vid_id)
+        self.assertIsNotNone(vid_id)
+
     def test_get_mostwatched_episodes(self):
-        test_url=rest_url['get_most_watched_episodes']
-        vid_id = vod_episode_list(test_url, 0, 0, SORT_METHOD_NONE)
+        test_url = nhk_api.rest_url['get_most_watched_episodes']
+        vid_id = plugin.vod_episode_list(test_url, 0, 0, SORT_METHOD_NONE)
         print(vid_id)
         self.assertIsNotNone(vid_id)
 
-class Test_Test_Top_Stories(unittest.TestCase):
-    def test_get_top_stories_list(self):
-        row_count = top_stories_list()
-        print(row_count)
-        self.assertIsNot(row_count,0)
 
-class Test_Test_VOD_Episode_Play(unittest.TestCase):
+class Test_Top_Stories(unittest.TestCase):
+    def test_get_top_stories_list(self):
+        row_count = plugin.top_stories_list()
+        print(row_count)
+        self.assertIsNot(row_count, 0)
+
+class Test_Live_Schedule(unittest.TestCase):
+    def test_get_live_schedule_index(self):
+        self.assertTrue(plugin.live_schedule_index())
+
+class Test_VOD_Episode_Play(unittest.TestCase):
 
     def test_show_episode(self):
 
-        test_url=rest_url['get_most_watched_episodes']
-        vid_id = vod_episode_list(test_url, 0, 0, SORT_METHOD_NONE)
-        
-        episode_url = show_episode(  
-                                        vid_id,
-                                        '2019',
-                                        '2020-01-01 12:00:00'
-                                     )
+        test_url = nhk_api.rest_url['get_most_watched_episodes']
+        vid_id = plugin.vod_episode_list(test_url, 0, 0, SORT_METHOD_NONE)
+        print(vid_id)
+
+        episode_url = plugin.show_episode(
+            vid_id,
+            '2019',
+            '2020-01-01 12:00:00'
+        )
         print(episode_url)
         self.assertIsNotNone(episode_url)
+
 
 if __name__ == '__main__':
     unittest.main()

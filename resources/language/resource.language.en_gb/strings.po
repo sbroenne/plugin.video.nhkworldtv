@@ -49,13 +49,17 @@ msgctxt "#30030"
 msgid "Watch live now >"
 msgstr ""
 
-msgctxt "#30031"
-msgid "\n\nUP NEXT:"
+# Schedule Menu Item
+
+msgctxt "#30036"
+msgid "Live Schedule >"
 msgstr ""
 
-msgctxt "#30032"
-msgid "\n\n(Listing generated at: {0})"
+
+msgctxt "#30037"
+msgid "FEATURED EPISODE:\n\n"
 msgstr ""
+
 
 #On-Demand Menu
 

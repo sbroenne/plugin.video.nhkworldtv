@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.23" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.24" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -8,12 +8,6 @@
         <import addon="script.module.pytz" version="2014.2"/>
         <import addon="script.module.tzlocal" version="2.0.0"/>
     </requires>
-
-    <extension point="xbmc.addon.repository" name="Kodi NHK World TV plug-in Development Repository">
-        <info compressed="true">https://raw.githubusercontent.com/sbroenne/kodirepo/master/addons.xml.gz</info>
-        <checksum>https://raw.githubusercontent.com/sbroenne/kodirepo/master/addons.xml.gz.md5</checksum>
-        <datadir zip="true">https://raw.githubusercontent.com/sbroenne/kodirepo/master</datadir>
-    </extension>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
         <provides>video</provides>
@@ -37,7 +31,6 @@ Originally based on Misty's Best Of NHK plug-in (https://forum.kodi.tv/showthrea
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <news>
-Package repo for easier updates
 Performance optimizations
 Updated localization
 Added screen shots

@@ -34,6 +34,7 @@ def index():
     add_top_stories_menu_item()
     add_on_demand_menu_item()
     add_live_stream_menu_item()
+    add_live_schedule_menu_item()
 
     # Set-up view
     xbmcplugin.setContent(plugin.handle, 'videos')
@@ -123,39 +124,72 @@ def add_live_stream_menu_item():
     program_json = api_result_json['channel']['item']
 
     # Currently playing
+    row = program_json[0]
+
+    #Schedule Information
+    pubDate = int(row['pubDate'])/1000
+    endDate = int(row['endDate'])/1000
+
+    broadcast_start_local = to_local_time(pubDate)
+    broadcast_end_local = to_local_time(endDate)
     
-    row_count = 0
-    for row in program_json:
-        row_count = row_count+1
+    #Live porgram
+    fanart_image = get_NHK_website_url(row['thumbnail'])
+    thumb_image = get_NHK_website_url(row['thumbnail_s'])
 
-        #Schedule Information
-        pubDate = int(row['pubDate'])/1000
-        endDate = int(row['endDate'])/1000
+    # Title and Description
+    full_title = u'{0}\n\n{1}'.format(row['title'], row['description'])
+    plot = u'{0}-{1}: {2}'.format(
+            broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
 
-        broadcast_start_local = to_local_time(pubDate)
-        broadcast_end_local = to_local_time(endDate)
-        
-        if (row_count == 1):
-            #Live porgram
-            fanart_image = get_NHK_website_url(row['thumbnail'])
-            thumb_image = get_NHK_website_url(row['thumbnail_s'])
+    li.setArt({'thumb': thumb_image,
+               'fanart': fanart_image})
+    video_info = {
+        'aspect': '1.78',
+        'width': '1920',
+        'height': '1080'
+    }
+    li.addStreamInfo('video', video_info)
+    li.setInfo('video', {'mediatype': 'episode', 'plot': plot})
+    xbmcplugin.addDirectoryItem(plugin.handle, livestream_url,li, False)
+    return(True)
 
-            # Title and Description
-            full_title = '{0}\n\n{1}'.format(row['title'], row['description'])
-            plot = u'{0}-{1}: {2}'.format(
-                    broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
-            output = plot + get_string(30031)
-        else:
-            #  Upcoming programs
-            #  Only Title
-            full_title = row['title']
-            plot = u'{0}-{1}: {2}'.format(
-                    broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
-            output = output + '\n' + plot
+# Add live schedule menu item
+def add_live_schedule_menu_item():
+    logger.debug('Adding live schedule menu item')
+    
+    title = get_string(30036)
+    li = xbmcgui.ListItem(title)
+    
+    logger.debug('Retrieving live stream next shows')
+    api_result_json = get_json(rest_url['get_live_stream_next_shows'])
+    program_json = api_result_json['channel']['item']
 
+    no_of_epsisodes = len(program_json)
+    featured_episode = random.randint(1, no_of_epsisodes-1)
+    
+    # Featured Episode
+    row = program_json[featured_episode]
+    
+    #Schedule Information
+    pubDate = int(row['pubDate'])/1000
+    endDate = int(row['endDate'])/1000
 
-    output = output + get_string(30032).format(datetime.now().strftime('%H:%M'))
-        
+    broadcast_start_local = to_local_time(pubDate)
+    broadcast_end_local = to_local_time(endDate)
+    
+    #Live porgram
+    fanart_image = get_NHK_website_url(row['thumbnail'])
+    thumb_image = get_NHK_website_url(row['thumbnail_s'])
+
+    output =get_string(30037)
+    # Title and Description
+    full_title = u'{0}\n\n{1}'.format(row['title'], row['description'])
+    plot = u'{0}-{1}: {2}'.format(
+            broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), full_title)
+    
+    output = output+plot
+
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})
     video_info = {
@@ -165,9 +199,82 @@ def add_live_stream_menu_item():
     }
     li.addStreamInfo('video', video_info)
     li.setInfo('video', {'mediatype': 'episode', 'plot': output})
-    xbmcplugin.addDirectoryItem(plugin.handle, livestream_url,li, False)
+    xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
+        live_schedule_index), li, True)
     return(True)
 
+
+
+#
+# Live Schedule Menu
+#
+
+@plugin.route('/live_schedule/index')
+def live_schedule_index():
+    logger.debug('Adding live schedule menu item')
+       
+    logger.debug('Retrieving live stream next shows')
+    api_result_json = get_json(rest_url['get_live_stream_next_shows'])
+    program_json = api_result_json['channel']['item']
+
+    
+    row_count = 0
+    for row in program_json:
+        row_count = row_count+1
+        
+        #Schedule Information
+        pubDate = int(row['pubDate'])/1000
+        endDate = int(row['endDate'])/1000
+
+        broadcast_start_local = to_local_time(pubDate)
+        broadcast_end_local = to_local_time(endDate)
+        
+        
+        #Live program
+        fanart_image = get_NHK_website_url(row['thumbnail'])
+        thumb_image = get_NHK_website_url(row['thumbnail_s'])
+
+        # Title and Description
+        title = row['title']
+        subtitle = row['subtitle']
+        description = row['description']
+
+        if len(title) == 0:
+            episode_name = u'{0}'.format(subtitle)
+        else:
+            episode_name = u'{0} - {1}'.format(title, subtitle)
+        
+        plot = u'{0}-{1}: {2}'.format(
+                broadcast_start_local.strftime('%H:%M'), broadcast_end_local.strftime('%H:%M'), description)
+        
+        year = int(broadcast_start_local.strftime('%Y'))
+        date_added_info_label = broadcast_start_local.strftime('%Y-%m-%d %H:%M:%S')
+     
+      
+        li = xbmcgui.ListItem(episode_name)
+        li.setArt(
+            {'thumb': thumb_image, 'fanart': fanart_image})
+        li.setInfo('video', {'mediatype': 'episode', 'plot': plot,
+                            'year': year, 'dateadded': date_added_info_label})
+
+        vod_id = row['vod_id']
+        if (len(vod_id) >0):
+            # There is a video to play
+            li.setProperty('IsPlayable','true')                             
+            xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(show_episode, vid_id=vod_id, year=year, dateadded=date_added_info_label), li, False)
+        else:
+            xbmcplugin.addDirectoryItem(plugin.handle, None, li, False)
+
+    xbmcplugin.setContent(plugin.handle, 'videos')
+    set_view_mode(VIEW_MODE_INFOWALL)
+    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_DATEADDED)
+
+    xbmcplugin.endOfDirectory(plugin.handle)
+
+    if (row_count > 0):
+        return(True)
+    else:
+        return(None)
 #
 # Video On Demand Mennu
 #
