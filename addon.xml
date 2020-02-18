@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.25" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.26" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -16,12 +16,11 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Watch NHK World in HD - live stream and on-demand programs</summary>
         <description lang="en_GB">
-Watch your favorite programs like Japanology Plus in HD with this plug-in.
+Watch your favorite programs like Japanology Plus in HD with this plug-in. Includes live stream, on-demand-programs and top stories.
 
 The plugin is optimized for an Internet connection with at least 10 MBIT.
-Live stream is typically about 4 MBIT but the on-demand programs require 10 MBIT.
 
-Originally based on Misty's Best Of NHK plug-in (https://forum.kodi.tv/showthread.php?tid=196657) - his plug-in alsp provides addtional content like NHK on Youtube.
+Originally based on Misty's Best Of NHK plug-in (https://forum.kodi.tv/showthread.php?tid=196657) - his plug-in also provides addtional content like NHK on Youtube.
         </description>
         <disclaimer lang="en_GB">This plug-in is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -31,12 +30,9 @@ Originally based on Misty's Best Of NHK plug-in (https://forum.kodi.tv/showthrea
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <news>
+Formatting fixes
 Added Live Schedule
-Updated localization
-Added screen shots
-Added Top-Stories Section
-Randomize featured episode image on main menu
-Added support for request.Sessions</news>
+</news>
         <assets>
             <icon>resources/icon.png</icon>
             <screenshot>resources/screenshot01.jpeg</screenshot>

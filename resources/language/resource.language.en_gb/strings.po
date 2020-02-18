@@ -14,11 +14,7 @@ msgstr ""
 
 # Top Stories Menu Item
 msgctxt "#30010"
-msgid "Top Stories >"
-msgstr ""
-
-msgctxt "#30011"
-msgid "Watch Top Stories in SD\n\n"
+msgid "Top Stories (SD) >"
 msgstr ""
 
 msgctxt "#30012"
@@ -32,21 +28,17 @@ msgstr ""
 #On-Demand Menu Item
 
 msgctxt "#30020"
-msgid "Watch on demand >"
-msgstr ""
-
-msgctxt "#30021"
-msgid "Watch NHK World On Demand in HD\n\n"
+msgid "Watch on demand (HD)>"
 msgstr ""
 
 msgctxt "#30022"
-msgid "Image from:\n{0}"
+msgid "Image from:\n\n{0}"
 msgstr ""
 
 #Live Menu Item
 
 msgctxt "#30030"
-msgid "Watch live now >"
+msgid "Watch live now (HD) >"
 msgstr ""
 
 # Schedule Menu Item
@@ -54,12 +46,6 @@ msgstr ""
 msgctxt "#30036"
 msgid "Live Schedule >"
 msgstr ""
-
-
-msgctxt "#30037"
-msgid "FEATURED EPISODE:\n\n"
-msgstr ""
-
 
 #On-Demand Menu
 
