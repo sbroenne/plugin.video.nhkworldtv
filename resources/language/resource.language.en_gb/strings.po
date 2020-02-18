@@ -14,7 +14,7 @@ msgstr ""
 
 # Top Stories Menu Item
 msgctxt "#30010"
-msgid "Top Stories (SD) >"
+msgid "Top Stories >"
 msgstr ""
 
 msgctxt "#30012"
@@ -28,7 +28,7 @@ msgstr ""
 #On-Demand Menu Item
 
 msgctxt "#30020"
-msgid "Watch on demand (HD)>"
+msgid "Watch on demand >"
 msgstr ""
 
 msgctxt "#30022"
@@ -38,7 +38,7 @@ msgstr ""
 #Live Menu Item
 
 msgctxt "#30030"
-msgid "Watch live now (HD) >"
+msgid "Watch live now >"
 msgstr ""
 
 # Schedule Menu Item
