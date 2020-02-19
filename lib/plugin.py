@@ -86,19 +86,27 @@ def add_on_demand_menu_item():
     no_of_epsisodes = len(featured_episodes)
     pgm_title = None
 
+    try_count = 0
     # Fine a valid episode to highlight
     while (pgm_title is None):
+        try_count = try_count + 1
+        logger.debug('Determening if random episode has a valid title. Try count:{0}'.format(try_count))
         featured_episode = random.randint(0, no_of_epsisodes-1)
         program_json = featured_episodes[featured_episode]
         pgm_title = program_json['pgm_title']
+        subtitle = program_json['subtitle']
 
     fanart_image = get_NHK_website_url(program_json['image_pc'])
     thumb_image = get_NHK_website_url(program_json['image_sp'])
-    # pgm_description = program_json['pgm_description']
-
+    
     title = get_string(30020)
-    output = get_string(30022).format(pgm_title)
-    # output = '{0}\n\n{1}'.format(output, pgm_description)
+
+    if len(subtitle) == 0:
+        episode_name= u'{0}'.format(pgm_title)
+    else:
+        episode_name= u'{0} - {1}'.format(pgm_title, subtitle)
+
+    output = get_string(30022).format(episode_name)
     li = xbmcgui.ListItem(title)
     li.setArt({'thumb': thumb_image,
                'fanart': fanart_image})

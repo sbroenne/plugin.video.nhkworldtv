@@ -17,7 +17,7 @@ class Test_Main_Menu_Items(unittest.TestCase):
     def test_add_top_stories_menu_item(self):
         self.assertTrue(plugin.add_top_stories_menu_item())
 
-    def test_add_on_demandm_menu_item(self):
+    def test_add_on_demand_menu_item(self):
         self.assertTrue(plugin.add_on_demand_menu_item())
 
     def test_add_live_stream_menu_item(self):
