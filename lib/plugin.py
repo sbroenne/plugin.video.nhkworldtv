@@ -500,13 +500,16 @@ def top_stories_list():
 
     for row_count in range(0, MAX_ROW_COUNT-1):
         row = api_result_json['data'][row_count]
-        thumbnail = row['thumbnails']
+        title= row['title']
+        description= row['description']
 
+        thumbnail = row['thumbnails']
         if (thumbnail is not None):
             fanart_image= get_NHK_website_url(thumbnail['middle'])
             thumb_image= get_NHK_website_url(thumbnail['small'])
-        title= row['title']
-        description= row['description']
+        else:
+            logger.debug('Could not retrieve thumbnails for top story {0}'.format(title))
+
         updated_at= int(row['updated_at'])/1000
         updated_at_local= to_local_time(updated_at)
         date_added_info_label= updated_at_local.strftime(
@@ -546,6 +549,9 @@ def top_stories_list():
             if (thumbnail is not None):
                 li.setArt({'thumb': thumb_image,
                         'fanart': fanart_image})
+            else:
+                li.setArt({'thumb': nhk_icon})
+
             video_info= {
                 'aspect': '1.78',
                 'width': '640',
