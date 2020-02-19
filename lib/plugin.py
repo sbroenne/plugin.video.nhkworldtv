@@ -499,9 +499,12 @@ def top_stories_list():
         MAX_ROW_COUNT= result_row_count
 
     for row_count in range(0, MAX_ROW_COUNT-1):
-        row= api_result_json['data'][row_count]
-        fanart_image= get_NHK_website_url(row['thumbnails']['middle'])
-        thumb_image= get_NHK_website_url(row['thumbnails']['small'])
+        row = api_result_json['data'][row_count]
+        thumbnail = row['thumbnails']
+
+        if (thumbnail is not None):
+            fanart_image= get_NHK_website_url(thumbnail['middle'])
+            thumb_image= get_NHK_website_url(thumbnail['small'])
         title= row['title']
         description= row['description']
         updated_at= int(row['updated_at'])/1000
@@ -540,8 +543,9 @@ def top_stories_list():
 
             li= xbmcgui.ListItem(path=video_url)
 
-            li.setArt({'thumb': thumb_image,
-                       'fanart': fanart_image})
+            if (thumbnail is not None):
+                li.setArt({'thumb': thumb_image,
+                        'fanart': fanart_image})
             video_info= {
                 'aspect': '1.78',
                 'width': '640',
