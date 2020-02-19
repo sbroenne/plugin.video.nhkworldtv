@@ -508,8 +508,9 @@ def top_stories_list():
             fanart_image= get_NHK_website_url(thumbnail['middle'])
             thumb_image= get_NHK_website_url(thumbnail['small'])
         else:
+            thumb_image = nhk_icon
             logger.debug('Could not retrieve thumbnails for top story {0}'.format(title))
-
+            
         updated_at= int(row['updated_at'])/1000
         updated_at_local= to_local_time(updated_at)
         date_added_info_label= updated_at_local.strftime(
@@ -550,7 +551,7 @@ def top_stories_list():
                 li.setArt({'thumb': thumb_image,
                         'fanart': fanart_image})
             else:
-                li.setArt({'thumb': nhk_icon})
+                  li.setArt({'thumb': thumb_image})
 
             video_info= {
                 'aspect': '1.78',
