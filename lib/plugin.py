@@ -417,6 +417,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
         else:
             year= 0
             date_added_info_label= ''
+            plot = description
 
         li= xbmcgui.ListItem(episode_name)
         li.setArt(
