@@ -493,7 +493,7 @@ def show_episode(vid_id, year, dateadded):
 def top_stories_list():
     logger.debug('Displaying Top Stories list')
     api_result_json= get_json(rest_url['homepage_news'])
-    MAX_ROW_COUNT= 9
+    MAX_ROW_COUNT= 12
     result_row_count= len(api_result_json['data'])
     # Only display MAX ROWS
     if (result_row_count < MAX_ROW_COUNT):
