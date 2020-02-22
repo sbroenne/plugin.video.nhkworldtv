@@ -388,7 +388,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
         else:
             episode_name= u'{0} - {1}'.format(title, subtitle)
 
-        plot= row['description_clean']
+        description= row['description_clean']
         largeImaga= get_NHK_website_url(row['image_l'])
         thumb_image= get_NHK_website_url(row['image'])
         promoImage= get_NHK_website_url(row['image_promo'])
@@ -409,7 +409,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist, sort_method)
             broadcast_end_local= to_local_time(broadcast_end_timestamp)
 
             plot= get_string(30050).format(
-                broadcast_start_local.strftime('%Y-%m-%d'), broadcast_end_local.strftime('%Y-%m-%d'), plot)
+                broadcast_start_local.strftime('%Y-%m-%d'), broadcast_end_local.strftime('%Y-%m-%d'), description)
             year= int(broadcast_start_local.strftime('%Y'))
             date_added_info_label= broadcast_start_local.strftime(
                 '%Y-%m-%d %H:%M:%S')

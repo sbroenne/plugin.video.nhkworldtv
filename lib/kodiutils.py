@@ -47,7 +47,9 @@ def get_setting_as_int(setting):
 
 
 def get_string(string_id):
-    return ADDON.getLocalizedString(string_id).encode('utf-8', 'ignore')
+    # FIXME: Force returnString to be Unicode - simple .encode did not work!
+    returnString = u'{0}'.format(ADDON.getLocalizedString(string_id).encode('utf-8', 'ignore'))
+    return returnString
 
 # Set the Kodi View Mode
 def set_view_mode(view_mode_id):
