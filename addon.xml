@@ -37,6 +37,7 @@ Added Live Schedule
 </news>
         <assets>
             <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
             <screenshot>resources/screenshot01.jpeg</screenshot>
             <screenshot>resources/screenshot02.jpeg</screenshot>
             <screenshot>resources/screenshot03.jpeg</screenshot>

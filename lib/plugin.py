@@ -15,7 +15,8 @@ import random
 
 
 ADDON = xbmcaddon.Addon()
-nhk_icon = ADDON.getAddonInfo('icon')  # icon.png in addon directory
+NHK_ICON = ADDON.getAddonInfo('icon')  
+NHK_FANART = ADDON.getAddonInfo('fanart')  
 logger = logging.getLogger(ADDON.getAddonInfo('id'))
 kodilogging.config()
 plugin = routing.Plugin()
@@ -223,17 +224,17 @@ def add_live_schedule_menu_item():
 def vod_index():
     logger.debug('Creating Video On Demand Menu')
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_programs), xbmcgui.ListItem(get_string(30040), iconImage=nhk_icon), True)
+        vod_programs), xbmcgui.ListItem(get_string(30040), iconImage=NHK_ICON), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_categories), xbmcgui.ListItem(get_string(30041), iconImage=nhk_icon), True)
+        vod_categories), xbmcgui.ListItem(get_string(30041), iconImage=NHK_ICON), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_playlists), xbmcgui.ListItem(get_string(30042), iconImage=nhk_icon), True)
+        vod_playlists), xbmcgui.ListItem(get_string(30042), iconImage=NHK_ICON), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_latest_episodes'], 0, 0, xbmcplugin.SORT_METHOD_DATEADDED), xbmcgui.ListItem(get_string(30043), iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_latest_episodes'], 0, 0, xbmcplugin.SORT_METHOD_DATEADDED), xbmcgui.ListItem(get_string(30043), iconImage=NHK_ICON), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_most_watched_episodes'], 0, 0, xbmcplugin.SORT_METHOD_NONE), xbmcgui.ListItem(get_string(30044), iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_most_watched_episodes'], 0, 0, xbmcplugin.SORT_METHOD_NONE), xbmcgui.ListItem(get_string(30044), iconImage=NHK_ICON), True)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(
-        vod_episode_list, rest_url['get_all_episodes'], 0, 0, xbmcplugin.SORT_METHOD_TITLE), xbmcgui.ListItem(get_string(30045), iconImage=nhk_icon), True)
+        vod_episode_list, rest_url['get_all_episodes'], 0, 0, xbmcplugin.SORT_METHOD_TITLE), xbmcgui.ListItem(get_string(30045), iconImage=NHK_ICON), True)
     set_view_mode(VIEW_MODE_WIDELIST)
     xbmcplugin.endOfDirectory(plugin.handle)
     return(True)
@@ -508,7 +509,7 @@ def top_stories_list():
             fanart_image= get_NHK_website_url(thumbnail['middle'])
             thumb_image= get_NHK_website_url(thumbnail['small'])
         else:
-            thumb_image = nhk_icon
+            thumb_image = NHK_ICON
             logger.debug('Could not retrieve thumbnails for top story {0}'.format(title))
             
         updated_at= int(row['updated_at'])/1000
