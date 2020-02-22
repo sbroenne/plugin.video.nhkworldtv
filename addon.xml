@@ -16,7 +16,7 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Watch NHK World in HD - live stream and on-demand programs</summary>
         <description lang="en_GB">
-Watch your favorite NHK World programs in HD - includes live stream & schedule , on-demand programs and top stories.
+Watch your favorite NHK World programs in HD - includes live stream and schedule , on-demand programs and top stories.
 
 The plugin is optimized for an Internet connection with at least 10 MBIT - NHK uses H264. I built this plugin because NHK does not support AndroidTV (yet).
 
@@ -32,8 +32,6 @@ Originally based on Misty's Best Of NHK plugin (https://forum.kodi.tv/showthread
         <news>
 New Icons
 Unicode Fixes
-Localization changes
-Formatting fixes
 Added Live Schedule
 </news>
         <assets>
