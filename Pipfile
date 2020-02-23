@@ -13,6 +13,8 @@ requests = "*"
 pytz = "*"
 tzlocal = "*"
 kodistubs = "*"
+flake8 = "*"
+yapf = "*"
 
 [requires]
 python_version = "2.7"
