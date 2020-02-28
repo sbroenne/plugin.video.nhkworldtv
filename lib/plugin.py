@@ -15,6 +15,11 @@ import nhk_api
 import routing
 import utils
 
+import ptvsd 
+
+ptvsd.enable_attach(address=('localhost', 5678))
+ptvsd.wait_for_attach()
+
 # Initiate constants and plug-in
 ADDON = xbmcaddon.Addon()
 NHK_ICON = ADDON.getAddonInfo('icon')
@@ -409,9 +414,8 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             episode_name = utils.get_episode_name(title, subtitle)
 
         description = row['description_clean']
-        largeImaga = utils.get_NHK_website_url(row['image_l'])
+        largeImage = utils.get_NHK_website_url(row['image_l'])
         thumb_image = utils.get_NHK_website_url(row['image'])
-        promoImage = utils.get_NHK_website_url(row['image_promo'])
         vid_id = row['vod_id']
         pgm_no = row['pgm_no']
         duration = row['movie_duration']
@@ -443,8 +447,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
         li = xbmcgui.ListItem(episode_name)
         li.setArt({
             'thumb': thumb_image,
-            'poster': promoImage,
-            'fanart': largeImaga
+            'fanart': largeImage
         })
         li.setInfo(
             'video', {
