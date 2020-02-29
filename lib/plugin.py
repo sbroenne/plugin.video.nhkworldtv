@@ -55,10 +55,17 @@ def add_top_stories_menu_item():
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
     featured_news = api_result_json['data'][0]
 
-    fanart_image = utils.get_NHK_website_url(
-        featured_news['thumbnails']['middle'])
-    thumb_image = utils.get_NHK_website_url(
-        featured_news['thumbnails']['small'])
+    thumbnail = featured_news['thumbnails']['small']
+
+    if (thumbnail is None):
+        # Featured news does not have a thumbnail
+        thumb_image = NHK_ICON
+        fanart_image = NHK_FANART
+    else:
+        thumb_image = utils.get_NHK_website_url(thumbnail)
+        fanart_image = utils.get_NHK_website_url(
+            featured_news['thumbnails']['middle'])
+
     pgm_title = featured_news['title']
     pgm_description = featured_news['description']
     title = kodiutils.get_string(30010)
@@ -440,10 +447,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             plot = description
 
         li = xbmcgui.ListItem(episode_name)
-        li.setArt({
-            'thumb': thumb_image,
-            'fanart': largeImage
-        })
+        li.setArt({'thumb': thumb_image, 'fanart': largeImage})
         li.setInfo(
             'video', {
                 'mediatype': 'episode',
@@ -552,14 +556,12 @@ def top_stories_list():
         description = row['description']
 
         thumbnail = row['thumbnails']
-        if (thumbnail is not None):
-            fanart_image = utils.get_NHK_website_url(thumbnail['middle'])
-            thumb_image = utils.get_NHK_website_url(thumbnail['small'])
-        else:
+        if (thumbnail is None):
             thumb_image = NHK_ICON
-            logger.debug(
-                'Could not retrieve thumbnails for top story {0}'.format(
-                    title))
+            fanart_image = NHK_FANART
+        else:
+            thumb_image = utils.get_NHK_website_url(thumbnail['small'])
+            fanart_image = utils.get_NHK_website_url(thumbnail['middle'])
 
         updated_at = int(row['updated_at']) / 1000
         updated_at_local = utils.to_local_time(updated_at)
@@ -594,12 +596,7 @@ def top_stories_list():
                                               description)
 
             li = xbmcgui.ListItem(path=video_url)
-
-            if (thumbnail is not None):
-                li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
-            else:
-                li.setArt({'thumb': thumb_image})
-
+            li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
             video_info = kodiutils.get_SD_video_info()
             li.addStreamInfo('video', video_info)
             li.setInfo(
@@ -617,7 +614,6 @@ def top_stories_list():
         else:
             # No video attached to it
             li = xbmcgui.ListItem(title)
-
             li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
             li.setInfo(
                 'video', {

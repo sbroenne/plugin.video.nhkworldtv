@@ -15,8 +15,8 @@ class Test_Test_nhk_api(unittest.TestCase):
     def test_nhk_api_video_url(self):
         self.assertIsNotNone(nhk_api.rest_url['video_url'])
 
-    def test_nhk_api_episode_url(self):
-        self.assertIsNotNone(nhk_api.rest_url['episode_url'])
+    def test_nhk_api_ondemand_url(self):
+        self.assertIsNotNone(nhk_api.rest_url['homepage_ondemand'])
 
 
 if __name__ == '__main__':

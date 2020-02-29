@@ -1,7 +1,9 @@
+import nhk_api_parser
+
 # NHK World API - reverse engineered from api.js
 rest_url = {
     'api_key':                      'EJfK8jdS57GqlupFgAfAAwr573q01y6k',
-    'homepage_ondemand':            'https://api.nhk.or.jp/nhkworld/vodrecommend/v7/en/list.json',
+    'homepage_ondemand':            nhk_api_parser.get_homepage_ondemand_url(),
     'homepage_news':                'https://www3.nhk.or.jp/nhkworld/data/en/news/all.json',
     'get_news_xml':                 'https://www3.nhk.or.jp/nhkworld/data/en/news/movie/{0}.xml',
     'news_url':                     'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',

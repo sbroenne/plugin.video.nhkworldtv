@@ -7,7 +7,6 @@ from pytz import timezone
 from tzlocal import get_localzone
 
 import kodilogging
-import nhk_api
 
 ADDON = xbmcaddon.Addon()
 logger = logging.getLogger(ADDON.getAddonInfo('id'))
@@ -15,12 +14,12 @@ kodilogging.config()
 
 # Instaniate request session
 s = requests.Session()
-api_key = nhk_api.rest_url['api_key']
+api_key = 'EJfK8jdS57GqlupFgAfAAwr573q01y6k'
 request_params = {'apikey': api_key}
 s.params = request_params
 
-
 # Get JSON object from a URL with improved error handling
+
 
 def get_json(url):
     r = get_url(url)
@@ -63,8 +62,7 @@ def get_url(url):
                 # with the NHK Website
                 # Raise exception
                 logger.fatal(
-                    'Could not get URL {0} - HTTP Status Code {1}' +
-                    ' - Retries {2}'.format(r.url, r.status_code, max_retries))
+                    'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'.format(r.url, r.status_code, max_retries))
                 r.raise_for_status()
             else:
                 # Wait for n seconds and then try again
