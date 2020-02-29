@@ -15,11 +15,6 @@ import nhk_api
 import routing
 import utils
 
-import ptvsd 
-
-ptvsd.enable_attach(address=('localhost', 5678))
-ptvsd.wait_for_attach()
-
 # Initiate constants and plug-in
 ADDON = xbmcaddon.Addon()
 NHK_ICON = ADDON.getAddonInfo('icon')
