@@ -1,21 +1,21 @@
-    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-    <addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.34" provider-name="sbroenne">
-        <requires>
-            <import addon="xbmc.python" version="2.26.0"/>
-            <import addon="script.module.certifi" version="2019.9.11"/>
-            <import addon="script.module.requests" version="2.22.0"/>
-            <import addon="script.module.routing" version="0.2.3"/>
-            <import addon="script.module.pytz" version="2014.2"/>
-            <import addon="script.module.tzlocal" version="2.0.0"/>
-        </requires>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.34" provider-name="sbroenne">
+    <requires>
+        <import addon="xbmc.python" version="2.26.0"/>
+        <import addon="script.module.certifi" version="2019.9.11"/>
+        <import addon="script.module.requests" version="2.22.0"/>
+        <import addon="script.module.routing" version="0.2.3"/>
+        <import addon="script.module.pytz" version="2014.2"/>
+        <import addon="script.module.tzlocal" version="2.0.0"/>
+    </requires>
 
-        <extension point="xbmc.python.pluginsource" library="main.py">
-            <provides>video</provides>
-        </extension>
+    <extension point="xbmc.python.pluginsource" library="main.py">
+        <provides>video</provides>
+    </extension>
 
-        <extension point="xbmc.addon.metadata">
-            <summary lang="en_GB">Watch NHK World in HD - live stream and on-demand programs</summary>
-            <description lang="en_GB">
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Watch NHK World in HD - live stream and on-demand programs</summary>
+        <description lang="en_GB">
     Watch NHK World in HD - includes live stream and on-demand programs.
 
     The plugin is optimized for an Internet connection with at least 10 MBIT.
@@ -23,26 +23,26 @@
     I built this plugin because NHK does not support AndroidTV (yet).
 
     Originally based on Misty's Best Of NHK plugin (https://forum.kodi.tv/showthread.php?tid=196657) but not related any longer. His plugin also provides addtional content like NHK on Youtube.
-            </description>
-            <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
-            <platform>all</platform>
-            <license>GPL-3.0</license>
-            <forum></forum>
-            <language>en_GB</language>
-            <email>stefan_broenner@yahoo.com</email>
-            <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
-            <news>
+        </description>
+        <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
+        <platform>all</platform>
+        <license>GPL-3.0</license>
+        <forum></forum>
+        <language>en_GB</language>
+        <email>stefan_broenner@yahoo.com</email>
+        <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
+        <news>
     Bug Fixes
     New Icons
     Added Live Schedule
-    </news>
-            <assets>
-                <icon>resources/icon.png</icon>
-                <fanart>resources/fanart.jpg</fanart>
-                <screenshot>resources/screenshot01.jpeg</screenshot>
-                <screenshot>resources/screenshot02.jpeg</screenshot>
-                <screenshot>resources/screenshot03.jpeg</screenshot>
-            </assets>
-            <reuselanguageinvoker>false</reuselanguageinvoker>
-        </extension>
-    </addon>
+        </news>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+            <screenshot>resources/screenshot01.jpeg</screenshot>
+            <screenshot>resources/screenshot02.jpeg</screenshot>
+            <screenshot>resources/screenshot03.jpeg</screenshot>
+        </assets>
+        <reuselanguageinvoker>false</reuselanguageinvoker>
+    </extension>
+</addon>
