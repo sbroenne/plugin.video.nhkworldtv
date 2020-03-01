@@ -131,7 +131,7 @@ def add_live_stream_menu_item():
 
     logger.debug('Retrieving live stream next shows')
     api_result_json = utils.get_json(
-        nhk_api.rest_url['get_live_stream_next_shows'])
+        nhk_api.rest_url['get_livestream'])
     program_json = api_result_json['channel']['item']
 
     # Currently playing
@@ -173,7 +173,7 @@ def add_live_schedule_menu_item():
 
     logger.debug('Retrieving live stream next shows')
     api_result_json = utils.get_json(
-        nhk_api.rest_url['get_live_stream_next_shows'])
+        nhk_api.rest_url['get_livestream'])
     program_json = api_result_json['channel']['item']
 
     no_of_epsisodes = len(program_json)
@@ -420,6 +420,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
         thumb_image = utils.get_NHK_website_url(row['image'])
         vid_id = row['vod_id']
         pgm_no = row['pgm_no']
+        #pgm_id = row['pgm_id']
         duration = row['movie_duration']
 
         # Check if we have an aired date
@@ -649,7 +650,7 @@ def live_schedule_index():
 
     logger.debug('Retrieving live stream next shows')
     api_result_json = utils.get_json(
-        nhk_api.rest_url['get_live_stream_next_shows'])
+        nhk_api.rest_url['get_livestream'])
     program_json = api_result_json['channel']['item']
 
     row_count = 0

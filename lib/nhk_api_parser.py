@@ -6,7 +6,7 @@ import utils
 
 
 API_BASE_URL = 'https://api.nhk.or.jp/nhkworld/'
-NHK_BASE_URL = 'https://www3.nhk.or.jp/nhkworld/'
+NHK_BASE_URL = 'https://www3.nhk.or.jp'
 
 API_LANGUAGE = 'en'
 API={}
@@ -57,6 +57,17 @@ def get_homepage_news_url():
     path = get_full_NHK_url(path)
     return(path)
 
+
+def get_livestream_url():
+    command = create_command('tv','EPGFetch')
+    params = API[command]['params']
+    version = API[command]['version']
+    path = str(params['path'])
+    path = path.replace('{version}', version)
+    path = path.replace('{region}', 'world')
+    path = path.replace('{Time}', 'now')
+    path = get_full_API_url(path)
+    return(path)
 
 
 API = get_API_from_NHK()
