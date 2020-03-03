@@ -7,32 +7,33 @@ rest_url = {
     nhk_api_parser.get_homepage_ondemand_url(),
     'homepage_news':
     nhk_api_parser.get_homepage_news_url(),
-    'get_news_xml':
-    'https://www3.nhk.or.jp/nhkworld/data/en/news/movie/{0}.xml',  # Not in api.js
-    'news_url':
-    'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',  # Not in api.js
     'get_livestream':
     nhk_api_parser.get_livestream_url(),
     'get_programs':
-    'https://api.nhk.or.jp/nhkworld/vodpglist/v7a/en/voice/list.json',
+    nhk_api_parser.get_programs_url(),
     'get_programs_episode_list':
-    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/program/{0}/en/all/all.json',
+    nhk_api_parser.get_programs_episode_list_url(),
     'get_categories':
-    'https://api.nhk.or.jp/nhkworld/vodcatlist/v7a/all/en/ondemand/list.json',
+    nhk_api_parser.get_categories_url(),
     'get_categories_episode_list':
-    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/category/{0}/en/all/all.json',
+    nhk_api_parser.get_categories_episode_list_url(),
     'get_playlists':
-    'https://api.nhk.or.jp/nhkworld/vodplaylist/v7a/en/all.json',
+    nhk_api_parser.get_playlists_url(),
     'get_playlists_episode_list':
-    'https://api.nhk.or.jp/nhkworld/vodplaylist/v7a/en/{0}.json',
+    nhk_api_parser.get_playlists_episode_list_url(),
     'get_latest_episodes':
-    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/all/all/en/all/12.json',
+    nhk_api_parser.get_all_episodes_url('12'),
     'get_most_watched_episodes':
-    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/mostwatch/all/en/all/12.json',
+    nhk_api_parser.get_most_watched_episodes_url(),
     'get_all_episodes':
-    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/all/all/en/all/all.json',
+    nhk_api_parser.get_all_episodes_url('all'),
     'get_episode_detail':
-    'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/vod_id/{0}/en/all/1.json',
+    nhk_api_parser.get_episode_detail_url(),
+    # Not in api.js
+    'get_news_xml':
+    'https://www3.nhk.or.jp/nhkworld/data/en/news/movie/{0}.xml',
+    'news_url':
+    'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',
     'live_stream_url':
     'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp/index_4M.m3u8',
     'player_url':

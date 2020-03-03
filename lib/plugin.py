@@ -687,7 +687,7 @@ def live_schedule_index():
                 broadcast_start_local.strftime('%H:%M'),
                 broadcast_end_local.strftime('%H:%M'), episode_name)
 
-        plot = '{0}\n\n{1}'.format(episode_name, description)
+        plot = u'{0}\n\n{1}'.format(episode_name, description)
         year = int(broadcast_start_local.strftime('%Y'))
         date_added_info_label = broadcast_start_local.strftime(
             '%Y-%m-%d %H:%M:%S')
