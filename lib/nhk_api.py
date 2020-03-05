@@ -22,7 +22,7 @@ rest_url = {
     'get_playlists_episode_list':
     nhk_api_parser.get_playlists_episode_list_url(),
     'get_latest_episodes':
-    nhk_api_parser.get_all_episodes_url('24'),
+    nhk_api_parser.get_all_episodes_url('23'),
     'get_most_watched_episodes':
     nhk_api_parser.get_most_watched_episodes_url(),
     'get_all_episodes':

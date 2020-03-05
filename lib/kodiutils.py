@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import kodilogging
 
 import xbmc
 import xbmcaddon
@@ -8,8 +9,8 @@ import xbmcgui
 
 # read settings
 ADDON = xbmcaddon.Addon()
-logger = logging.getLogger(__name__)
-
+logger = logging.getLogger(ADDON.getAddonInfo('id'))
+kodilogging.config()
 
 def notification(header,
                  message,
@@ -77,10 +78,9 @@ def set_sort_direction(sort_direction):
     #
     # FIXME: Not working right now since Kodi always returns Ascending
     # need to investigate
-    #  if (current_sort_direction <> sort_direction):
-    #    xbmc.executebuiltin('Container.SetSortDirection')
-    #    logger.debug('Toggling sort direction from {0} to {1}'
-    # .format(current_sort_direction, sort_direction))
+    if (current_sort_direction <> sort_direction):
+        xbmc.executebuiltin('Container.SetSortDirection')
+        logger.debug('Toggling sort direction from {0} to {1}'.format(current_sort_direction, sort_direction))
 
 
 # Returns a Full-HD (1080p) video info array
