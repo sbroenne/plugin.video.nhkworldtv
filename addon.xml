@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.40" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.41" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -32,7 +32,6 @@ Originally based on Misty's Best Of NHK plugin (https://forum.kodi.tv/showthread
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <news>
-Dynamic API, Part II
 Bug fixes
         </news>
         <assets>
