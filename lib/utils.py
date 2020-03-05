@@ -1,16 +1,10 @@
-import logging
+
 from datetime import datetime, timedelta
 
 import requests
-import xbmcaddon
+import xbmc
 from pytz import timezone
 from tzlocal import get_localzone
-
-import kodilogging
-
-ADDON = xbmcaddon.Addon()
-logger = logging.getLogger(ADDON.getAddonInfo('id'))
-kodilogging.config()
 
 # Instaniate request session
 s = requests.Session()
@@ -25,7 +19,7 @@ def get_json(url):
     r = get_url(url)
     try:
         result = r.json()
-        logger.debug(
+        xbmc.log(
             'Successfully loaded JSON from API: {0} with Status {1}'.format(
                 r.url, r.status_code))
         return (result)
@@ -46,12 +40,12 @@ def get_url(url):
         # Only add the API key for API Calls
         r = s.get(url)
         # Make an API Call
-        logger.debug('Making API Call {0} ({1} of {2})'.format(
+        xbmc.log('Making API Call {0} ({1} of {2})'.format(
             r.url, current_try, max_retries))
 
         if (r.status_code == 200):
             # Call was successfull
-            logger.debug(
+            xbmc.log(
                 'Successfully fetched URL/API: {0} with Status {1}'.format(
                     r.url, r.status_code))
             return (r)
@@ -61,14 +55,14 @@ def get_url(url):
                 # Failure - no way to handle - probably an issue
                 # with the NHK Website
                 # Raise exception
-                logger.fatal(
-                    'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'.format(r.url, r.status_code, max_retries))
+                xbmc.log(
+                    'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'.format(r.url, r.status_code, max_retries), xbmc.LOGFATAL)
                 r.raise_for_status()
             else:
                 # Wait for n seconds and then try again
-                logger.warning(
+                xbmc.log(
                     'Failure fetching URL: {0} with Status {1})'.format(
-                        r.url, r.status_code))
+                        r.url, r.status_code), xbmc.LOGWARNING)
                 current_try = +1
 
 

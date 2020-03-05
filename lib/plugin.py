@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import logging
 import random
 import re
 from datetime import datetime
@@ -8,8 +7,8 @@ from datetime import datetime
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
+import xbmc
 
-import kodilogging
 import kodiutils
 import nhk_api
 import routing
@@ -19,8 +18,6 @@ import utils
 ADDON = xbmcaddon.Addon()
 NHK_ICON = ADDON.getAddonInfo('icon')
 NHK_FANART = ADDON.getAddonInfo('fanart')
-logger = logging.getLogger(ADDON.getAddonInfo('id'))
-kodilogging.config()
 plugin = routing.Plugin()
 
 # View Modes from the default Estuary skin
@@ -32,7 +29,7 @@ VIEW_MODE_WIDELIST = 55
 # Start page of the plug-in
 @plugin.route('/')
 def index():
-    logger.debug('Creating Main Menu')
+    xbmc.log('Creating Main Menu')
 
     # Add menus
     add_top_stories_menu_item()
@@ -49,7 +46,7 @@ def index():
 
 #  Add the Top Stories menu
 def add_top_stories_menu_item():
-    logger.debug('Adding top stories menu item')
+    xbmc.log('Adding top stories menu item')
 
     # Getting top story
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
@@ -84,7 +81,7 @@ def add_top_stories_menu_item():
 # Add on-demand menu item
 def add_on_demand_menu_item():
 
-    logger.debug('Adding on-demand menu item')
+    xbmc.log('Adding on-demand menu item')
     # Getting random on-demand episode to show
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_ondemand'])
     featured_episodes = api_result_json['data']['items']
@@ -96,7 +93,7 @@ def add_on_demand_menu_item():
     # Fine a valid episode to highlight
     while (pgm_title is None):
         try_count = try_count + 1
-        logger.debug(
+        xbmc.log(
             'Determening if random episode has a valid title. Try count:{0}'.
             format(try_count))
         featured_episode = random.randint(0, no_of_epsisodes - 1)
@@ -122,16 +119,15 @@ def add_on_demand_menu_item():
 
 # Add live stream menu item
 def add_live_stream_menu_item():
-    logger.debug('Adding live stream menu item')
+    xbmc.log('Adding live stream menu item')
     livestream_url = nhk_api.rest_url['live_stream_url']
-    logger.debug('1080p Livestream Akamai URL: {0}'.format(livestream_url))
+    xbmc.log('1080p Livestream Akamai URL: {0}'.format(livestream_url))
 
     title = kodiutils.get_string(30030)
     li = xbmcgui.ListItem(title)
 
-    logger.debug('Retrieving live stream next shows')
-    api_result_json = utils.get_json(
-        nhk_api.rest_url['get_livestream'])
+    xbmc.log('Retrieving live stream next shows')
+    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'])
     program_json = api_result_json['channel']['item']
 
     # Currently playing
@@ -166,14 +162,13 @@ def add_live_stream_menu_item():
 
 
 def add_live_schedule_menu_item():
-    logger.debug('Adding live schedule menu item')
+    xbmc.log('Adding live schedule menu item')
 
     title = kodiutils.get_string(30036)
     li = xbmcgui.ListItem(title)
 
-    logger.debug('Retrieving live stream next shows')
-    api_result_json = utils.get_json(
-        nhk_api.rest_url['get_livestream'])
+    xbmc.log('Retrieving live stream next shows')
+    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'])
     program_json = api_result_json['channel']['item']
 
     no_of_epsisodes = len(program_json)
@@ -212,7 +207,7 @@ def add_live_schedule_menu_item():
 
 @plugin.route('/vod/index')
 def vod_index():
-    logger.debug('Creating Video On Demand Menu')
+    xbmc.log('Creating Video On Demand Menu')
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(vod_programs),
         xbmcgui.ListItem(kodiutils.get_string(30040), iconImage=NHK_ICON),
@@ -281,7 +276,7 @@ def vod_programs():
                 'title': title,
                 'plot': plot
             })
-            logger.debug('Creating Directory Item {0} - {1}'.format(
+            xbmc.log('Creating Directory Item {0} - {1}'.format(
                 api_url, title.encode('ascii', 'ignore')))
 
             xbmcplugin.addDirectoryItem(
@@ -325,7 +320,7 @@ def vod_categories():
             li = xbmcgui.ListItem(title)
             li.setArt({'thumb': thumb_image})
             li.setInfo('video', {'mediatype': 'videos', 'title': title})
-            logger.debug('Creating Directory Item {0} - {1}'.format(
+            xbmc.log('Creating Directory Item {0} - {1}'.format(
                 api_url, title.encode('ascii', 'ignore')))
             xbmcplugin.addDirectoryItem(
                 plugin.handle,
@@ -369,7 +364,7 @@ def vod_playlists():
             li = xbmcgui.ListItem(title)
             li.setArt({'thumb': thumb_image})
             li.setInfo('video', {'mediatype': 'videos', 'title': title})
-            logger.debug('Creating Directory Item {0} - {1}'.format(
+            xbmc.log('Creating Directory Item {0} - {1}'.format(
                 api_url, title.encode('ascii', 'ignore')))
 
             xbmcplugin.addDirectoryItem(
@@ -395,7 +390,7 @@ def vod_playlists():
 )
 def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
                      sort_method):
-    logger.debug('Displaying Episode List for URL: {0} - {1} - {2}'.format(
+    xbmc.log('Displaying Episode List for URL: {0} - {1} - {2}'.format(
         api_url, show_only_subtitle, is_from_playlist))
     api_result_json = utils.get_json(api_url)
     if (int(is_from_playlist) == 1):
@@ -513,7 +508,7 @@ def show_episode(vid_id, year, dateadded):
         reference_file_json = vod_program['asset']['referenceFile']
         play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
         episode_url = nhk_api.rest_url['episode_url'].format(play_path)
-        logger.debug('Episode Akamai URL: {0}'.format(episode_url))
+        xbmc.log('Episode Akamai URL: {0}'.format(episode_url))
         li = xbmcgui.ListItem(path=episode_url)
         video_info = {
             'aspect': reference_file_json['aspectRatio'],
@@ -535,15 +530,15 @@ def show_episode(vid_id, year, dateadded):
         xbmcplugin.setResolvedUrl(plugin.handle, True, li)
         return (episode_url)
     else:
-        logger.fatal(
-            'Could not retrieve Akamai URL for VID_ID {0}'.format(vid_id))
+        xbmc.log(
+            'Could not retrieve Akamai URL for VID_ID {0}'.format(vid_id), xbmc.LOGFATAL)
         return (None)
 
 
 # Top Stories - List
 @plugin.route('/vod/top_stories_list/')
 def top_stories_list():
-    logger.debug('Displaying Top Stories list')
+    xbmc.log('Displaying Top Stories list')
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
     MAX_ROW_COUNT = 12
     result_row_count = len(api_result_json['data'])
@@ -646,11 +641,10 @@ def top_stories_list():
 
 @plugin.route('/live_schedule/index')
 def live_schedule_index():
-    logger.debug('Adding live schedule menu item')
+    xbmc.log('Adding live schedule menu item')
 
-    logger.debug('Retrieving live stream next shows')
-    api_result_json = utils.get_json(
-        nhk_api.rest_url['get_livestream'])
+    xbmc.log('Retrieving live stream next shows')
+    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'])
     program_json = api_result_json['channel']['item']
 
     row_count = 0

@@ -1,18 +1,10 @@
-import logging
 import requests
-import kodilogging
 import xbmcaddon
 import utils
 
-# read settings
-ADDON = xbmcaddon.Addon()
-logger = logging.getLogger(ADDON.getAddonInfo('id'))
-kodilogging.config()
 
 API_BASE_URL = 'https://api.nhk.or.jp/nhkworld/'
 NHK_BASE_URL = 'https://www3.nhk.or.jp'
-
-
 API_LANGUAGE = 'en'
 API={}
 
