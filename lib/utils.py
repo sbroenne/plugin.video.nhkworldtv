@@ -6,7 +6,7 @@ import xbmc
 from pytz import timezone
 from tzlocal import get_localzone
 
-requests_cache.install_cache('nhk_world_cache', backend='sqlite', expire_after=600)
+requests_cache.install_cache('nhk_world_cache', backend='memory', expire_after=300)
 
 # Instantiate request session
 s = requests.Session()
