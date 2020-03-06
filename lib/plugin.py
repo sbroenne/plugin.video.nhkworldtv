@@ -127,7 +127,7 @@ def add_live_stream_menu_item():
     li = xbmcgui.ListItem(title)
 
     xbmc.log('Retrieving live stream next shows')
-    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'])
+    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)
     program_json = api_result_json['channel']['item']
 
     # Currently playing
@@ -168,7 +168,7 @@ def add_live_schedule_menu_item():
     li = xbmcgui.ListItem(title)
 
     xbmc.log('Retrieving live stream next shows')
-    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'])
+    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)
     program_json = api_result_json['channel']['item']
 
     no_of_epsisodes = len(program_json)
@@ -644,7 +644,7 @@ def live_schedule_index():
     xbmc.log('Adding live schedule menu item')
 
     xbmc.log('Retrieving live stream next shows')
-    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'])
+    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)
     program_json = api_result_json['channel']['item']
 
     row_count = 0

@@ -1,12 +1,14 @@
-
 from datetime import datetime, timedelta
 
 import requests
+import requests_cache
 import xbmc
 from pytz import timezone
 from tzlocal import get_localzone
 
-# Instaniate request session
+requests_cache.install_cache('nhk_world_cache', backend='sqlite', expire_after=600)
+
+# Instantiate request session
 s = requests.Session()
 api_key = 'EJfK8jdS57GqlupFgAfAAwr573q01y6k'
 request_params = {'apikey': api_key}
@@ -15,8 +17,12 @@ s.params = request_params
 # Get JSON object from a URL with improved error handling
 
 
-def get_json(url):
-    r = get_url(url)
+def get_json(url, cached = True):
+    if (not cached):
+        r = get_url(url)
+    else:
+        with requests_cache.disabled():
+            r = get_url(url)
     try:
         result = r.json()
         xbmc.log(
@@ -56,7 +62,8 @@ def get_url(url):
                 # with the NHK Website
                 # Raise exception
                 xbmc.log(
-                    'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'.format(r.url, r.status_code, max_retries), xbmc.LOGFATAL)
+                    'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'
+                    .format(r.url, r.status_code, max_retries), xbmc.LOGFATAL)
                 r.raise_for_status()
             else:
                 # Wait for n seconds and then try again

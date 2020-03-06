@@ -129,3 +129,4 @@ dmypy.json
 .vscode
 .DS_Store
 *.code-workspace
+*.sqlite
