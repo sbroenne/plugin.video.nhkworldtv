@@ -3,10 +3,23 @@ from datetime import datetime, timedelta
 import requests
 import requests_cache
 import xbmc
+import xbmcaddon
 from pytz import timezone
 from tzlocal import get_localzone
 
-requests_cache.install_cache('nhk_world_cache', backend='memory', expire_after=300)
+
+# Get Plug-In path
+ADDON = xbmcaddon.Addon()
+plugin_path = ADDON.getAddonInfo('path')
+if (len(plugin_path)>0):
+    # Running within Kodi - use that path
+    db_name = '{0}/nhk_world_cache'.format(plugin_path)
+else:
+    # Running under unit test
+    db_name ='nhk_world_cache'
+
+# Enable cache for requests
+requests_cache.install_cache(db_name, backend='sqlite', expire_after=300)
 
 # Instantiate request session
 s = requests.Session()
@@ -18,11 +31,7 @@ s.params = request_params
 
 
 def get_json(url, cached = True):
-    if (not cached):
-        r = get_url(url)
-    else:
-        with requests_cache.disabled():
-            r = get_url(url)
+    r = get_url(url, cached)
     try:
         result = r.json()
         xbmc.log(
@@ -38,13 +47,20 @@ def get_json(url, cached = True):
 # Get a URL with automatic retries - NHK sometimes have intermittent problems
 
 
-def get_url(url):
+def get_url(url, cached = True):
     # maximum number of retries
     max_retries = 3
     current_try = 1
     while (current_try <= max_retries):
         # Only add the API key for API Calls
-        r = s.get(url)
+
+        # Use cached or non-cached result
+        if (cached):
+            r = s.get(url)
+        else:
+            with s.cache_disabled():
+                r = s.get(url)
+
         # Make an API Call
         xbmc.log('Making API Call {0} ({1} of {2})'.format(
             r.url, current_try, max_retries))
@@ -52,8 +68,8 @@ def get_url(url):
         if (r.status_code == 200):
             # Call was successfull
             xbmc.log(
-                'Successfully fetched URL/API: {0} with Status {1}'.format(
-                    r.url, r.status_code))
+                'Successfully fetched URL/API: {0} with Status {1} and from cache {2}'.format(
+                    r.url, r.status_code, r.from_cache))
             return (r)
         else:
             if (current_try == max_retries):
