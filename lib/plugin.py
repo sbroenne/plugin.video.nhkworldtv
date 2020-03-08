@@ -484,56 +484,65 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
 # Video On Demand - Display Episode
 @plugin.route('/vod/show_episode/<vid_id>/<year>/<dateadded>/')
 def show_episode(vid_id, year, dateadded):
-    r = utils.get_url(nhk_api.rest_url['player_url'].format(vid_id, vid_id))
-    playerJS = r.text
-    # Parse the output of the Player JS file for the UUID of the episode
-    program_uuid = re.compile("'data-de-program-uuid','(.+?)'").findall(
-        playerJS)
-    if (program_uuid.count > 0):
-        video_url = nhk_api.rest_url['video_url'].format(program_uuid[0])
 
-        # Get episode detail
-        episode_json = utils.get_json(
-            nhk_api.rest_url['get_episode_detail'].format(vid_id))
-        episode_detail = episode_json['data']['episodes'][0]
-        title = episode_detail['title_clean']
-        plot = episode_detail['description_clean']
-        episode = episode_detail['pgm_no']
-        duration = episode_detail['movie_duration']
-
-        # Get episode URL and video information
-        api_result_json = utils.get_json(video_url)
-        vod_program = api_result_json['response']['WsProgramResponse'][
-            'program']
-        reference_file_json = vod_program['asset']['referenceFile']
-        play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
-        episode_url = nhk_api.rest_url['episode_url'].format(play_path)
-        xbmc.log('Episode Akamai URL: {0}'.format(episode_url))
-        li = xbmcgui.ListItem(path=episode_url)
-        video_info = {
-            'aspect': reference_file_json['aspectRatio'],
-            'width': reference_file_json['videoWidth'],
-            'height': reference_file_json['videoHeight'],
-        }
-        li.addStreamInfo('video', video_info)
-        li.setInfo(
-            'video', {
-                'mediatype': 'episode',
-                'title': title,
-                'plot': plot,
-                'duration': duration,
-                'episode': episode,
-                'year': year,
-                'dateadded': dateadded
-            })
-
-        xbmcplugin.setResolvedUrl(plugin.handle, True, li)
-        return (episode_url)
+    use_backend = kodiutils.get_setting_as_bool('use_backend')
+    if (use_backend):
+        # Use NHK World TV Cloud Service to speed-up start of episode playback
+        # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
+        xbmc.log('Using Cloud Service to retrieve vid_id: {0}'.format(vid_id))
+        program_json = utils.get_json(
+            nhk_api.rest_url['nhkworldtv-backend'].format(vid_id))
+        program_Uuid = program_json["ProgamUuid"]
+       
     else:
-        xbmc.log(
-            'Could not retrieve Akamai URL for VID_ID {0}'.format(vid_id), xbmc.LOGFATAL)
-        return (None)
+        # Get result from NHK - slow
+        xbmc.log('Using Player.js to retrieve vid_id: {0}'.format(vid_id))
+        r = utils.get_url(nhk_api.rest_url['player_url'].format(vid_id, vid_id))
+        playerJS = r.text
+        # Parse the output of the Player JS file for the UUID of the episode
+        uuid_match = re.compile("'data-de-program-uuid','(.+?)'").findall(
+            playerJS)
+        program_Uuid = uuid_match[0]
 
+        
+    # Get episode detail
+    episode_json = utils.get_json(
+        nhk_api.rest_url['get_episode_detail'].format(vid_id))
+    episode_detail = episode_json['data']['episodes'][0]
+    title = episode_detail['title_clean']
+    plot = episode_detail['description_clean']
+    episode = episode_detail['pgm_no']
+    duration = episode_detail['movie_duration']
+
+    # Get episode URL and video information
+    video_url = nhk_api.rest_url['video_url'].format(program_Uuid)
+    api_result_json = utils.get_json(video_url)
+    vod_program = api_result_json['response']['WsProgramResponse'][
+        'program']
+    reference_file_json = vod_program['asset']['referenceFile']
+    play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
+    episode_url = nhk_api.rest_url['episode_url'].format(play_path)
+    xbmc.log('Episode Akamai URL: {0}'.format(episode_url))
+    li = xbmcgui.ListItem(path=episode_url)
+    video_info = {
+        'aspect': reference_file_json['aspectRatio'],
+        'width': reference_file_json['videoWidth'],
+        'height': reference_file_json['videoHeight'],
+    }
+    li.addStreamInfo('video', video_info)
+    li.setInfo(
+        'video', {
+            'mediatype': 'episode',
+            'title': title,
+            'plot': plot,
+            'duration': duration,
+            'episode': episode,
+            'year': year,
+            'dateadded': dateadded
+        })
+
+    xbmcplugin.setResolvedUrl(plugin.handle, True, li)
+    return (episode_url)
 
 # Top Stories - List
 @plugin.route('/vod/top_stories_list/')

@@ -56,9 +56,11 @@ def get_url(url, cached = True):
 
         # Use cached or non-cached result
         if (cached):
+            # Use session cache
             r = s.get(url)
         else:
             with s.cache_disabled():
+                # Don't use session cache
                 r = s.get(url)
 
         # Make an API Call
@@ -68,7 +70,7 @@ def get_url(url, cached = True):
         if (r.status_code == 200):
             # Call was successfull
             xbmc.log(
-                'Successfully fetched URL/API: {0} with Status {1} and from cache {2}'.format(
+                'Successfully fetched URL/API: {0} - Status {1} - Retrieved from cache {2}'.format(
                     r.url, r.status_code, r.from_cache))
             return (r)
         else:
