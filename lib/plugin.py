@@ -52,14 +52,15 @@ def add_top_stories_menu_item():
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
     featured_news = api_result_json['data'][0]
 
-    thumbnail = featured_news['thumbnails']['small']
+    thumbnails = featured_news['thumbnails']
 
-    if (thumbnail is None):
+    if (thumbnails is None):
         # Featured news does not have a thumbnail
         thumb_image = NHK_ICON
         fanart_image = NHK_FANART
     else:
-        thumb_image = utils.get_NHK_website_url(thumbnail)
+        thumb_image = utils.get_NHK_website_url(
+            featured_news['thumbnails']['small'])
         fanart_image = utils.get_NHK_website_url(
             featured_news['thumbnails']['middle'])
 
@@ -493,18 +494,18 @@ def show_episode(vid_id, year, dateadded):
         program_json = utils.get_json(
             nhk_api.rest_url['nhkworldtv-backend'].format(vid_id))
         program_Uuid = program_json["ProgamUuid"]
-       
+
     else:
         # Get result from NHK - slow
         xbmc.log('Using Player.js to retrieve vid_id: {0}'.format(vid_id))
-        r = utils.get_url(nhk_api.rest_url['player_url'].format(vid_id, vid_id))
+        r = utils.get_url(nhk_api.rest_url['player_url'].format(
+            vid_id, vid_id))
         playerJS = r.text
         # Parse the output of the Player JS file for the UUID of the episode
         uuid_match = re.compile("'data-de-program-uuid','(.+?)'").findall(
             playerJS)
         program_Uuid = uuid_match[0]
 
-        
     # Get episode detail
     episode_json = utils.get_json(
         nhk_api.rest_url['get_episode_detail'].format(vid_id))
@@ -517,8 +518,7 @@ def show_episode(vid_id, year, dateadded):
     # Get episode URL and video information
     video_url = nhk_api.rest_url['video_url'].format(program_Uuid)
     api_result_json = utils.get_json(video_url)
-    vod_program = api_result_json['response']['WsProgramResponse'][
-        'program']
+    vod_program = api_result_json['response']['WsProgramResponse']['program']
     reference_file_json = vod_program['asset']['referenceFile']
     play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
     episode_url = nhk_api.rest_url['episode_url'].format(play_path)
@@ -544,6 +544,7 @@ def show_episode(vid_id, year, dateadded):
     xbmcplugin.setResolvedUrl(plugin.handle, True, li)
     return (episode_url)
 
+
 # Top Stories - List
 @plugin.route('/vod/top_stories_list/')
 def top_stories_list():
@@ -559,14 +560,17 @@ def top_stories_list():
         row = api_result_json['data'][row_count]
         title = row['title']
         description = row['description']
+        thumbnails = row['thumbnails']
 
-        thumbnail = row['thumbnails']
-        if (thumbnail is None):
+        if (thumbnails is None):
+            # Featured news does not have a thumbnail
             thumb_image = NHK_ICON
             fanart_image = NHK_FANART
         else:
-            thumb_image = utils.get_NHK_website_url(thumbnail['small'])
-            fanart_image = utils.get_NHK_website_url(thumbnail['middle'])
+            thumb_image = utils.get_NHK_website_url(
+                row['thumbnails']['small'])
+            fanart_image = utils.get_NHK_website_url(
+                row['thumbnails']['middle'])
 
         updated_at = int(row['updated_at']) / 1000
         updated_at_local = utils.to_local_time(updated_at)
