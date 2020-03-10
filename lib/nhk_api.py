@@ -37,7 +37,9 @@ rest_url = {
     'live_stream_url':
     'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp/index_4M.m3u8',
     'nhkworldtv-backend':
-    'https://nhkworldtv.azurewebsites.net/api/GetVideoUrl/{0}',
+    'https://nhkworldtv.azurewebsites.net/api/Program/{0}',
+     'player_url':
+    'https://movie-s.nhk.or.jp/v/refid/nhkworld/prefid/{0}?embed=js&targetId=videoplayer&de-responsive=true&de-callback-method=nwCustomCallback&de-appid={1}&de-subtitle-on=false',
      'video_url':
     'https://movie-s.nhk.or.jp/ws/ws_program/api/67f5b750-b419-11e9-8a16-0e45e8988f42/apiv/5/mode/json?v={0}',
     'episode_url':

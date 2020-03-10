@@ -414,7 +414,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
         description = row['description_clean']
         largeImage = utils.get_NHK_website_url(row['image_l'])
         thumb_image = utils.get_NHK_website_url(row['image'])
-        vid_id = row['vod_id']
+        vod_id = row['vod_id']
         pgm_no = row['pgm_no']
         #pgm_id = row['pgm_id']
         duration = row['movie_duration']
@@ -458,7 +458,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
         xbmcplugin.addDirectoryItem(
             plugin.handle,
             plugin.url_for(show_episode,
-                           vid_id=vid_id,
+                           vod_id=vod_id,
                            year=year,
                            dateadded=date_added_info_label), li, False)
 
@@ -477,29 +477,29 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
     # Used for unit testing
     # only successfull if we processed at least one episode
     if (row_count > 0):
-        return (vid_id)
+        return (vod_id)
     else:
         return (None)
 
 
 # Video On Demand - Display Episode
-@plugin.route('/vod/show_episode/<vid_id>/<year>/<dateadded>/')
-def show_episode(vid_id, year, dateadded):
+@plugin.route('/vod/show_episode/<vod_id>/<year>/<dateadded>/')
+def show_episode(vod_id, year, dateadded):
 
     use_backend = kodiutils.get_setting_as_bool('use_backend')
     if (use_backend):
         # Use NHK World TV Cloud Service to speed-up start of episode playback
         # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
-        xbmc.log('Using Cloud Service to retrieve vid_id: {0}'.format(vid_id))
+        xbmc.log('Using Cloud Service to retrieve vod_id: {0}'.format(vod_id))
         program_json = utils.get_json(
-            nhk_api.rest_url['nhkworldtv-backend'].format(vid_id))
-        program_Uuid = program_json["ProgamUuid"]
+            nhk_api.rest_url['nhkworldtv-backend'].format(vod_id))
+        program_Uuid = program_json["ProgramUuid"]
 
     else:
         # Get result from NHK - slow
-        xbmc.log('Using Player.js to retrieve vid_id: {0}'.format(vid_id))
+        xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
         r = utils.get_url(nhk_api.rest_url['player_url'].format(
-            vid_id, vid_id))
+            vod_id, vod_id))
         playerJS = r.text
         # Parse the output of the Player JS file for the UUID of the episode
         uuid_match = re.compile("'data-de-program-uuid','(.+?)'").findall(
@@ -508,7 +508,7 @@ def show_episode(vid_id, year, dateadded):
 
     # Get episode detail
     episode_json = utils.get_json(
-        nhk_api.rest_url['get_episode_detail'].format(vid_id))
+        nhk_api.rest_url['get_episode_detail'].format(vod_id))
     episode_detail = episode_json['data']['episodes'][0]
     title = episode_detail['title_clean']
     plot = episode_detail['description_clean']
@@ -589,11 +589,11 @@ def top_stories_list():
         if row['videos'] is not None:
             # Top stories that have a video attached to them
             title = kodiutils.get_string(30070).format(title)
-            vid_id = row['id']
-            video_xml_url = nhk_api.rest_url['get_news_xml'].format(vid_id)
+            vod_id = row['id']
+            video_xml_url = nhk_api.rest_url['get_news_xml'].format(vod_id)
             video_response = utils.get_url(video_xml_url)
             video_xml = str(video_response.content)
-            start_pos = video_xml.find(vid_id)
+            start_pos = video_xml.find(vod_id)
             end_pos = video_xml.find('HQ')
             video_file = video_xml[start_pos:end_pos]
             video_url = nhk_api.rest_url['news_url'].format(video_file)
@@ -716,7 +716,7 @@ def live_schedule_index():
             xbmcplugin.addDirectoryItem(
                 plugin.handle,
                 plugin.url_for(show_episode,
-                               vid_id=vod_id,
+                               vod_id=vod_id,
                                year=year,
                                dateadded=date_added_info_label), li, False)
         else:
