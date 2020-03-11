@@ -19,7 +19,7 @@ else:
     db_name ='nhk_world_cache'
 
 # Enable cache for requests
-requests_cache.install_cache(db_name, backend='sqlite', expire_after=300)
+requests_cache.install_cache(db_name, backend='sqlite', expire_after=1800)
 
 # Instantiate request session
 s = requests.Session()

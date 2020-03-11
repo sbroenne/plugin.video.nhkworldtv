@@ -11,7 +11,7 @@ msgid "Plug-in will set default viewmode"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Use third-party cloud cache to significantly speed-up episode playback"
+msgid "Use 3rd-party cloud cache to speed-up video playback"
 msgstr ""
 
 #plugin.py

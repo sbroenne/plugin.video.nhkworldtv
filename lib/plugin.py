@@ -99,7 +99,7 @@ def add_on_demand_menu_item():
             format(try_count))
         featured_episode = random.randint(0, no_of_epsisodes - 1)
         program_json = featured_episodes[featured_episode]
-        pgm_title = program_json['pgm_title']
+        pgm_title = program_json['pgm_title_clean']
         subtitle = program_json['subtitle']
 
     fanart_image = utils.get_NHK_website_url(program_json['image_pc'])

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.48" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.49" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -21,7 +21,7 @@ Watch NHK World in HD - includes live stream and on-demand programs.
 
 The plugin is optimized for an Internet connection with at least 10 MBIT.
     
-I built this plugin because NHK does not support AndroidTV (yet).
+I built this plugin because NHK does not support Android TV (yet).
 
 Originally based on Misty's Best Of NHK plugin (https://forum.kodi.tv/showthread.php?tid=196657) but not related any longer. His plugin also provides addtional content like NHK on Youtube.
         </description>
@@ -33,7 +33,6 @@ Originally based on Misty's Best Of NHK plugin (https://forum.kodi.tv/showthread
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <news>
-Extended Cloud Cache - Optional caching of vod_id lookup
 Bug fixes
         </news>
         <assets>
