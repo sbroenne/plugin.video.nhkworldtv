@@ -94,7 +94,7 @@ class Test_Live_Schedule(unittest.TestCase):
         self.assertTrue(plugin.live_schedule_index())
 
 
-class Test_VOD_Episode_Play(unittest.TestCase):
+class Test_VOD_Episode_Play_NonCache(unittest.TestCase):
     def test_show_episode(self):
 
         test_url = nhk_api.rest_url['get_most_watched_episodes']
@@ -103,7 +103,20 @@ class Test_VOD_Episode_Play(unittest.TestCase):
         print(vid_id)
 
         episode_url = plugin.show_episode(vid_id, '2019',
-                                          '2020-01-01 12:00:00')
+                                          '2020-01-01 12:00:00', False)
+        print(episode_url)
+        self.assertIsNotNone(episode_url)
+
+class Test_VOD_Episode_Play_Cache(unittest.TestCase):
+    def test_show_episode(self):
+
+        test_url = nhk_api.rest_url['get_most_watched_episodes']
+        vid_id = plugin.vod_episode_list(test_url, 0, 0,
+                                         xbmcplugin.SORT_METHOD_NONE)
+        print(vid_id)
+
+        episode_url = plugin.show_episode(vid_id, '2019',
+                                          '2020-01-01 12:00:00', True)
         print(episode_url)
         self.assertIsNotNone(episode_url)
 

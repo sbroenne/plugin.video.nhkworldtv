@@ -484,9 +484,13 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
 
 # Video On Demand - Display Episode
 @plugin.route('/vod/show_episode/<vod_id>/<year>/<dateadded>/')
-def show_episode(vod_id, year, dateadded):
+def show_episode(vod_id, year, dateadded, enforceCache=False):
 
-    use_backend = kodiutils.get_setting_as_bool('use_backend')
+    if (enforceCache):
+        use_backend = True
+    else:
+        use_backend = kodiutils.get_setting_as_bool('use_backend')
+
     if (use_backend):
         # Use NHK World TV Cloud Service to speed-up start of episode playback
         # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
@@ -494,7 +498,14 @@ def show_episode(vod_id, year, dateadded):
         program_json = utils.get_json(
             nhk_api.rest_url['nhkworldtv-backend'].format(vod_id))
         program_Uuid = program_json["ProgramUuid"]
-
+        title = program_json['Title']
+        plot = program_json['Plot']
+        pgm_no = program_json['PgmNo']
+        duration = program_json['Duration']
+        play_path = program_json['PlayPath']
+        aspect = program_json['Aspect']
+        width = program_json['Width']
+        height = program_json['Height']
     else:
         # Get result from NHK - slow
         xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
@@ -506,28 +517,31 @@ def show_episode(vod_id, year, dateadded):
             playerJS)
         program_Uuid = uuid_match[0]
 
-    # Get episode detail
-    episode_json = utils.get_json(
-        nhk_api.rest_url['get_episode_detail'].format(vod_id))
-    episode_detail = episode_json['data']['episodes'][0]
-    title = episode_detail['title_clean']
-    plot = episode_detail['description_clean']
-    episode = episode_detail['pgm_no']
-    duration = episode_detail['movie_duration']
+        # Get episode detail
+        episode_json = utils.get_json(
+            nhk_api.rest_url['get_episode_detail'].format(vod_id))
+        episode_detail = episode_json['data']['episodes'][0]
+        title = episode_detail['title_clean']
+        plot = episode_detail['description_clean']
+        pgm_no = episode_detail['pgm_no']
+        duration = episode_detail['movie_duration']
+        
+        # Get episode URL and video information
+        video_url = nhk_api.rest_url['video_url'].format(program_Uuid)
+        api_result_json = utils.get_json(video_url)
+        reference_file_json = api_result_json['response']['WsProgramResponse']['program']['asset']['referenceFile']
+        play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
+        aspect = reference_file_json['aspectRatio'],
+        width = reference_file_json['videoWidth'],
+        height = reference_file_json['videoHeight'],
 
-    # Get episode URL and video information
-    video_url = nhk_api.rest_url['video_url'].format(program_Uuid)
-    api_result_json = utils.get_json(video_url)
-    vod_program = api_result_json['response']['WsProgramResponse']['program']
-    reference_file_json = vod_program['asset']['referenceFile']
-    play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
     episode_url = nhk_api.rest_url['episode_url'].format(play_path)
     xbmc.log('Episode Akamai URL: {0}'.format(episode_url))
     li = xbmcgui.ListItem(path=episode_url)
     video_info = {
-        'aspect': reference_file_json['aspectRatio'],
-        'width': reference_file_json['videoWidth'],
-        'height': reference_file_json['videoHeight'],
+        'aspect': aspect,
+        'width': width,
+        'height': height,
     }
     li.addStreamInfo('video', video_info)
     li.setInfo(
@@ -536,7 +550,7 @@ def show_episode(vod_id, year, dateadded):
             'title': title,
             'plot': plot,
             'duration': duration,
-            'episode': episode,
+            'episode': pgm_no,
             'year': year,
             'dateadded': dateadded
         })
@@ -567,8 +581,7 @@ def top_stories_list():
             thumb_image = NHK_ICON
             fanart_image = NHK_FANART
         else:
-            thumb_image = utils.get_NHK_website_url(
-                row['thumbnails']['small'])
+            thumb_image = utils.get_NHK_website_url(row['thumbnails']['small'])
             fanart_image = utils.get_NHK_website_url(
                 row['thumbnails']['middle'])
 
