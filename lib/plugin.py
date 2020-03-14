@@ -467,7 +467,6 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             use_backend = kodiutils.get_setting_as_bool('use_backend')
 
         if (use_backend):
-            
             if (vod_id in EPISODE_CACHE):
                 episode = EPISODE_CACHE[vod_id]
                 # In cache - display directly
@@ -482,7 +481,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
                 li.setInfo(
                     'video', {
                         'mediatype': 'episode',
-                        'title': title,
+                        'title': episode_name,
                         'plot': plot,
                         'duration': duration,
                         'episode': pgm_no,
