@@ -482,6 +482,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
                 li.setInfo(
                     'video', {
                         'mediatype': 'episode',
+                        'title': title,
                         'plot': plot,
                         'duration': duration,
                         'episode': pgm_no,
