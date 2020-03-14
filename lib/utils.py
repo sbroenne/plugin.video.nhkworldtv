@@ -124,10 +124,14 @@ def to_local_time(UTC_timestamp):
 
 # Construct an epsidode name from the title and the subtitle
 
-
 def get_episode_name(title, subtitle):
     if len(subtitle) == 0:
         episode_name = u'{0}'.format(title)
     else:
         episode_name = u'{0} - {1}'.format(title, subtitle)
     return (episode_name)
+
+# Returns a valid Kodi Sort-Date
+def get_sort_date(datevalue):
+    return datevalue.strftime('%d/%m/%Y')
+

@@ -70,7 +70,7 @@ class Test_VOD_Episode_List(unittest.TestCase):
     def test_get_latest_episodes(self):
         test_url = nhk_api.rest_url['get_latest_episodes']
         vid_id = plugin.vod_episode_list(test_url, 0, 0,
-                                         xbmcplugin.SORT_METHOD_DATEADDED, True)
+                                         xbmcplugin.SORT_METHOD_DATE, True)
         # print(vid_id)
         self.assertIsNotNone(vid_id)
 

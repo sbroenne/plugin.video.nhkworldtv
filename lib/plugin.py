@@ -42,7 +42,6 @@ def get_episode_cache():
 # Episode Cache
 EPISODE_CACHE = get_episode_cache()
 
-
 # Start page of the plug-in
 @plugin.route('/')
 def index():
@@ -242,7 +241,7 @@ def vod_index():
         plugin.handle,
         plugin.url_for(vod_episode_list,
                        nhk_api.rest_url['get_latest_episodes'], 0, 0,
-                       xbmcplugin.SORT_METHOD_DATEADDED),
+                       xbmcplugin.SORT_METHOD_DATE),
         xbmcgui.ListItem(kodiutils.get_string(30043), iconImage=NHK_ICON),
         True)
     xbmcplugin.addDirectoryItem(
@@ -300,7 +299,7 @@ def vod_programs():
             xbmcplugin.addDirectoryItem(
                 plugin.handle,
                 plugin.url_for(vod_episode_list, api_url, 1, 0,
-                               xbmcplugin.SORT_METHOD_TITLE), li, True)
+                               xbmcplugin.SORT_METHOD_DATE), li, True)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_INFOWALL)
@@ -408,7 +407,7 @@ def vod_playlists():
 # via show_epsisode()
 #
 
-def add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, date_added_info_label, year, thumb_image, large_image,enforce_cache = False):
+def add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, sort_date, year, thumb_image, large_image,enforce_cache = False):
     # Use the cache backend or not
     if (enforce_cache):
         use_backend = True
@@ -435,7 +434,7 @@ def add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, dat
                     'duration': duration,
                     'episode': pgm_no,
                     'year': year,
-                    'dateadded': date_added_info_label
+                    'date': sort_date
                 })
             li.setProperty('IsPlayable', 'true')
         
@@ -458,7 +457,7 @@ def add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, dat
             'duration': duration,
             'episode': pgm_no,
             'year': year,
-            'dateadded': date_added_info_label
+            'date': sort_date
         })
     li.setProperty('IsPlayable', 'true')
     
@@ -467,7 +466,7 @@ def add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, dat
         plugin.url_for(show_episode,
                     vod_id=vod_id,
                     year=year,
-                    dateadded=date_added_info_label), li, False)
+                    dateadded=sort_date), li, False)
     return(True)
 
 
@@ -522,15 +521,14 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
                 broadcast_start_local.strftime('%Y-%m-%d'),
                 broadcast_end_local.strftime('%Y-%m-%d'), description)
             year = int(broadcast_start_local.strftime('%Y'))
-            date_added_info_label = broadcast_start_local.strftime(
-                '%Y-%m-%d %H:%M:%S')
+            sort_date =utils.get_sort_date(broadcast_start_local)
         else:
             year = 0
-            date_added_info_label = ''
+            sort_date=""
             plot = description
     
         # Add the current episode directory item
-        add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, date_added_info_label, year, thumb_image, large_image, enforceCache)   
+        add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, sort_date, year, thumb_image, large_image, enforceCache)   
     
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_INFOWALL)
@@ -539,7 +537,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
 
     # If we sort by date added, make sure sort direction
     # is descending (e.g. for latest episodes)
-    if (sort_method == xbmcplugin.SORT_METHOD_DATEADDED):
+    if (sort_method == xbmcplugin.SORT_METHOD_DATE):
         kodiutils.set_sort_direction('Descending')
 
     xbmcplugin.endOfDirectory(plugin.handle)
@@ -622,7 +620,7 @@ def show_episode(vod_id, year, dateadded, enforce_cache=False):
             'duration': duration,
             'episode': pgm_no,
             'year': year,
-            'dateadded': dateadded
+            'date': dateadded
         })
 
     xbmcplugin.setResolvedUrl(plugin.handle, True, li)
@@ -657,7 +655,7 @@ def top_stories_list():
 
         updated_at = int(row['updated_at']) / 1000
         updated_at_local = utils.to_local_time(updated_at)
-        date_added_info_label = updated_at_local.strftime('%Y-%m-%d %H:%M:%S')
+        sort_date = utils.get_sort_date(updated_at_local)
         year = int(updated_at_local.strftime('%Y'))
 
         time_difference_hours = datetime.now().hour - updated_at_local.hour
@@ -698,7 +696,7 @@ def top_stories_list():
                     'plot': plot,
                     'duration': duration,
                     'year': year,
-                    'dateadded': date_added_info_label
+                    'date': sort_date
                 })
             li.setProperty('IsPlayable', 'true')
             xbmcplugin.addDirectoryItem(plugin.handle, video_url, li, False)
@@ -712,13 +710,13 @@ def top_stories_list():
                     'mediatype': 'episode',
                     'plot': plot,
                     'year': year,
-                    'dateadded': date_added_info_label
+                    'date': sort_date
                 })
             xbmcplugin.addDirectoryItem(plugin.handle, None, li, False)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_INFOWALL)
-    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_DATEADDED)
+    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_DATE)
     kodiutils.set_sort_direction('Descending')
     xbmcplugin.endOfDirectory(plugin.handle)
 
@@ -782,8 +780,7 @@ def live_schedule_index():
 
         plot = u'{0}\n\n{1}'.format(episode_name, description)
         year = int(broadcast_start_local.strftime('%Y'))
-        date_added_info_label = broadcast_start_local.strftime(
-            '%Y-%m-%d %H:%M:%S')
+        sort_date = utils.get_sort_date(broadcast_start_local)
 
         li = xbmcgui.ListItem(title)
         li.setArt({'thumb': thumb_image, 'fanart': large_image})
@@ -792,19 +789,19 @@ def live_schedule_index():
                 'mediatype': 'episode',
                 'plot': plot,
                 'year': year,
-                'dateadded': date_added_info_label
+                'date': sort_date
             })
 
         vod_id = row['vod_id']
         if (playable):
             # Add the episode directory item
-            add_episode_directory_item(vod_id, title, plot, duration, 0, date_added_info_label, year, thumb_image, large_image)   
+            add_episode_directory_item(vod_id, title, plot, duration, 0, sort_date, year, thumb_image, large_image)   
         else:
             xbmcplugin.addDirectoryItem(plugin.handle, None, li, False)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_WIDELIST)
-    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_DATEADDED)
+    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_DATE)
 
     xbmcplugin.endOfDirectory(plugin.handle)
 
