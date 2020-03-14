@@ -2,7 +2,7 @@
 
 import random
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import xbmcaddon
 import xbmcgui
@@ -402,6 +402,73 @@ def vod_playlists():
         return (None)
 
 
+#
+# Add a Kodi directory item for a playable episode
+# If the vod_id is in cache and cache is being used, diretly add the URL otherwise dynmaically resolve it
+# via show_epsisode()
+#
+
+def add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, date_added_info_label, year, thumb_image, large_image,enforce_cache = False):
+        # Use the cache backend or not
+        if (enforce_cache):
+            use_backend = True
+        else:
+            use_backend = kodiutils.get_setting_as_bool('use_backend')
+
+        if (use_backend):
+            if (vod_id in EPISODE_CACHE):
+                episode = EPISODE_CACHE[vod_id]
+                # In cache - display directly
+                play_path = episode["PlayPath"]
+                aspect = episode['Aspect']
+                width = episode['Width']
+                height = episode['Height']
+                episode_url = nhk_api.rest_url['episode_url'].format(play_path)
+                xbmc.log('Episode Akamai URL: {0}'.format(episode_url))
+                li = xbmcgui.ListItem(path=episode_url)
+                li.setArt({'thumb': thumb_image, 'fanart': large_image})
+                li.setInfo(
+                    'video', {
+                        'mediatype': 'episode',
+                        'title': episode_name,
+                        'plot': plot,
+                        'duration': duration,
+                        'episode': pgm_no,
+                        'year': year,
+                        'dateadded': date_added_info_label
+                    })
+                li.setProperty('IsPlayable', 'true')
+            
+                video_info = {
+                    'aspect': aspect,
+                    'width': width,
+                    'height': height,
+                }
+                li.addStreamInfo('video', video_info)
+                xbmcplugin.addDirectoryItem(plugin.handle, episode_url, li)
+        else:
+            # Resolve URL dynamically
+            li = xbmcgui.ListItem(episode_name)
+            li.setArt({'thumb': thumb_image, 'fanart': large_image})
+            li.setInfo(
+                'video', {
+                    'mediatype': 'episode',
+                    'plot': plot,
+                    'duration': duration,
+                    'episode': pgm_no,
+                    'year': year,
+                    'dateadded': date_added_info_label
+                })
+            li.setProperty('IsPlayable', 'true')
+            
+            xbmcplugin.addDirectoryItem(
+                plugin.handle,
+                plugin.url_for(show_episode,
+                            vod_id=vod_id,
+                            year=year,
+                            dateadded=date_added_info_label), li, False)
+
+
 # Video On Demand - Episode List
 @plugin.route(
     '/vod/episode_list/<path:api_url>/<show_only_subtitle>/<is_from_playlist>/<sort_method>/'
@@ -429,7 +496,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             episode_name = utils.get_episode_name(title, subtitle)
 
         description = row['description_clean']
-        largeImage = utils.get_NHK_website_url(row['image_l'])
+        large_image = utils.get_NHK_website_url(row['image_l'])
         thumb_image = utils.get_NHK_website_url(row['image'])
         vod_id = row['vod_id']
         pgm_no = row['pgm_no']
@@ -460,65 +527,9 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             date_added_info_label = ''
             plot = description
     
-        # Use the cahce backend or not
-        if (enforceCache):
-            use_backend = True
-        else:
-            use_backend = kodiutils.get_setting_as_bool('use_backend')
-
-        if (use_backend):
-            if (vod_id in EPISODE_CACHE):
-                episode = EPISODE_CACHE[vod_id]
-                # In cache - display directly
-                play_path = episode["PlayPath"]
-                aspect = episode['Aspect']
-                width = episode['Width']
-                height = episode['Height']
-                episode_url = nhk_api.rest_url['episode_url'].format(play_path)
-                xbmc.log('Episode Akamai URL: {0}'.format(episode_url))
-                li = xbmcgui.ListItem(path=episode_url)
-                li.setArt({'thumb': thumb_image, 'fanart': largeImage})
-                li.setInfo(
-                    'video', {
-                        'mediatype': 'episode',
-                        'title': episode_name,
-                        'plot': plot,
-                        'duration': duration,
-                        'episode': pgm_no,
-                        'year': year,
-                        'dateadded': date_added_info_label
-                    })
-                li.setProperty('IsPlayable', 'true')
-            
-                video_info = {
-                    'aspect': aspect,
-                    'width': width,
-                    'height': height,
-                }
-                li.addStreamInfo('video', video_info)
-                xbmcplugin.addDirectoryItem(plugin.handle, episode_url, li)
-        else:
-            # Resolve URL dynamically
-            li = xbmcgui.ListItem(episode_name)
-            li.setArt({'thumb': thumb_image, 'fanart': largeImage})
-            li.setInfo(
-                'video', {
-                    'mediatype': 'episode',
-                    'plot': plot,
-                    'duration': duration,
-                    'episode': pgm_no,
-                    'year': year,
-                    'dateadded': date_added_info_label
-                })
-            li.setProperty('IsPlayable', 'true')
-            
-            xbmcplugin.addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(show_episode,
-                            vod_id=vod_id,
-                            year=year,
-                            dateadded=date_added_info_label), li, False)
-
+        # Add the current episode directory item
+        add_episode_directory_item(vod_id, episode_name, plot, duration, pgm_no, date_added_info_label, year, thumb_image, large_image, enforceCache)   
+    
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_INFOWALL)
     sort_method = int(sort_method)
@@ -541,9 +552,9 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
 
 # Video On Demand - Display Episode
 @plugin.route('/vod/show_episode/<vod_id>/<year>/<dateadded>/')
-def show_episode(vod_id, year, dateadded, enforceCache=False):
+def show_episode(vod_id, year, dateadded, enforce_cache=False):
 
-    if (enforceCache):
+    if (enforce_cache):
         use_backend = True
     else:
         use_backend = kodiutils.get_setting_as_bool('use_backend')
@@ -740,8 +751,11 @@ def live_schedule_index():
         broadcast_start_local = utils.to_local_time(pubDate)
         broadcast_end_local = utils.to_local_time(endDate)
 
+        duration_diff = broadcast_end_local-broadcast_start_local
+        duration = duration_diff.seconds
+        
         # Live program
-        fanart_image = utils.get_NHK_website_url(row['thumbnail'])
+        large_image = utils.get_NHK_website_url(row['thumbnail'])
         thumb_image = utils.get_NHK_website_url(row['thumbnail_s'])
 
         # Title and Description
@@ -770,7 +784,7 @@ def live_schedule_index():
             '%Y-%m-%d %H:%M:%S')
 
         li = xbmcgui.ListItem(title)
-        li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
+        li.setArt({'thumb': thumb_image, 'fanart': large_image})
         li.setInfo(
             'video', {
                 'mediatype': 'episode',
@@ -781,14 +795,8 @@ def live_schedule_index():
 
         vod_id = row['vod_id']
         if (playable):
-            # There is a video to play
-            li.setProperty('IsPlayable', 'true')
-            xbmcplugin.addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(show_episode,
-                               vod_id=vod_id,
-                               year=year,
-                               dateadded=date_added_info_label), li, False)
+            # Add the episode directory item
+            add_episode_directory_item(vod_id, title, plot, duration, 0, date_added_info_label, year, thumb_image, large_image)   
         else:
             xbmcplugin.addDirectoryItem(plugin.handle, None, li, False)
 
