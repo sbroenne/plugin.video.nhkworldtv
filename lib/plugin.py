@@ -25,6 +25,23 @@ VIEW_MODE_INFOWALL = 54
 VIEW_MODE_WALL = 500
 VIEW_MODE_WIDELIST = 55
 
+#
+# Helpers
+#
+
+#  Add the Top Stories menu
+def get_episode_cache():
+    xbmc.log('Getting vod_id/video cache from Azure')
+
+    max_episodes = 1500
+
+    # Getting top story
+    episodes = utils.get_json(nhk_api.rest_url['cache_get_program_list'].format(max_episodes))
+    return (episodes)
+
+# Episode Cache
+EPISODE_CACHE = get_episode_cache()
+
 
 # Start page of the plug-in
 @plugin.route('/')
@@ -390,7 +407,7 @@ def vod_playlists():
     '/vod/episode_list/<path:api_url>/<show_only_subtitle>/<is_from_playlist>/<sort_method>/'
 )
 def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
-                     sort_method):
+                     sort_method, enforceCache=False):
     xbmc.log('Displaying Episode List for URL: {0} - {1} - {2}'.format(
         api_url, show_only_subtitle, is_from_playlist))
     api_result_json = utils.get_json(api_url)
@@ -442,25 +459,65 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             year = 0
             date_added_info_label = ''
             plot = description
+    
+        # Use the cahce backend or not
+        if (enforceCache):
+            use_backend = True
+        else:
+            use_backend = kodiutils.get_setting_as_bool('use_backend')
 
-        li = xbmcgui.ListItem(episode_name)
-        li.setArt({'thumb': thumb_image, 'fanart': largeImage})
-        li.setInfo(
-            'video', {
-                'mediatype': 'episode',
-                'plot': plot,
-                'duration': duration,
-                'episode': pgm_no,
-                'year': year,
-                'dateadded': date_added_info_label
-            })
-        li.setProperty('IsPlayable', 'true')
-        xbmcplugin.addDirectoryItem(
-            plugin.handle,
-            plugin.url_for(show_episode,
-                           vod_id=vod_id,
-                           year=year,
-                           dateadded=date_added_info_label), li, False)
+        if (use_backend):
+            
+            if (vod_id in EPISODE_CACHE):
+                episode = EPISODE_CACHE[vod_id]
+                # In cache - display directly
+                play_path = episode["PlayPath"]
+                aspect = episode['Aspect']
+                width = episode['Width']
+                height = episode['Height']
+                episode_url = nhk_api.rest_url['episode_url'].format(play_path)
+                xbmc.log('Episode Akamai URL: {0}'.format(episode_url))
+                li = xbmcgui.ListItem(path=episode_url)
+                li.setArt({'thumb': thumb_image, 'fanart': largeImage})
+                li.setInfo(
+                    'video', {
+                        'mediatype': 'episode',
+                        'plot': plot,
+                        'duration': duration,
+                        'episode': pgm_no,
+                        'year': year,
+                        'dateadded': date_added_info_label
+                    })
+                li.setProperty('IsPlayable', 'true')
+            
+                video_info = {
+                    'aspect': aspect,
+                    'width': width,
+                    'height': height,
+                }
+                li.addStreamInfo('video', video_info)
+                xbmcplugin.addDirectoryItem(plugin.handle, episode_url, li)
+        else:
+            # Resolve URL dynamically
+            li = xbmcgui.ListItem(episode_name)
+            li.setArt({'thumb': thumb_image, 'fanart': largeImage})
+            li.setInfo(
+                'video', {
+                    'mediatype': 'episode',
+                    'plot': plot,
+                    'duration': duration,
+                    'episode': pgm_no,
+                    'year': year,
+                    'dateadded': date_added_info_label
+                })
+            li.setProperty('IsPlayable', 'true')
+            
+            xbmcplugin.addDirectoryItem(
+                plugin.handle,
+                plugin.url_for(show_episode,
+                            vod_id=vod_id,
+                            year=year,
+                            dateadded=date_added_info_label), li, False)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_INFOWALL)
@@ -496,7 +553,7 @@ def show_episode(vod_id, year, dateadded, enforceCache=False):
         # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
         xbmc.log('Using Cloud Service to retrieve vod_id: {0}'.format(vod_id))
         program_json = utils.get_json(
-            nhk_api.rest_url['nhkworldtv-backend'].format(vod_id))
+            nhk_api.rest_url['cache_get_program'].format(vod_id))
         program_Uuid = program_json["ProgramUuid"]
         title = program_json['Title']
         plot = program_json['Plot']
@@ -745,6 +802,7 @@ def live_schedule_index():
         return (True)
     else:
         return (None)
+
 
 
 def run():

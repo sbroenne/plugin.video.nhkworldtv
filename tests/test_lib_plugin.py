@@ -77,7 +77,7 @@ class Test_VOD_Episode_List(unittest.TestCase):
     def test_get_mostwatched_episodes(self):
         test_url = nhk_api.rest_url['get_most_watched_episodes']
         vid_id = plugin.vod_episode_list(test_url, 0, 0,
-                                         xbmcplugin.SORT_METHOD_NONE)
+                                         xbmcplugin.SORT_METHOD_NONE, True)
         print(vid_id)
         self.assertIsNotNone(vid_id)
 
@@ -120,6 +120,8 @@ class Test_VOD_Episode_Play_Cache(unittest.TestCase):
         print(episode_url)
         self.assertIsNotNone(episode_url)
 
+    def test_get_episode_cache(self):
+        self.assertIsNotNone(plugin.get_episode_cache())
 
 if __name__ == '__main__':
     unittest.main()
