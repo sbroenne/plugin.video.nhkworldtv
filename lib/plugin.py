@@ -11,6 +11,7 @@ import xbmc
 
 import kodiutils
 import nhk_api
+import cache_api
 import routing
 import utils
 
@@ -31,12 +32,14 @@ VIEW_MODE_WIDELIST = 55
 
 #  Add the Top Stories menu
 def get_episode_cache():
+    # Use NHK World TV Cloud Service to speed-up episode URLlookup
+    # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
     xbmc.log('Getting vod_id/video cache from Azure')
 
     max_episodes = 2000
 
     # Getting top story
-    episodes = utils.get_json(nhk_api.rest_url['cache_get_program_list'].format(max_episodes))
+    episodes = utils.get_json(cache_api.url['cache_get_program_list'].format(max_episodes))
     return (episodes)
 
 # Episode Cache
@@ -564,7 +567,7 @@ def show_episode(vod_id, year, dateadded, enforce_cache=False):
         # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
         xbmc.log('Using Cloud Service to retrieve vod_id: {0}'.format(vod_id))
         program_json = utils.get_json(
-            nhk_api.rest_url['cache_get_program'].format(vod_id))
+            cache_api.url['cache_get_program'].format(vod_id))
         program_Uuid = program_json["ProgramUuid"]
         title = program_json['Title']
         plot = program_json['Plot']

@@ -36,11 +36,7 @@ rest_url = {
     'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',
     'live_stream_url':
     'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp/index_4M.m3u8',
-    'cache_get_program':
-    'https://nhkworldtv.azurewebsites.net/api/Program/{0}',
-    'cache_get_program_list':
-    'https://nhkworldtv.azurewebsites.net/api/Program/List/{0}',
-     'player_url':
+    'player_url':
     'https://movie-s.nhk.or.jp/v/refid/nhkworld/prefid/{0}?embed=js&targetId=videoplayer&de-responsive=true&de-callback-method=nwCustomCallback&de-appid={1}&de-subtitle-on=false',
      'video_url':
     'https://movie-s.nhk.or.jp/ws/ws_program/api/67f5b750-b419-11e9-8a16-0e45e8988f42/apiv/5/mode/json?v={0}',
