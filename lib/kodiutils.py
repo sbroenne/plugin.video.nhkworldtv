@@ -75,9 +75,9 @@ def set_sort_direction(sort_direction):
     #
     # FIXME: This seems to be broken in Kodi 18.6 - current sort order always returns Ascending even if it is descendingg
     #
-    if (current_sort_direction <> sort_direction):
-        xbmc.executebuiltin('Container.SetSortDirection')
-        xbmc.log('Toggling sort direction from {0} to {1}'.format(current_sort_direction, sort_direction))
+    #if (current_sort_direction <> sort_direction):
+    #    xbmc.executebuiltin('Container.SetSortDirection')
+    #    xbmc.log('Toggling sort direction from {0} to {1}'.format(current_sort_direction, sort_direction))
 
 
 # Returns a Full-HD (1080p) video info array
