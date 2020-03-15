@@ -813,7 +813,5 @@ def live_schedule_index():
     else:
         return (None)
 
-
-
 def run():
     plugin.run()

@@ -6,6 +6,7 @@ import xbmc
 import xbmcaddon
 from pytz import timezone
 from tzlocal import get_localzone
+import cache_api
 
 
 # Get Plug-In path
@@ -19,12 +20,14 @@ else:
     db_name ='nhk_world_cache'
 
 # Enable cache for requests
-requests_cache.install_cache(db_name, backend='sqlite', expire_after=1800)
+requests_cache.install_cache(db_name, backend='sqlite', expire_after=3600)
 
 # Instantiate request session
 s = requests.Session()
+
+# FIXME: Adding all API Keys to the request session
 api_key = 'EJfK8jdS57GqlupFgAfAAwr573q01y6k'
-request_params = {'apikey': api_key}
+request_params = {'apikey': api_key, "code": cache_api.api_key}
 s.params = request_params
 
 # Get JSON object from a URL with improved error handling
