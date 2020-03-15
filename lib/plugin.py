@@ -14,6 +14,7 @@ import nhk_api
 import cache_api
 import routing
 import utils
+from episode import Episode
 
 # Initiate constants and plug-in
 ADDON = xbmcaddon.Addon()
@@ -66,35 +67,35 @@ def index():
 #  Add the Top Stories menu
 def add_top_stories_menu_item():
     xbmc.log('Adding top stories menu item')
+    episode = Episode()
 
     # Getting top story
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
     featured_news = api_result_json['data'][0]
-
     thumbnails = featured_news['thumbnails']
 
     if (thumbnails is None):
         # Featured news does not have a thumbnail
-        thumb_image = NHK_ICON
-        fanart_image = NHK_FANART
+        episode.thumb = NHK_ICON
+        episode.fanart = NHK_FANART
     else:
-        thumb_image = utils.get_NHK_website_url(
+        episode.thumb = utils.get_NHK_website_url(
             featured_news['thumbnails']['small'])
-        fanart_image = utils.get_NHK_website_url(
+        episode.fanart = utils.get_NHK_website_url(
             featured_news['thumbnails']['middle'])
-
+    
+    episode.title = kodiutils.get_string(30010)
+  
+    # Create the plot field
     pgm_title = featured_news['title']
     pgm_description = featured_news['description']
-    title = kodiutils.get_string(30010)
-    output = kodiutils.get_string(30012).format(pgm_title, pgm_description)
-
-    li = xbmcgui.ListItem(title)
-    li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
-    video_info = kodiutils.get_SD_video_info()
-    li.addStreamInfo('video', video_info)
-    li.setInfo('video', {'mediatype': 'episode', 'plot': output})
+    episode.plot = kodiutils.get_string(30012).format(pgm_title, pgm_description)
+    
+    # Create the directory itemn
+    episode.video_info = kodiutils.get_SD_video_info()
+    episode.update_list_item()
     xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(top_stories_list), li, True)
+                                plugin.url_for(top_stories_list), episode.kodi_list_item, True)
     return (True)
 
 

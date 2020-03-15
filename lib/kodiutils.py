@@ -48,8 +48,12 @@ def get_setting_as_int(setting):
 
 def get_string(string_id):
     # FIXME: Force returnString to be Unicode - simple .encode did not work!
-    returnString = u'{0}'.format(
-        ADDON.getLocalizedString(string_id).encode('utf-8', 'ignore'))
+    localized_string = ADDON.getLocalizedString(string_id).encode('utf-8', 'ignore')
+    if len(localized_string)>0:
+        returnString = u'{0}'.format(localized_string)
+    else:
+        # Running under unit test - return a unit test string
+        returnString = u'UNIT TEST LOCALIZED STRING {0}'.format(string_id)
     return returnString
 
 

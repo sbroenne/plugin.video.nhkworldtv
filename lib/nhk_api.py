@@ -30,6 +30,8 @@ rest_url = {
     'get_episode_detail':
     nhk_api_parser.get_episode_detail_url(),
     # Not in api.js
+    'get_news_ataglance':
+    'https://www3.nhk.or.jp/nhkworld/en/news/ataglance/index.json',
     'get_news_xml':
     'https://www3.nhk.or.jp/nhkworld/data/en/news/movie/{0}.xml',
     'news_url':
