@@ -7,14 +7,14 @@ verify_ssl = true
 pylint = "<2.0.0"
 autopep8 = "*"
 rope = "*"
+flake8 = "*"
+yapf = "*"
 
 [packages]
 requests = "*"
 pytz = "*"
 tzlocal = "*"
 kodistubs = "*"
-flake8 = "*"
-yapf = "*"
 requests-cache = "<5"
 
 [requires]

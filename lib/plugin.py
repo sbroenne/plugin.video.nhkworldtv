@@ -79,10 +79,8 @@ def add_top_stories_menu_item():
         episode.thumb = NHK_ICON
         episode.fanart = NHK_FANART
     else:
-        episode.thumb = utils.get_NHK_website_url(
-            featured_news['thumbnails']['small'])
-        episode.fanart = utils.get_NHK_website_url(
-            featured_news['thumbnails']['middle'])
+        episode.thumb = featured_news['thumbnails']['small']
+        episode.fanart = featured_news['thumbnails']['middle']
     
     episode.title = kodiutils.get_string(30010)
   
@@ -93,7 +91,6 @@ def add_top_stories_menu_item():
     
     # Create the directory itemn
     episode.video_info = kodiutils.get_SD_video_info()
-    episode.update_list_item()
     xbmcplugin.addDirectoryItem(plugin.handle,
                                 plugin.url_for(top_stories_list), episode.kodi_list_item, True)
     return (True)
@@ -109,7 +106,6 @@ def add_on_demand_menu_item():
 
     no_of_epsisodes = len(featured_episodes)
     pgm_title = None
-
     try_count = 0
     # Fine a valid episode to highlight
     while (pgm_title is None):
@@ -121,20 +117,18 @@ def add_on_demand_menu_item():
         program_json = featured_episodes[featured_episode]
         pgm_title = program_json['pgm_title_clean']
         subtitle = program_json['subtitle']
-
-    fanart_image = utils.get_NHK_website_url(program_json['image_pc'])
-    thumb_image = utils.get_NHK_website_url(program_json['image_sp'])
-    title = kodiutils.get_string(30020)
+    
     episode_name = utils.get_episode_name(pgm_title, subtitle)
 
-    output = kodiutils.get_string(30022).format(episode_name)
-    li = xbmcgui.ListItem(title)
-    li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
-    video_info = kodiutils.get_1080_HD_video_info()
-    li.addStreamInfo('video', video_info)
-    li.setInfo('video', {'mediatype': 'episode', 'plot': output})
-    xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_index), li,
-                                True)
+    episode = Episode()
+    episode.thumb = program_json['image_sp']
+    episode.fanart = program_json['image_pc']
+    episode.title = kodiutils.get_string(30020)
+    episode.plot = kodiutils.get_string(30022).format(episode_name)
+
+    # Create the directory itemn
+    episode.video_info = kodiutils.get_1080_HD_video_info()
+    xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_index), episode.kodi_list_item, True)
     return (True)
 
 
@@ -144,9 +138,9 @@ def add_live_stream_menu_item():
     livestream_url = nhk_api.rest_url['live_stream_url']
     xbmc.log('1080p Livestream Akamai URL: {0}'.format(livestream_url))
 
-    title = kodiutils.get_string(30030)
-    li = xbmcgui.ListItem(title)
-
+    episode = Episode()
+    episode.title = kodiutils.get_string(30030)
+   
     xbmc.log('Retrieving live stream next shows')
     api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)
     program_json = api_result_json['channel']['item']
@@ -155,27 +149,19 @@ def add_live_stream_menu_item():
     row = program_json[0]
 
     # Schedule Information
-    pubDate = int(row['pubDate']) / 1000
-    endDate = int(row['endDate']) / 1000
-
-    broadcast_start_local = utils.to_local_time(pubDate)
-    broadcast_end_local = utils.to_local_time(endDate)
-
-    # Live porgram
-    fanart_image = utils.get_NHK_website_url(row['thumbnail'])
-    thumb_image = utils.get_NHK_website_url(row['thumbnail_s'])
-
+    episode.broadcast_start_date = row['pubDate']
+    episode.broadcast_end_date = row['endDate']
+    episode.thumb = row['thumbnail_s']
+    episode.fanart = row['thumbnail']
+   
     # Title and Description
     full_title = u'{0}\n\n{1}'.format(row['title'], row['description'])
-    plot = u'{0}-{1}: {2}'.format(broadcast_start_local.strftime('%H:%M'),
-                                  broadcast_end_local.strftime('%H:%M'),
+    episode.plot = u'{0}-{1}: {2}'.format(episode.broadcast_start_date.strftime('%H:%M'),
+                                  episode.broadcast_end_date.strftime('%H:%M'),
                                   full_title)
 
-    li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
-    video_info = kodiutils.get_1080_HD_video_info()
-    li.addStreamInfo('video', video_info)
-    li.setInfo('video', {'mediatype': 'episode', 'plot': plot})
-    xbmcplugin.addDirectoryItem(plugin.handle, livestream_url, li, False)
+    episode.video_info = kodiutils.get_1080_HD_video_info()
+    xbmcplugin.addDirectoryItem(plugin.handle, livestream_url, episode.kodi_list_item, False)
     return (True)
 
 
@@ -185,9 +171,9 @@ def add_live_stream_menu_item():
 def add_live_schedule_menu_item():
     xbmc.log('Adding live schedule menu item')
 
-    title = kodiutils.get_string(30036)
-    li = xbmcgui.ListItem(title)
-
+    episode = Episode()
+    episode.title = kodiutils.get_string(30036)
+  
     xbmc.log('Retrieving live stream next shows')
     api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)
     program_json = api_result_json['channel']['item']
@@ -199,25 +185,20 @@ def add_live_schedule_menu_item():
     row = program_json[featured_episode]
 
     # Schedule Information
-    pubDate = int(row['pubDate']) / 1000
-    endDate = int(row['endDate']) / 1000
-    broadcast_start_local = utils.to_local_time(pubDate)
-    broadcast_end_local = utils.to_local_time(endDate)
-    fanart_image = utils.get_NHK_website_url(row['thumbnail'])
-    thumb_image = utils.get_NHK_website_url(row['thumbnail_s'])
+    episode.broadcast_start_date = row['pubDate']
+    episode.broadcast_end_date = row['endDate']
+    episode.thumb = row['thumbnail_s']
+    episode.fanart = row['thumbnail']
 
-    title = u'{0}-{1}: {2}'.format(broadcast_start_local.strftime('%H:%M'),
-                                   broadcast_end_local.strftime('%H:%M'),
+    title = u'{0}-{1}: {2}'.format(episode.broadcast_start_date.strftime('%H:%M'),
+                                   episode.broadcast_end_date.strftime('%H:%M'),
                                    row['title'])
-    output = '{0}\n\n{1}'.format(
+    episode.plot = '{0}\n\n{1}'.format(
         kodiutils.get_string(30022).format(title), row['description'])
 
-    li.setArt({'thumb': thumb_image, 'fanart': fanart_image})
-    video_info = kodiutils.get_1080_HD_video_info()
-    li.addStreamInfo('video', video_info)
-    li.setInfo('video', {'mediatype': 'episode', 'plot': output})
+    episode.video_info = kodiutils.get_1080_HD_video_info()
     xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(live_schedule_index), li, True)
+                                plugin.url_for(live_schedule_index), episode.kodi_list_item, True)
     return (True)
 
 

@@ -1,27 +1,99 @@
 import xbmcgui
+import utils
+from datetime import datetime, timedelta
 
-class Episode():
+
+class Episode(object):
     """ NHK Episode that contains all the necessary informaton
-    to convert it into a Kodi ListItem"""
+    to convert itself into a Kodi ListItem"""
+    def __init__(self):
+        """ Creates an Episode instance """
+        self.vod_id = None
+        self.title = None
+        self.plot = None
+        self.video_info = None
+        self.url = None
+        self.IsPlayable = False
+        self._broadcast_start_date = None
+        self._broadcast_end_date = None
+        self._thumb = None
+        self._fanart = None
+        self._kodi_list_item = None
+  
 
-    def __init__(self, vod_id="", title="", plot="", thumb="", fanart="", video_info=None):
-        """ Creates an Episode instance. All parameters are optional """
-        self.vod_id = vod_id
-        self.title = title
-        self.plot = plot
-        self.thumb = thumb
-        self.fanart= fanart
-        self.video_info = video_info
-        self.kodi_list_item = xbmcgui.ListItem(self.title)
+    #
+    # Properties
+    #
 
-    def update_kodi_list_item(self):
-        """ Updates the Kodi List Item propety with the latest values"""
-        self.kodi_list_item.setLabel = self.title
-        self.kodi_list_item = xbmcgui.ListItem(self.title)
-        self.kodi_list_item.setArt({'thumb': self.thumb, 'fanart': self.fanart})
-        self.kodi_list_item.setInfo('video', {'mediatype': 'episode', 'plot': self.title})
+    @property
+    def broadcast_start_date(self):
+        """ Gets the current broadcast start date in local timezone """
+        return self._broadcast_start_date
+
+    @broadcast_start_date.setter
+    def broadcast_start_date(self, value):
+        """ Sets the current broadcast start date from the timestamp value """
+        timestamp = int(value) // 1000
+        local_date = utils.to_local_time(timestamp)
+        self._broadcast_start_date = local_date
+
+    @property
+    def broadcast_end_date(self):
+        """ Gets the current broadcast end date in local timezone """
+        return self._broadcast_end_date
+
+    @broadcast_end_date.setter
+    def broadcast_end_date(self, value):
+        """ Sets the current broadcast end date from the timestamp value """
+        timestamp = int(value) // 1000
+        local_date = utils.to_local_time(timestamp)
+        self._broadcast_end_date = local_date
+
+    @property
+    def thumb(self):
+        """ Gets the thumbnail URL """
+        return self._thumb
+
+    @thumb.setter
+    def thumb(self, value):
+        """ Sets thumbnail URL """
+        self._thumb = utils.get_NHK_website_url(value)
+
+    @property
+    def fanart(self):
+        """ Gets the fanart URL """
+        return self._fanart
+
+    @fanart.setter
+    def fanart(self, value):
+        """ Sets thumbnail URL """
+        self._fanart = utils.get_NHK_website_url(value)
+
+    @property
+    def kodi_list_item(self):
+        """ Gets the current Kodi List Item """
+        if (self.url is not None):
+            # Path was provided - created the ListItem with path
+            self._kodi_list_item = xbmcgui.ListItem(path=self.url)
+        else:
+            # Create ListItem with title
+            self._kodi_list_item = xbmcgui.ListItem(self.title)
+
+        if (self.IsPlayable):
+            # Playable episode
+            self._kodi_list_item.setProperty('IsPlayable', 'true')
+
+        self._kodi_list_item.setArt({
+            'thumb': self.thumb,
+            'fanart': self.fanart
+        })
+        self._kodi_list_item.setInfo('video', {
+            'mediatype': 'episode',
+            'plot': self.plot,
+            "title": self.title
+        })
         # Only add Stream Info if the the video_info property is not none
         if (self.video_info is not None):
-             self.kodi_list_item.addStreamInfo('video', self.video_info)
-        
-    
+            self._kodi_list_item.addStreamInfo('video', self.video_info)
+
+        return self._kodi_list_item
