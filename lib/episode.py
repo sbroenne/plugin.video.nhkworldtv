@@ -57,7 +57,10 @@ class Episode(object):
     @thumb.setter
     def thumb(self, value):
         """ Sets thumbnail URL """
-        self._thumb = utils.get_NHK_website_url(value)
+        if 'https://' in value:
+            self._thumb = value
+        else:
+            self._thumb = utils.get_NHK_website_url(value)
 
     @property
     def fanart(self):
@@ -67,7 +70,10 @@ class Episode(object):
     @fanart.setter
     def fanart(self, value):
         """ Sets thumbnail URL """
-        self._fanart = utils.get_NHK_website_url(value)
+        if 'https://' in value:
+            self._fanart = value
+        else:
+            self._fanart = utils.get_NHK_website_url(value)
 
     @property
     def kodi_list_item(self):

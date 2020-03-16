@@ -125,16 +125,25 @@ def to_local_time(UTC_timestamp):
     return (dt)
 
 
-# Construct an epsidode name from the title and the subtitle
-
 def get_episode_name(title, subtitle):
+    """ Construct an epsidode name from the title and the subtitle"""
     if len(subtitle) == 0:
         episode_name = u'{0}'.format(title)
     else:
         episode_name = u'{0} - {1}'.format(title, subtitle)
     return (episode_name)
 
-# Returns a valid Kodi Sort-Date
+
 def get_sort_date(datevalue):
+    """ Returns a date that can be used for sorting in Kodi"""
     return datevalue.strftime('%d/%m/%Y')
+
+def get_episodelist_title(title, total_episodes):
+    """ Gets a formated episode list title, e.g. '1 episode' or '2 episodes'"""
+    if (total_episodes == 1):
+        episodelist_title = u'{0} - {1} episode'.format(title, total_episodes)
+    else:
+        episodelist_title = u'{0} - {1} episodes'.format(title, total_episodes)
+    return (episodelist_title)
+
 

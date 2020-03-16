@@ -254,37 +254,29 @@ def vod_programs():
     api_result_json = utils.get_json(nhk_api.rest_url['get_programs'])
     program_json = api_result_json['vod_programs']['programs']
     row_count = 0
+  
     for row in program_json:
         row_count = row_count + 1
+        episode = Episode()
+        # Format title
         title = program_json[row]['title_clean']
-        plot = program_json[row]['description_clean']
-        poster_image = utils.get_NHK_website_url(program_json[row]['image_l'])
-        thumb_image = utils.get_NHK_website_url(program_json[row]['image'])
         total_episodes = program_json[row]['total_episode']
-        if (total_episodes == 1):
-            title = u'{0} - {1} episode'.format(title, total_episodes)
-        else:
-            title = u'{0} - {1} episodes'.format(title, total_episodes)
-        api_url = nhk_api.rest_url['get_programs_episode_list'].format(row)
-        if (total_episodes > 0):
-            li = xbmcgui.ListItem(title)
-            li.setArt({
-                'thumb': thumb_image,
-                'poster': poster_image,
-                'fanart': poster_image
-            })
-            li.setInfo('video', {
-                'mediatype': 'videos',
-                'title': title,
-                'plot': plot
-            })
-            xbmc.log('Creating Directory Item {0} - {1}'.format(
-                api_url, title.encode('ascii', 'ignore')))
+        episodelist_title = utils.get_episodelist_title(title, total_episodes)
+        episode.title = episodelist_title
+        
+        episode.plot = program_json[row]['description_clean']
+        episode.thumb = utils.get_NHK_website_url(program_json[row]['image'])
+        episode.fanart = utils.get_NHK_website_url(program_json[row]['image_l'])
 
-            xbmcplugin.addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(vod_episode_list, api_url, 1, 0,
-                               xbmcplugin.SORT_METHOD_DATE), li, True)
+        # Create the directory item
+        api_url = nhk_api.rest_url['get_programs_episode_list'].format(row)
+        xbmc.log('Creating Directory Item {0} - {1}'.format(
+            api_url, title.encode('ascii', 'ignore')))
+
+        xbmcplugin.addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(vod_episode_list, api_url, 1, 0,
+                            xbmcplugin.SORT_METHOD_DATE), episode.kodi_list_item, True)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_INFOWALL)
@@ -307,27 +299,26 @@ def vod_categories():
     row_count = 0
     for row in api_result_json['vod_categories']:
         row_count = row_count + 1
-        categoryId = row['category_id']
+        episode = Episode()
+        # Format title
         title = row['name']
         total_epsiodes = row['count']
-        if (total_epsiodes == 1):
-            title = u'{0} - {1} episode'.format(title, total_epsiodes)
-        else:
-            title = u'{0} - {1} episodes'.format(title, total_epsiodes)
+        episodelist_title = utils.get_episodelist_title(title, total_epsiodes)
+        episode.title = episodelist_title
 
-        thumb_image = row['icon_l']
+        episode.thumb = row['icon_l']
+        episode.fanart = row['icon_l']
+    
+        # Create the directory item
+        categoryId = row['category_id']
         api_url = nhk_api.rest_url['get_categories_episode_list'].format(
             categoryId)
-        if (total_epsiodes > 0):
-            li = xbmcgui.ListItem(title)
-            li.setArt({'thumb': thumb_image})
-            li.setInfo('video', {'mediatype': 'videos', 'title': title})
-            xbmc.log('Creating Directory Item {0} - {1}'.format(
-                api_url, title.encode('ascii', 'ignore')))
-            xbmcplugin.addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(vod_episode_list, api_url, 0, 0,
-                               xbmcplugin.SORT_METHOD_TITLE), li, True)
+        xbmc.log('Creating Directory Item {0} - {1}'.format(
+            api_url, title.encode('ascii', 'ignore')))
+        xbmcplugin.addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(vod_episode_list, api_url, 0, 0,
+                            xbmcplugin.SORT_METHOD_TITLE), episode.kodi_list_item, True)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_WALL)
@@ -349,30 +340,28 @@ def vod_playlists():
     api_result_json = utils.get_json(nhk_api.rest_url['get_playlists'])
     row_count = 0
     for row in api_result_json['data']['playlist']:
-        row_count = row_count + 1
-        playlistId = row['playlist_id']
+        row_count = row_count + 1        
+        episode = Episode()
+        # Format title
         title = row['title_clean']
         total_epsiodes = row['track_total']
-        if (total_epsiodes == 1):
-            title = u'{0} - {1} episode'.format(title, total_epsiodes)
-        else:
-            title = u'{0} - {1} episodes'.format(title, total_epsiodes)
-
-        thumb_image = utils.get_NHK_website_url(row['image_square'])
+        episodelist_title = utils.get_episodelist_title(title, total_epsiodes)
+        episode.title = episodelist_title
+  
+        episode.thumb = row['image_square']
+        episode.fanart = row['image_square']
+        
+        playlistId = row['playlist_id']
         api_url = nhk_api.rest_url['get_playlists_episode_list'].format(
             playlistId)
 
-        if (total_epsiodes > 0):
-            li = xbmcgui.ListItem(title)
-            li.setArt({'thumb': thumb_image})
-            li.setInfo('video', {'mediatype': 'videos', 'title': title})
-            xbmc.log('Creating Directory Item {0} - {1}'.format(
-                api_url, title.encode('ascii', 'ignore')))
+        xbmc.log('Creating Directory Item {0} - {1}'.format(
+            api_url, title.encode('ascii', 'ignore')))
 
-            xbmcplugin.addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(vod_episode_list, api_url, 0, 1,
-                               xbmcplugin.SORT_METHOD_TITLE), li, True)
+        xbmcplugin.addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(vod_episode_list, api_url, 0, 1,
+                            xbmcplugin.SORT_METHOD_TITLE), episode.kodi_list_item, True)
 
     xbmcplugin.setContent(plugin.handle, 'videos')
     kodiutils.set_view_mode(VIEW_MODE_WALL)
