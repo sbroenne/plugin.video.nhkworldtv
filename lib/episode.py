@@ -9,8 +9,10 @@ class Episode(object):
     def __init__(self):
         """ Creates an Episode instance """
         self.vod_id = None
+        self.pgm_no = None
         self.title = None
         self.plot = None
+        self.duration = None
         self.video_info = None
         self.url = None
         self.IsPlayable = False
@@ -78,6 +80,8 @@ class Episode(object):
     @property
     def kodi_list_item(self):
         """ Gets the current Kodi List Item """
+
+        info_labels = {}
         if (self.url is not None):
             # Path was provided - created the ListItem with path
             self._kodi_list_item = xbmcgui.ListItem(path=self.url)
@@ -93,11 +97,14 @@ class Episode(object):
             'thumb': self.thumb,
             'fanart': self.fanart
         })
-        self._kodi_list_item.setInfo('video', {
-            'mediatype': 'episode',
-            'plot': self.plot,
-            "title": self.title
-        })
+        
+        # Add Kodi InfoLabels
+        info_labels = {}
+        info_labels['mediatype'] = 'episode'
+        info_labels['plot'] = self.plot
+        info_labels['title'] = self.title
+        self._kodi_list_item.setInfo('video',info_labels)
+       
         # Only add Stream Info if the the video_info property is not none
         if (self.video_info is not None):
             self._kodi_list_item.addStreamInfo('video', self.video_info)

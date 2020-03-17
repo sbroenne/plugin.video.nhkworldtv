@@ -3,6 +3,7 @@
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcplugin
 
 # read settings
 ADDON = xbmcaddon.Addon()
@@ -94,3 +95,17 @@ def get_1080_HD_video_info():
 def get_SD_video_info():
     video_info = {'aspect': '1.78', 'width': '640', 'height': '360'}
     return (video_info)
+
+# Sets the metadatalike VIEW_MODE and SORT_METHOD on the current Kodi directory
+def set_video_directory_information(plugin_handle, view_mode, sort_method):
+    """ Sets the metadate like VIEW_MODE and SORT_METHOD on the current Kodi directory """
+    xbmcplugin.setContent(plugin_handle, 'videos')
+    set_view_mode(view_mode)
+    xbmcplugin.addSortMethod(plugin_handle, sort_method)
+    
+    # If we sort by date added, make sure sort direction
+    # is descending (e.g. for latest episodes)
+    if (sort_method == xbmcplugin.SORT_METHOD_DATE):
+        set_sort_direction('Descending')
+
+    xbmcplugin.endOfDirectory(plugin_handle)
