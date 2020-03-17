@@ -15,12 +15,14 @@ class Episode(object):
         self.duration = None
         self.video_info = None
         self.url = None
+        self._date = None
+        self._year = None
         self.IsPlayable = False
         self._broadcast_start_date = None
         self._broadcast_end_date = None
         self._thumb = None
         self._fanart = None
-        self._kodi_list_item = None
+        self._kodi_list_item = xbmcgui.ListItem
   
 
     #
@@ -78,22 +80,41 @@ class Episode(object):
             self._fanart = utils.get_NHK_website_url(value)
 
     @property
+    def date(self):
+        """ Get the sort date in Kodi date format """
+        if (self._date is not None):
+            return self._date.strftime('%d/%m/%Y')
+        else:
+            return None
+
+    @date.setter
+    def date(self, value):
+        self._date = value
+
+    @property
+    def year(self):
+        if (self._date is not None):
+            self._year = self._date.strftime('%Y')
+            return self._year
+        else:
+            return None
+
+    @property
     def kodi_list_item(self):
         """ Gets the current Kodi List Item """
-
-        info_labels = {}
+        
         if (self.url is not None):
             # Path was provided - created the ListItem with path
-            self._kodi_list_item = xbmcgui.ListItem(path=self.url)
+            li = xbmcgui.ListItem(path=self.url)
         else:
             # Create ListItem with title
-            self._kodi_list_item = xbmcgui.ListItem(self.title)
+            li = xbmcgui.ListItem(self.title)
 
         if (self.IsPlayable):
             # Playable episode
-            self._kodi_list_item.setProperty('IsPlayable', 'true')
+            li.setProperty('IsPlayable', 'true')
 
-        self._kodi_list_item.setArt({
+        li.setArt({
             'thumb': self.thumb,
             'fanart': self.fanart
         })
@@ -103,10 +124,25 @@ class Episode(object):
         info_labels['mediatype'] = 'episode'
         info_labels['plot'] = self.plot
         info_labels['title'] = self.title
-        self._kodi_list_item.setInfo('video',info_labels)
+        
+        if (self.duration is not None):
+            info_labels['duration'] = self.duration
+
+        if (self.pgm_no is not None):
+            info_labels['pgm_no'] = self.pgm_no
+
+        if (self.year is not None):
+            info_labels['year'] = self.year
+        
+        if (self._date is not None):
+            info_labels['date'] = self.date
+            
+        li.setInfo('video',info_labels)
        
         # Only add Stream Info if the the video_info property is not none
         if (self.video_info is not None):
-            self._kodi_list_item.addStreamInfo('video', self.video_info)
+            li.addStreamInfo('video', self.video_info)
+
+        self._kodi_list_item = li
 
         return self._kodi_list_item

@@ -97,15 +97,13 @@ def get_SD_video_info():
     return (video_info)
 
 # Sets the metadatalike VIEW_MODE and SORT_METHOD on the current Kodi directory
-def set_video_directory_information(plugin_handle, view_mode, sort_method):
-    """ Sets the metadate like VIEW_MODE and SORT_METHOD on the current Kodi directory """
+def set_video_directory_information(plugin_handle, view_mode, sort_method, sort_direction="Ascending"):
+    """ Sets the metadate like VIEW_MODE and SORT_METHOD on the current Kodi directory 
+    sort_direction can be either Ascending or Descending
+    """
     xbmcplugin.setContent(plugin_handle, 'videos')
     set_view_mode(view_mode)
     xbmcplugin.addSortMethod(plugin_handle, sort_method)
-    
-    # If we sort by date added, make sure sort direction
-    # is descending (e.g. for latest episodes)
-    if (sort_method == xbmcplugin.SORT_METHOD_DATE):
-        set_sort_direction('Descending')
+    set_sort_direction(sort_method)
 
     xbmcplugin.endOfDirectory(plugin_handle)

@@ -133,11 +133,6 @@ def get_episode_name(title, subtitle):
         episode_name = u'{0} - {1}'.format(title, subtitle)
     return (episode_name)
 
-
-def get_sort_date(datevalue):
-    """ Returns a date that can be used for sorting in Kodi"""
-    return datevalue.strftime('%d/%m/%Y')
-
 def get_episodelist_title(title, total_episodes):
     """ Gets a formated episode list title, e.g. '1 episode' or '2 episodes'"""
     if (total_episodes == 1):
