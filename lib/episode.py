@@ -13,18 +13,20 @@ class Episode(object):
         self.title = None
         self.plot = None
         self.duration = None
-        self.video_info = None
+        self.aspect = None
+        self.width = None
+        self.height = None
         self.url = None
-        self._date = None
-        self._year = None
         self.IsPlayable = False
+        self._date = None
+        self._year = None  
         self._broadcast_start_date = None
         self._broadcast_end_date = None
         self._thumb = None
         self._fanart = None
+        self._video_info = None
         self._kodi_list_item = xbmcgui.ListItem
-  
-
+        self.absolute_image_url = False
     #
     # Properties
     #
@@ -61,10 +63,10 @@ class Episode(object):
     @thumb.setter
     def thumb(self, value):
         """ Sets thumbnail URL """
-        if value.find('https://') >0:
-            self._thumb = value
-        else:
+        if ('/nhkworld/' in value and not self.absolute_image_url):
             self._thumb = utils.get_NHK_website_url(value)
+        else:
+            self._thumb = value
 
     @property
     def fanart(self):
@@ -74,10 +76,11 @@ class Episode(object):
     @fanart.setter
     def fanart(self, value):
         """ Sets thumbnail URL """
-        if value.find('https://') >0:
-            self._fanart = value
-        else:
+        if ('/nhkworld/' in value and not self.absolute_image_url):
             self._fanart = utils.get_NHK_website_url(value)
+        else:
+            self._fanart = value
+            
 
     @property
     def date(self):
@@ -98,6 +101,22 @@ class Episode(object):
             return self._year
         else:
             return None
+
+    @property
+    def video_info(self):
+        if (self._video_info is not None):
+            return self._video_info
+        elif (self.aspect is not None):
+            vi = {'aspect': self.aspect, 'width': self.width, 'height': self.height}
+            self._video_info = vi
+            return vi
+            
+        else:
+            return None
+    
+    @video_info.setter
+    def video_info(self, value):
+        self._video_info = value
 
     @property
     def kodi_list_item(self):

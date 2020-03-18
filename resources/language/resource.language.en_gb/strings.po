@@ -93,7 +93,7 @@ msgstr ""
 
 # Live Schedule
 msgctxt "#30070"
-msgid "{0} - WATCH NOW!"
+msgid "ON DEMAND/{0}"
 msgstr ""
 
 
