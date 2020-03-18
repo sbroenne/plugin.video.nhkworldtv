@@ -106,6 +106,7 @@ class Episode(object):
         if (self.url is not None):
             # Path was provided - created the ListItem with path
             li = xbmcgui.ListItem(path=self.url)
+            li.setLabel(self.title)
         else:
             # Create ListItem with title
             li = xbmcgui.ListItem(self.title)
@@ -123,7 +124,6 @@ class Episode(object):
         info_labels = {}
         info_labels['mediatype'] = 'episode'
         info_labels['plot'] = self.plot
-        info_labels['title'] = self.title
         
         if (self.duration is not None):
             info_labels['duration'] = self.duration

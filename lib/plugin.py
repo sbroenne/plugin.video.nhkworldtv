@@ -243,8 +243,10 @@ def add_live_schedule_menu_item():
     xbmc.log('Adding live schedule menu item')
     program_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)['channel']['item']
   
-    # Get first episode
-    row = program_json[0]
+    # Featured Episode
+    no_of_epsisodes = len(program_json)
+    featured_episode = random.randint(1, no_of_epsisodes - 1)
+    row = program_json[featured_episode]
 
     # Add live-schedule text
     episode = Episode()
@@ -294,17 +296,18 @@ def live_schedule_index():
         episode.thumb = row['thumbnail_s']
         episode.fanart = row['thumbnail']
         episode_name= utils.get_episode_name(row['title'], row['subtitle'])
-        
+        title =  u'{0}-{1}: {2}'.format(
+                episode.broadcast_start_date.strftime('%H:%M'),
+                episode.broadcast_end_date.strftime('%H:%M'), episode_name)
+    
         vod_id = row['vod_id']
         episode.vod_id = vod_id
         if (len(vod_id) > 0):
             # Can play on-demand
             episode.IsPlayable=True
-            episode.title = kodiutils.get_string(30070).format(episode_name)
+            episode.title = kodiutils.get_string(30070).format(title)
         else:
-            episode.title = u'{0}-{1}: {2}'.format(
-                episode.broadcast_start_date.strftime('%H:%M'),
-                episode.broadcast_end_date.strftime('%H:%M'), episode_name)
+            episode.title = title
 
         episode.plot = u'{0}\n\n{1}'.format(episode_name, row['description'])
        
@@ -490,6 +493,8 @@ def add_playable_episode_directory_item(vod_id, episode_name, plot, duration, da
     episode = Episode()
     episode.vod_id = vod_id
     episode.date = date
+    episode.title = episode_name
+    episode.plot = plot
 
     if (thumb_image is not None):
         episode.thumb = thumb_image
