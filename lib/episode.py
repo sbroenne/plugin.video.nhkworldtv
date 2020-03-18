@@ -61,7 +61,7 @@ class Episode(object):
     @thumb.setter
     def thumb(self, value):
         """ Sets thumbnail URL """
-        if 'https://' in value:
+        if value.find('https://') >0:
             self._thumb = value
         else:
             self._thumb = utils.get_NHK_website_url(value)
@@ -74,7 +74,7 @@ class Episode(object):
     @fanart.setter
     def fanart(self, value):
         """ Sets thumbnail URL """
-        if 'https://' in value:
+        if value.find('https://') >0:
             self._fanart = value
         else:
             self._fanart = utils.get_NHK_website_url(value)

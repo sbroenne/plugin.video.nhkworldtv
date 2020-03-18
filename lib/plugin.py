@@ -63,8 +63,11 @@ def index():
     xbmcplugin.endOfDirectory(plugin.handle)
     return (True)
 
+#
+# Top Stories
+#
 
-#  Add the Top Stories menu
+#  Menu item
 def add_top_stories_menu_item():
     xbmc.log('Adding top stories menu item')
   
@@ -89,13 +92,89 @@ def add_top_stories_menu_item():
     # Create the directory itemn
     episode.video_info = kodiutils.get_SD_video_info()
     xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(top_stories_list), episode.kodi_list_item, True)
+                                plugin.url_for(top_stories_index), episode.kodi_list_item, True)
     return (True)
+
+
+# List
+@plugin.route('/vod/top_stories/index')
+def top_stories_index():
+    xbmc.log('Displaying Top Stories Index')
+    api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
+    MAX_ROW_COUNT = 23
+    result_row_count = len(api_result_json['data'])
+    # Only display MAX ROWS
+    if (result_row_count < MAX_ROW_COUNT):
+        MAX_ROW_COUNT = result_row_count
+
+    for row_count in range(0, MAX_ROW_COUNT - 1):
+        row = api_result_json['data'][row_count]
+        
+        episode = Episode()
+        title = row['title']
+        
+        thumbnails = row['thumbnails']
+
+        if (thumbnails is None):
+            # Featured news does not have a thumbnail
+            episode.thumb = NHK_ICON
+            episode.fanart = NHK_FANART
+        else:
+            episode.thumb = row['thumbnails']['small']
+            episode.fanart = row['thumbnails']['middle']
+
+        episode.broadcast_start_date = row['updated_at']
+        episode.date = episode.broadcast_start_date
+        
+        time_difference_hours = datetime.now().hour - episode.broadcast_start_date.hour
+        if (time_difference_hours <= 1):
+            time_difference = kodiutils.get_string(30060).format(
+                time_difference_hours)
+        else:
+            time_difference = kodiutils.get_string(30061).format(
+                time_difference_hours)
+
+        if row['videos'] is not None:
+            # Top stories that have a video attached to them
+            episode.title = kodiutils.get_string(30070).format(title)
+            vod_id = row['id']
+            episode.vod_id = vod_id
+            video_xml_url = nhk_api.rest_url['get_news_xml'].format(vod_id)
+            video_response = utils.get_url(video_xml_url)
+            video_xml = str(video_response.content)
+            start_pos = video_xml.find(vod_id)
+            end_pos = video_xml.find('HQ')
+            video_file = video_xml[start_pos:end_pos]
+            episode.url = nhk_api.rest_url['news_url'].format(video_file)
+            episode.duration = row['videos']['duration']
+            minutes = int(episode.duration / 60)
+            seconds = episode.duration - (minutes * 60)
+            duration_text = '{0}m {1}'.format(minutes, seconds)
+           
+            episode.plot = u'{0} | {1}\n\n{2}'.format(duration_text, time_difference, row['description'])
+            episode.video_info = kodiutils.get_SD_video_info()
+            episode.IsPlayable = True
+            xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item, False)
+
+        else:
+            # No video attached to it
+            episode.title = title
+            episode.plot = u'{0}\n\n{1}'.format(time_difference, row['description'])
+            episode.IsPlayable = False
+            xbmcplugin.addDirectoryItem(plugin.handle, None, episode.kodi_list_item, False)
+
+    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_DATE, "Descending")
+
+    # Used for unit testing
+    # only successfull if we processed at least top story
+    if (row_count > 0):
+        return (row_count)
+    else:
+        return (0)
 
 
 # Add on-demand menu item
 def add_on_demand_menu_item():
-
     xbmc.log('Adding on-demand menu item')
     # Getting random on-demand episode to show
     featured_episodes = utils.get_json(nhk_api.rest_url['homepage_ondemand'])['data']['items']
@@ -155,28 +234,26 @@ def add_live_stream_menu_item():
     xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item, False)
     return (True)
 
+#
+# Live schedule
+#
 
-# Add live schedule menu item
-
-
+# Menu item
 def add_live_schedule_menu_item():
     xbmc.log('Adding live schedule menu item')
-
-    xbmc.log('Retrieving live stream next shows')
     program_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)['channel']['item']
-    no_of_epsisodes = len(program_json)
-    featured_episode = random.randint(1, no_of_epsisodes - 1)
+  
+    # Get first episode
+    row = program_json[0]
 
     # Add live-schedule text
     episode = Episode()
     episode.title = kodiutils.get_string(30036)
   
-    # Featured Episode
-    row = program_json[featured_episode]
-
     # Schedule Information
     episode.broadcast_start_date = row['pubDate']
     episode.broadcast_end_date = row['endDate']
+    episode.date = episode.broadcast_start_date
     episode.thumb = row['thumbnail_s']
     episode.fanart = row['thumbnail']
 
@@ -190,6 +267,57 @@ def add_live_schedule_menu_item():
     xbmcplugin.addDirectoryItem(plugin.handle,
                                 plugin.url_for(live_schedule_index), episode.kodi_list_item, True)
     return (True)
+ 
+
+#
+# List
+#
+
+@plugin.route('/live_schedule/index')
+def live_schedule_index():
+    xbmc.log('Adding live schedule inde')
+    program_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)['channel']['item']
+
+    row_count = 0
+    for row in program_json:
+        row_count = row_count + 1
+
+        episode = Episode()
+        # Schedule Information
+        episode.broadcast_start_date = row['pubDate']
+        episode.broadcast_end_date = row['endDate']
+        episode.date = episode.broadcast_start_date
+        duration_diff = episode.broadcast_start_date-episode.broadcast_end_date
+        episode.duration = duration_diff.seconds
+        
+        # Live program
+        episode.thumb = row['thumbnail_s']
+        episode.fanart = row['thumbnail']
+        episode_name= utils.get_episode_name(row['title'], row['subtitle'])
+        
+        vod_id = row['vod_id']
+        episode.vod_id = vod_id
+        if (len(vod_id) > 0):
+            # Can play on-demand
+            episode.IsPlayable=True
+            episode.title = kodiutils.get_string(30070).format(episode_name)
+        else:
+            episode.title = u'{0}-{1}: {2}'.format(
+                episode.broadcast_start_date.strftime('%H:%M'),
+                episode.broadcast_end_date.strftime('%H:%M'), episode_name)
+
+        episode.plot = u'{0}\n\n{1}'.format(episode_name, row['description'])
+       
+        if (episode.IsPlayable):
+            # Display the playable episode
+            add_playable_episode_directory_item(episode.vod_id, episode.title, episode.plot, episode.duration, episode.broadcast_start_date, episode.year, episode.thumb, episode.fanart)   
+        else:
+            # Simply display text
+            xbmcplugin.addDirectoryItem(plugin.handle, None, episode.kodi_list_item, False)
+
+    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_WIDELIST, xbmcplugin.SORT_METHOD_DATE, "Ascending")
+
+    return row_count
 
 
 #
@@ -244,28 +372,26 @@ def vod_programs():
     program_json = utils.get_json(nhk_api.rest_url['get_programs'])['vod_programs']['programs']
     row_count = 0
   
-    for row in program_json:
+    for index in program_json:
+        row = program_json[index]
         row_count = row_count + 1
+   
         episode = Episode()
-        # Format title
-        title = program_json[row]['title_clean']
-        total_episodes = program_json[row]['total_episode']
-        episodelist_title = utils.get_episodelist_title(title, total_episodes)
-        episode.title = episodelist_title
-        
-        episode.plot = program_json[row]['description_clean']
-        episode.thumb = utils.get_NHK_website_url(program_json[row]['image'])
-        episode.fanart = utils.get_NHK_website_url(program_json[row]['image_l'])
+        episode.title= utils.get_episodelist_title(row['title_clean'], row['total_episode'])
+        episode.plot = row['description_clean']
+        episode.thumb = row['image']
+        episode.fanart = row['image_l']
+        episode.video_info = kodiutils.get_1080_HD_video_info()
 
         # Create the directory item
         api_url = nhk_api.rest_url['get_programs_episode_list'].format(row)
         xbmc.log('Creating Directory Item {0} - {1}'.format(
-            api_url, title.encode('ascii', 'ignore')))
+            api_url, episode.title.encode('ascii', 'ignore')))
 
         xbmcplugin.addDirectoryItem(
             plugin.handle,
             plugin.url_for(vod_episode_list, api_url, 1, 0,
-                            xbmcplugin.SORT_METHOD_DATE), episode.kodi_list_item, True)
+                            xbmcplugin.SORT_METHOD_TITLE), episode.kodi_list_item, True)
 
     kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_TITLE)
    
@@ -275,9 +401,7 @@ def vod_programs():
     else:
         return (None)
 
-
 # Categories
-
 
 @plugin.route('/vod/categories/')
 def vod_categories():
@@ -287,21 +411,18 @@ def vod_categories():
     for row in api_result_json['vod_categories']:
         row_count = row_count + 1
         episode = Episode()
-        # Format title
-        title = row['name']
-        total_epsiodes = row['count']
-        episodelist_title = utils.get_episodelist_title(title, total_epsiodes)
-        episode.title = episodelist_title
-
+      
+        episode.title = utils.get_episodelist_title(row['name'], row['count'])
         episode.thumb = row['icon_l']
         episode.fanart = row['icon_l']
+        episode.video_info = kodiutils.get_1080_HD_video_info()
     
         # Create the directory item
         categoryId = row['category_id']
         api_url = nhk_api.rest_url['get_categories_episode_list'].format(
             categoryId)
         xbmc.log('Creating Directory Item {0} - {1}'.format(
-            api_url, title.encode('ascii', 'ignore')))
+            api_url, episode.title.encode('ascii', 'ignore')))
         xbmcplugin.addDirectoryItem(
             plugin.handle,
             plugin.url_for(vod_episode_list, api_url, 0, 0,
@@ -326,13 +447,9 @@ def vod_playlists():
     row_count = 0
     for row in api_result_json['data']['playlist']:
         row_count = row_count + 1        
+        
         episode = Episode()
-        # Format title
-        title = row['title_clean']
-        total_epsiodes = row['track_total']
-        episodelist_title = utils.get_episodelist_title(title, total_epsiodes)
-        episode.title = episodelist_title
-  
+        episode.title = utils.get_episodelist_title(row['title_clean'], row['track_total'])
         episode.thumb = row['image_square']
         episode.fanart = row['image_square']
         
@@ -341,7 +458,7 @@ def vod_playlists():
             playlistId)
 
         xbmc.log('Creating Directory Item {0} - {1}'.format(
-            api_url, title.encode('ascii', 'ignore')))
+            api_url, episode.title.encode('ascii', 'ignore')))
 
         xbmcplugin.addDirectoryItem(
             plugin.handle,
@@ -363,7 +480,7 @@ def vod_playlists():
 # via show_epsisode()
 #
 
-def add_episode_directory_item(vod_id, episode_name, plot, duration, date, thumb_image, large_image,enforce_cache = False):
+def add_playable_episode_directory_item(vod_id, episode_name, plot, duration, date, thumb_image, fanart,enforce_cache = False):
     # Use the cache backend or not
     if (enforce_cache):
         use_backend = True
@@ -374,6 +491,11 @@ def add_episode_directory_item(vod_id, episode_name, plot, duration, date, thumb
     episode.vod_id = vod_id
     episode.date = date
 
+    if (thumb_image is not None):
+        episode.thumb = thumb_image
+    if (fanart is not None):
+        episode.fanart = fanart
+
     if (use_backend):
         if (vod_id in EPISODE_CACHE):
             cached_episode = EPISODE_CACHE[vod_id]
@@ -382,9 +504,8 @@ def add_episode_directory_item(vod_id, episode_name, plot, duration, date, thumb
             episode.aspect = cached_episode['Aspect']
             episode.width = cached_episode['Width']
             episode.height = cached_episode['Height']
+            episode.onair = cached_episode['OnAir']
             episode.duration = duration
-            episode.thumb = thumb_image
-            episode.fanart = large_image
             episode.IsPlayable=True
             
             xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item)
@@ -392,9 +513,7 @@ def add_episode_directory_item(vod_id, episode_name, plot, duration, date, thumb
 
     # Need to be resolve dynmaically
     episode.duration = duration
-    episode.thumb = thumb_image
-    episode.fanart = large_image
-  
+
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(show_episode,episode.vod_id), episode.kodi_list_item
@@ -449,7 +568,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             episode.plot = description
     
         # Add the current episode directory item
-        add_episode_directory_item(episode.vod_id, episode.title, episode.plot, episode.duration, episode.broadcast_start_date,  episode.thumb, episode.fanart, enforceCache)   
+        add_playable_episode_directory_item(episode.vod_id, episode.title, episode.plot, episode.duration, episode.broadcast_start_date,  episode.thumb, episode.fanart, enforceCache)   
 
     sort_method = int(sort_method)
     kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, sort_method)
@@ -491,6 +610,7 @@ def show_episode(vod_id, enforce_cache=False):
         episode.aspect = cached_episode['Aspect']
         episode.width = cached_episode['Width']
         episode.height = cached_episode['Height']
+        episode.onair = cached_episode['OnAir']
     else:
         # Get result from NHK - slow
         xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
@@ -524,134 +644,9 @@ def show_episode(vod_id, enforce_cache=False):
     xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
     return (episode.url)
 
-
-# Top Stories - List
-@plugin.route('/vod/top_stories_list/')
-def top_stories_list():
-    xbmc.log('Displaying Top Stories list')
-    api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
-    MAX_ROW_COUNT = 12
-    result_row_count = len(api_result_json['data'])
-    # Only display MAX ROWS
-    if (result_row_count < MAX_ROW_COUNT):
-        MAX_ROW_COUNT = result_row_count
-
-    for row_count in range(0, MAX_ROW_COUNT - 1):
-        row = api_result_json['data'][row_count]
-        title = row['title']
-        episode = Episode()
-        
-        thumbnails = row['thumbnails']
-
-        if (thumbnails is None):
-            # Featured news does not have a thumbnail
-            episode.thumb = NHK_ICON
-            episode.fanart = NHK_FANART
-        else:
-            episode.thumb = row['thumbnails']['small']
-            episode.fanart = row['thumbnails']['middle']
-
-        episode.broadcast_start_date = row['updated_at']
-        episode.sort_date = episode.broadcast_start_date
-        
-        time_difference_hours = datetime.now().hour - episode.broadcast_start_date.hour
-        if (time_difference_hours <= 1):
-            time_difference = kodiutils.get_string(30060).format(
-                time_difference_hours)
-        else:
-            time_difference = kodiutils.get_string(30061).format(
-                time_difference_hours)
-
-        if row['videos'] is not None:
-            # Top stories that have a video attached to them
-            title = kodiutils.get_string(30070).format(title)
-            vod_id = row['id']
-            video_xml_url = nhk_api.rest_url['get_news_xml'].format(vod_id)
-            video_response = utils.get_url(video_xml_url)
-            video_xml = str(video_response.content)
-            start_pos = video_xml.find(vod_id)
-            end_pos = video_xml.find('HQ')
-            video_file = video_xml[start_pos:end_pos]
-            episode.url = nhk_api.rest_url['news_url'].format(video_file)
-            episode.duration = row['videos']['duration']
-            minutes = int(episode.duration / 60)
-            seconds = episode.duration - (minutes * 60)
-            duration_text = '{0}m {1}s'.format(minutes, seconds)
-            episode.plot = u'{0} | {1}\n\n{2}'.format(duration_text, time_difference, row['description'])
-            episode.video_info = kodiutils.get_SD_video_info()
-            episode.IsPlayable = True
-            xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item, False)
-
-        else:
-            # No video attached to it
-            episode.plot = u'{0}\n\n{1}'.format(time_difference, row['description'])
-            episode.IsPlayable = False
-            xbmcplugin.addDirectoryItem(plugin.handle, None, episode.kodi_list_item, False)
-
-    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_DATE, "Descending")
-
-    # Used for unit testing
-    # only successfull if we processed at least top story
-    if (row_count > 0):
-        return (row_count)
-    else:
-        return (0)
-
-
 #
-# Live Schedule Menu
+# Main loop
 #
-
-
-@plugin.route('/live_schedule/index')
-def live_schedule_index():
-    xbmc.log('Adding live schedule menu item')
-
-    xbmc.log('Retrieving live stream next shows')
-    api_result_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)
-    program_json = api_result_json['channel']['item']
-
-    row_count = 0
-    for row in program_json:
-        row_count = row_count + 1
-
-        episode = Episode()
-        # Schedule Information
-        episode.broadcast_start_date = row['pubDate']
-        episode.broadcast_end_date = row['endDate']
-        duration_diff = episode.broadcast_start_date-episode.broadcast_end_date
-        episode.duration = duration_diff.seconds
-        
-        # Live program
-        episode.thumb = row['thumbnail_s']
-        episode.fanart = row['thumbnail']
-        episode_name= utils.get_episode_name(row['title'], row['subtitle'])
-        
-        vod_id = row['vod_id']
-        if (len(vod_id) > 0):
-            # Can play on-demand
-            episode.IsPlayable=True
-            episode.title = kodiutils.get_string(30070).format(episode_name)
-        else:
-            episode.title = u'{0}-{1}: {2}'.format(
-                episode.broadcast_start_date.strftime('%H:%M'),
-                episode.broadcast_end_date.strftime('%H:%M'), episode_name)
-
-        episode.plot = u'{0}\n\n{1}'.format(episode_name, row['description'])
-        episode.vod_id = row['vod_id']
-
-        if (episode.IsPlayable):
-            # Add the episode directory item
-            add_episode_directory_item(episode.vod_id, episode.title, episode.plot, episode.duration, episode.broadcast_start_date, episode.year, episode.thumb, episode.fanart)   
-        else:
-            xbmcplugin.addDirectoryItem(plugin.handle, None, episode.kodi_list_item, False)
-
-    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_DATE, "Ascending")
-
-    if (row_count > 0):
-        return (True)
-    else:
-        return (None)
 
 def run():
     plugin.run()

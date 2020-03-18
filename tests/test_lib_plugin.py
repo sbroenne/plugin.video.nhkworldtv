@@ -15,8 +15,6 @@ class Test_Navigation_Menus(unittest.TestCase):
 
 
 class Test_Main_Menu_Items(unittest.TestCase):
-    def test_add_top_stories_menu_item(self):
-        self.assertTrue(plugin.add_top_stories_menu_item())
 
     def test_add_on_demand_menu_item(self):
         self.assertTrue(plugin.add_on_demand_menu_item())
@@ -24,8 +22,6 @@ class Test_Main_Menu_Items(unittest.TestCase):
     def test_add_live_stream_menu_item(self):
         self.assertTrue(plugin.add_live_stream_menu_item())
 
-    def test_add_live_schedule_menu_item(self):
-        self.assertTrue(plugin.add_live_schedule_menu_item())
 
 
 class Test_VOD_Menus(unittest.TestCase):
@@ -83,15 +79,18 @@ class Test_VOD_Episode_List(unittest.TestCase):
 
 
 class Test_Top_Stories(unittest.TestCase):
-    def test_get_top_stories_list(self):
-        row_count = plugin.top_stories_list()
-        print(row_count)
-        self.assertIsNot(row_count, 0)
-
+    def test_add_top_stories_menu_item(self):
+        self.assertTrue(plugin.add_top_stories_menu_item())
+    
+    def test_get_top_stories_index(self):
+        self.assertIsNot(plugin.top_stories_index(), 0)
 
 class Test_Live_Schedule(unittest.TestCase):
+    def test_add_live_schedule_menu_item(self):
+        self.assertTrue(plugin.add_live_schedule_menu_item())
+
     def test_get_live_schedule_index(self):
-        self.assertTrue(plugin.live_schedule_index())
+        self.assertIsNot(plugin.live_schedule_index(), 0)
 
 
 class Test_VOD_Episode_Play_Cache(unittest.TestCase):
