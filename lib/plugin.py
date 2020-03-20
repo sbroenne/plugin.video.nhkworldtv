@@ -37,7 +37,7 @@ def get_episode_cache():
     # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
     xbmc.log('Getting vod_id/video cache from Azure')
 
-    max_episodes = 2000
+    max_episodes = 1000
 
     # Getting top story
     episodes = utils.get_json(cache_api.url['cache_get_program_list'].format(max_episodes))
@@ -531,6 +531,7 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
     for row in program_json:
         row_count = row_count + 1
         episode = Episode()
+        episode.IsPlayable = True
         title = row['title_clean']
         subtitle = row['sub_title_clean']
 
