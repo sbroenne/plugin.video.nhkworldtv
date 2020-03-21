@@ -14,6 +14,10 @@ msgctxt "#30002"
 msgid "Use 3rd-party cloud cache to speed-up video playback"
 msgstr ""
 
+msgctxt "#30003"
+msgid "Max items to show in News and At A Glance"
+msgstr ""
+
 #plugin.py
 
 # Top Stories Menu Item
@@ -27,6 +31,11 @@ msgstr ""
 
 msgctxt "#30013"
 msgid "Last update at: {0})"
+msgstr ""
+
+# At A Glance
+msgctxt "#30015"
+msgid "At a Glance >"
 msgstr ""
 
 #On-Demand Menu Item

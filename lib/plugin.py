@@ -27,6 +27,12 @@ VIEW_MODE_INFOWALL = 54
 VIEW_MODE_WALL = 500
 VIEW_MODE_WIDELIST = 55
 
+# Define how many items should be displayed in News and At A Glance
+MAX_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_display_items")
+if MAX_DISPLAY_ITEMS == 0:
+    # Only happens during DEV/Unit test
+    MAX_DISPLAY_ITEMS=10
+
 #
 # Helpers
 #
@@ -56,6 +62,7 @@ def index():
     add_on_demand_menu_item()
     add_live_stream_menu_item()
     add_live_schedule_menu_item()
+    add_ataglance_menu_item()
 
     # Set-up view
     xbmcplugin.setContent(plugin.handle, 'videos')
@@ -81,8 +88,8 @@ def add_top_stories_menu_item():
         episode.thumb = NHK_ICON
         episode.fanart = NHK_FANART
     else:
-        episode.thumb = featured_news['thumbnails']['small']
-        episode.fanart = featured_news['thumbnails']['middle']
+        episode.thumb = thumbnails['small']
+        episode.fanart = thumbnails['middle']
     
     episode.title = kodiutils.get_string(30010)
   
@@ -97,17 +104,17 @@ def add_top_stories_menu_item():
 
 
 # List
-@plugin.route('/vod/top_stories/index')
+@plugin.route('/news/top_stories/index')
 def top_stories_index():
     xbmc.log('Displaying Top Stories Index')
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
-    MAX_ROW_COUNT = 23
+    max_row_count = MAX_DISPLAY_ITEMS
     result_row_count = len(api_result_json['data'])
     # Only display MAX ROWS
-    if (result_row_count < MAX_ROW_COUNT):
-        MAX_ROW_COUNT = result_row_count
+    if (result_row_count < max_row_count):
+        max_row_count = result_row_count
 
-    for row_count in range(0, MAX_ROW_COUNT - 1):
+    for row_count in range(0, max_row_count - 1):
         row = api_result_json['data'][row_count]
         
         episode = Episode()
@@ -120,8 +127,8 @@ def top_stories_index():
             episode.thumb = NHK_ICON
             episode.fanart = NHK_FANART
         else:
-            episode.thumb = row['thumbnails']['small']
-            episode.fanart = row['thumbnails']['middle']
+            episode.thumb = thumbnails['small']
+            episode.fanart = thumbnails['middle']
 
         episode.broadcast_start_date = row['updated_at']
         episode.date = episode.broadcast_start_date
@@ -139,7 +146,7 @@ def top_stories_index():
             episode.title = kodiutils.get_string(30070).format(title)
             vod_id = row['id']
             episode.vod_id = vod_id
-            video_xml_url = nhk_api.rest_url['get_news_xml'].format(vod_id)
+            video_xml_url = utils.get_NHK_website_url(row['videos']['config'])
             video_response = utils.get_url(video_xml_url)
             video_xml = str(video_response.content)
             start_pos = video_xml.find(vod_id)
@@ -163,6 +170,100 @@ def top_stories_index():
             episode.IsPlayable = False
             xbmcplugin.addDirectoryItem(plugin.handle, None, episode.kodi_list_item, False)
 
+    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_DATE, "Descending")
+
+    # Used for unit testing
+    # only successfull if we processed at least top story
+    if (row_count > 0):
+        return (row_count)
+    else:
+        return (0)
+
+#
+# At a glance
+#
+
+#  Menu item
+def add_ataglance_menu_item():
+    xbmc.log('Adding at a glance menu item')
+  
+    # Getting firststory
+    featured_news = utils.get_json(nhk_api.rest_url['get_news_ataglance'])['data'][0]
+    thumbnails = featured_news['image']
+
+    episode = Episode()
+    if (thumbnails is None):
+        # Featured news does not have a thumbnail
+        episode.thumb = NHK_ICON
+        episode.fanart = NHK_FANART
+    else:
+        episode.thumb = thumbnails['list_sp']
+        episode.fanart = thumbnails['main_pc']
+    
+    episode.title = kodiutils.get_string(30015)
+  
+    # Create the plot field
+    episode.plot = kodiutils.get_string(30012).format(featured_news['title'], featured_news['description'])
+    
+    # Create the directory itemn
+    episode.video_info = kodiutils.get_SD_video_info()
+    xbmcplugin.addDirectoryItem(plugin.handle,
+                                plugin.url_for(ataglance_index), episode.kodi_list_item, True)
+    return (True)
+
+# List
+@plugin.route('/news/ataglance/index')
+def ataglance_index():
+    xbmc.log('Displaying At a Glance Index')
+    api_result_json = utils.get_json(nhk_api.rest_url['get_news_ataglance'])
+    max_row_count = MAX_DISPLAY_ITEMS
+    result_row_count = len(api_result_json['data'])
+    # Only display MAX ROWS
+    if (result_row_count < max_row_count):
+        max_row_count = result_row_count
+
+    for row_count in range(0, max_row_count - 1):
+        row = api_result_json['data'][row_count]
+        
+        episode = Episode()
+        title = row['title']
+        
+        thumbnails = row['image']
+
+        if (thumbnails is None):
+            # Featured news does not have a thumbnail
+            episode.thumb = NHK_ICON
+            episode.fanart = NHK_FANART
+        else:
+            episode.thumb = thumbnails['list_sp']
+            episode.fanart = thumbnails['main_pc']
+
+        episode.broadcast_start_date = row['posted_at']
+        episode.date = episode.broadcast_start_date
+       
+        episode.title = title
+        vod_id = row['id']
+        episode.vod_id = vod_id
+        video_xml_url = utils.get_NHK_website_url(row['video']['config'])
+        video_response = utils.get_url(video_xml_url)
+        video_xml = str(video_response.content)
+        start_pattern = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/'
+        start_pos = video_xml.find(start_pattern)
+        end_pos = video_xml.find('</file.high>')
+        video_file = video_xml[start_pos+len(start_pattern):end_pos]
+
+        episode.url = nhk_api.rest_url['ataglance_url'].format(video_file)
+        episode.duration = row['video']['duration']
+        minutes = int(episode.duration / 60)
+        seconds = episode.duration - (minutes * 60)
+        duration_text = '{0}m {1}'.format(minutes, seconds)
+        
+        episode.plot = u'{0}\n\n{1}'.format(duration_text, row['description'])
+        episode.video_info = kodiutils.get_SD_video_info()
+        episode.IsPlayable = True
+        xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item, False)
+
+      
     kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_DATE, "Descending")
 
     # Used for unit testing

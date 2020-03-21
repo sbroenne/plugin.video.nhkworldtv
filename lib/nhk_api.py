@@ -32,10 +32,10 @@ rest_url = {
     # Not in api.js
     'get_news_ataglance':
     'https://www3.nhk.or.jp/nhkworld/en/news/ataglance/index.json',
-    'get_news_xml':
-    'https://www3.nhk.or.jp/nhkworld/data/en/news/movie/{0}.xml',
     'news_url':
     'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',
+    'ataglance_url':
+    'https://nhkworld-vh.akamaihd.net/i/nhkworld/english/news/ataglance/{0}/master.m3u8?set-akamai-hls-revision=5',
     'live_stream_url':
     'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp/index_4M.m3u8',
     'player_url':
