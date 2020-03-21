@@ -2,5 +2,5 @@
 <settings>
     <setting id="set_view_mode" type="bool" label="30001" default="true"/>
     <setting id="use_backend" type="bool" label="30002" default="true"/>
-    <setting id="max_display_items" type="int" label="30003" default="43"/>
+    <setting id="max_display_items" type="number" label="30003" default="43"/>
 </settings>
