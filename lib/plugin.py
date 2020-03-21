@@ -379,23 +379,25 @@ def vod_programs():
     for index in program_json:
         row = program_json[index]
         row_count = row_count + 1
-   
-        episode = Episode()
-        episode.title= utils.get_episodelist_title(row['title_clean'], row['total_episode'])
-        episode.plot = row['description_clean']
-        episode.thumb = row['image']
-        episode.fanart = row['image_l']
-        episode.video_info = kodiutils.get_1080_HD_video_info()
+        total_episodes = int(row['total_episode'])
+        if total_episodes > 0:
+            # Only show programs that have at lease on episode
+            episode = Episode()
+            episode.title= utils.get_episodelist_title(row['title_clean'], total_episodes)
+            episode.plot = row['description_clean']
+            episode.thumb = row['image']
+            episode.fanart = row['image_l']
+            episode.video_info = kodiutils.get_1080_HD_video_info()
 
-        # Create the directory item
-        api_url = nhk_api.rest_url['get_programs_episode_list'].format(index)
-        xbmc.log('Creating Directory Item {0} - {1}'.format(
-            api_url, episode.title.encode('ascii', 'ignore')))
+            # Create the directory item
+            api_url = nhk_api.rest_url['get_programs_episode_list'].format(index)
+            xbmc.log('Creating Directory Item {0} - {1}'.format(
+                api_url, episode.title.encode('ascii', 'ignore')))
 
-        xbmcplugin.addDirectoryItem(
-            plugin.handle,
-            plugin.url_for(vod_episode_list, api_url, 1, 0,
-                            xbmcplugin.SORT_METHOD_DATE), episode.kodi_list_item, True)
+            xbmcplugin.addDirectoryItem(
+                plugin.handle,
+                plugin.url_for(vod_episode_list, api_url, 1, 0,
+                                xbmcplugin.SORT_METHOD_DATE), episode.kodi_list_item, True)
 
     kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_LABEL)
    
