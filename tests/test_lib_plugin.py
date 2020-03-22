@@ -58,7 +58,8 @@ class Test_VOD_Episode_List(unittest.TestCase):
         self.assertIsNotNone(vid_id)
 
     def test_get_playlists_episodes(self):
-        test_url = plugin.vod_playlists()
+        #test_url = plugin.vod_playlists()
+        test_url = u'https://api.nhk.or.jp/nhkworld/vodplaylist/v7a/en/28.json'
         vid_id = plugin.vod_episode_list(test_url, 0, 1,
                                          xbmcplugin.SORT_METHOD_TITLE)
         # print(vid_id)
@@ -99,14 +100,21 @@ class Test_Play_News_Item(unittest.TestCase):
         api_url = utils.get_NHK_website_url(api_url_string)
         news_id = 822
         title = u'Global coronavirus deaths exceed 10,000'
-        self.assertIsNotNone(plugin.play_news_item(api_url, news_id, title))
+        self.assertTrue(plugin.play_news_item(api_url, news_id, 'news', title))
 
     def test_play_news_item_from_ataglance(self):
         api_url_string = u'/nhkworld/en/news/ataglance/822/video-main.xml'
         api_url = utils.get_NHK_website_url(api_url_string)
         news_id = u'20200322_18'
         title = u'Teen makes masks for elderly, orphans'
-        self.assertIsNotNone(plugin.play_ataglance_item(api_url, news_id, title))
+        self.assertTrue(plugin.play_news_item(api_url, news_id, 'ataglance', title))
+    
+    def test_play_news_item_invalid(self):
+        api_url_string = u'/nhkworld/en/news/ataglance/822/video-main.xml'
+        api_url = utils.get_NHK_website_url(api_url_string)
+        news_id = u'20200322_18'
+        title = u'Teen makes masks for elderly, orphans'
+        self.assertFalse(plugin.play_news_item(api_url, news_id, 'invalid', title))
 
 
 class Test_Live_Schedule(unittest.TestCase):

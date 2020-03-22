@@ -14,7 +14,7 @@ Originally it started as a fork of Misty's [Best Of NHK plug-in](https://forum.k
 
 **Thank you Misty, awesome work!**
 
-The design goal for the NHK World TV plug-in is to eventually be included in the official Kodi repo and to include **only** content from the NHK World web site. If you like to add the other content that can be found in Best Of NHK, please feel free to clone - I will **not** accept PRs for adding content sources outside of NHK itself.
+The design goal for the NHK World TV plug-in is to eventually be included in the official Kodi repo and to include **only** content from the NHK World web site - but int hest best possible quality. If you like to add the other content that can be found in Best Of NHK, please feel free to clone - I will **not** accept PRs for adding content sources outside of NHK itself.
 
 You can install the plugin by installing the [NHK World TV Development Repo](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne). The github-repo also contains the plug-in as a ZIP file if you want to download & install it without the development repo.
 
@@ -24,10 +24,10 @@ The plug-in is largely feature complete. You are able to:
 
 - watch the live stream in HD
 - access the on-demand programs in HD, including categories, playlists, etc.
-- check the latest Top-Stories
+- check the latest Top-Stories & At A Glance stories
 - acess a "mini EPG" with the upcoming status.
 
-Automatic timezone support is implemented and has been tested on MacOs, Windows and Android TV. Most of the NHK API is parsed and not hard-coded so this should make the plug-in more resilient to changes on the NHK web site.
+Automatic timezone support is implemented and has been tested on MacOs, Windows and Android TV. Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site.
 
 ## Performance
 
@@ -35,7 +35,7 @@ Automatic timezone support is implemented and has been tested on MacOs, Windows 
 
 The plug-in also uses companion cloud service to speed up video play-back because these NHK Apis are very slow. You can disabe this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer.
 
-You can find the source code for the cloud service at [NHK World TV Azure Backend](https://github.com/sbroenne/nhkworldtv-backend). The cache runs on Azure implemented as Azure Functions backed by Cosmos DB. It gets updated with new episodes once per hour.
+You can find the source code for the cloud service at [NHK World TV Azure Backend](https://github.com/sbroenne/nhkworldtv-backend). The cache runs on Azure implemented as Azure Functions backed by Cosmos DB. It gets updated with new episodes multiple times per day.
 
 ## Future Development
 

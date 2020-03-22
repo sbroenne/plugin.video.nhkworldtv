@@ -169,7 +169,7 @@ def top_stories_index():
 
             api_url = utils.get_NHK_website_url(video['config'])
             xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(play_news_item, api_url , episode.vod_id, episode.title), episode.kodi_list_item, False)
+                                plugin.url_for(play_news_item, api_url , episode.vod_id, 'news', episode.title), episode.kodi_list_item, False)
             
         else:
             # No video attached to it
@@ -270,7 +270,7 @@ def ataglance_index():
         episode.IsPlayable = True
         api_url = utils.get_NHK_website_url(row['video']['config'])
         xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(play_ataglance_item, api_url , episode.vod_id, episode.title), episode.kodi_list_item, False)
+                                plugin.url_for(play_news_item, api_url , episode.vod_id, 'ataglance', episode.title), episode.kodi_list_item, False)
       
     kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_NONE, "Descending")
 
@@ -650,7 +650,10 @@ def vod_episode_list(api_url, show_only_subtitle, is_from_playlist,
             # Use the subtitle as the episode name
             episode_name = subtitle
         else:
-            episode_name = utils.get_episode_name(title, subtitle)
+            if len(title)>0:
+                episode_name = utils.get_episode_name(title, subtitle)
+            else:
+                episode_name = subtitle
 
         episode.title=episode_name
         description = row['description_clean']
@@ -748,16 +751,23 @@ def show_episode(vod_id, enforce_cache=False):
     xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
     return (episode.url)
 
-#  Play News Item
-@plugin.route('/news/play_news_item/<path:api_url>/<news_id>/<title>/')
-def play_news_item(api_url, news_id, title):
-
+#  Play News or At A Glance Item
+@plugin.route('/news/play_news_item/<path:api_url>/<news_id>/<item_type>/<title>/')
+def play_news_item(api_url, news_id, item_type, title):
+    """ Play a news item - can either be 'news' or 'ataglance' """
+    xbmc.log('ITEM_TYPE: {0}'.format(item_type))
     xbmc.log('API_URL: {0}'.format(api_url))
     xbmc.log('NEWS_ID: {0}'.format(news_id))
     xbmc.log('TITLE: {0}'.format(title))
 
     video_xml= utils.get_url(api_url).content
-    play_path = nhk_api.rest_url['news_url'].format(utils.get_top_stories_play_path(video_xml))
+    if (item_type =='news'):
+        play_path = nhk_api.rest_url['news_url'].format(utils.get_top_stories_play_path(video_xml))
+    elif (item_type =="ataglance"):
+        play_path = nhk_api.rest_url['ataglance_url'].format(utils.get_ataglance_play_path(video_xml))
+    else:
+        return (False)
+
     xbmc.log('Play Path: {0}'.format(play_path))
     episode = Episode()
     episode.vod_id = news_id
@@ -767,29 +777,7 @@ def play_news_item(api_url, news_id, title):
     episode.IsPlayable = True
              
     xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
-    return (episode.url)
-
-#  Play At a Glance news itme
-@plugin.route('/news/play_ataglance_item/<path:api_url>/<news_id>/<title>/')
-def play_ataglance_item(api_url, news_id, title):
-
-    xbmc.log('API_URL: {0}'.format(api_url))
-    xbmc.log('NEWS_ID: {0}'.format(news_id))
-    xbmc.log('TITLE: {0}'.format(title))
-
-    video_xml= utils.get_url(api_url).content
-    play_path = nhk_api.rest_url['ataglance_url'].format(utils.get_ataglance_play_path(video_xml))
-    xbmc.log('Play Path: {0}'.format(play_path))
-    episode = Episode()
-    episode.vod_id = news_id
-    episode.title = title
-    episode.url = play_path
-    episode.video_info = kodiutils.get_SD_video_info()
-    episode.IsPlayable = True
-             
-    xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
-    return (episode.url)
-
+    return (True)
 
 #
 # Main loop
