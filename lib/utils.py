@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+import re
 import requests
 import requests_cache
 import xbmc
@@ -47,7 +47,7 @@ def get_json(url, cached = True):
         r.raise_for_status()
 
 
-# Get a URL with automatic retries - NHK sometimes have intermittent problems
+# Get a URL with automatic retries - NHK sometimes have intermittent problems with 502 Bad Gateway
 
 
 def get_url(url, cached = True):
@@ -76,22 +76,31 @@ def get_url(url, cached = True):
                 'Successfully fetched URL/API: {0} - Status {1} - Retrieved from cache {2}'.format(
                     r.url, r.status_code, r.from_cache))
             return (r)
-        else:
+        elif (r.status_code == 502):
+            # Bad Gateway
             if (current_try == max_retries):
                 # Max retries reached - still could not get url
                 # Failure - no way to handle - probably an issue
                 # with the NHK Website
                 # Raise exception
                 xbmc.log(
-                    'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'
-                    .format(r.url, r.status_code, max_retries), xbmc.LOGFATAL)
+                'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'
+                .format(r.url, r.status_code, current_try), xbmc.LOGFATAL)
                 r.raise_for_status()
             else:
                 # Wait for n seconds and then try again
                 xbmc.log(
                     'Failure fetching URL: {0} with Status {1})'.format(
                         r.url, r.status_code), xbmc.LOGWARNING)
-                current_try = +1
+                current_try = current_try +1
+        else:
+            # Other error
+            xbmc.log(
+                'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'
+                .format(r.url, r.status_code, current_try), xbmc.LOGFATAL)
+            r.raise_for_status()
+            exit
+
 
 
 # Return a full URL from the partial URLs in the JSON results
@@ -141,4 +150,14 @@ def get_episodelist_title(title, total_episodes):
         episodelist_title = u'{0} - {1} episodes'.format(title, total_episodes)
     return (episodelist_title)
 
+def get_top_stories_play_path(xmltext):
+    """ Extracts the play path from a top story XML file """
+    matches = re.compile('rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ').findall(xmltext)
+    play_path = matches[0]
+    return play_path
 
+def get_ataglance_play_path(xmltext):
+    """ Extracts the play path from a At a Glance XML file """
+    matches = re.compile('<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>').findall(xmltext)
+    play_path = matches[0]
+    return play_path

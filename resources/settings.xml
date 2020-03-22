@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
-    <setting id="set_view_mode" type="bool" label="30001" default="true"/>
-    <setting id="use_backend" type="bool" label="30002" default="true"/>
-    <setting id="max_display_items" type="number" label="30003" default="43"/>
+    <setting label="30001" type="lsep"/>
+    <setting id="set_view_mode" type="bool" label="30005" default="true"/>
+    <setting label="30002" type="lsep"/>
+    <setting id="use_backend" type="bool" label="30008" default="true"/>
+    <setting id="max_program_metadate_cache_items" type="number" label="30009" default="2000"/>  
+    <setting label="30003" type="lsep"/>
+    <setting id="max_news_items" type="number" label="30006" default="103"/>
+    <setting id="max_ataglance_items" type="number" label="30007" default="1003"/>
 </settings>

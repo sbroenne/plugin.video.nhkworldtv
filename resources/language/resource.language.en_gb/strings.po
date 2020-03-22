@@ -7,15 +7,35 @@ msgstr ""
 
 # Settings.xml
 msgctxt "#30001"
-msgid "Plug-in will set default viewmode"
+msgid "General"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Use 3rd-party cloud cache to speed-up video playback"
+msgid "Program meta data cloud cache"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Max items to show in News and At A Glance"
+msgid "Configure program lists"
+msgstr ""
+
+msgctxt "#30005"
+msgid "Enable setting default Kodi view modes (recommended)"
+msgstr ""
+
+msgctxt "#30006"
+msgid "Max News items to show"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Max At A Glance items to show"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Enable to speed-up video playback (recommended)"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Maximum number of programs to retrieve at start-up"
 msgstr ""
 
 #plugin.py
@@ -102,5 +122,5 @@ msgstr ""
 
 # Live Schedule
 msgctxt "#30070"
-msgid "ON DEMAND / {0}"
+msgid "PLAY: {0}"
 msgstr ""

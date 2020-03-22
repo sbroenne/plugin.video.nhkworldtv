@@ -29,6 +29,13 @@ class Test_Test_utils(unittest.TestCase):
             datetime.datetime(year=2020, month=2, day=9, hour=17, minute=40))
         self.assertEqual(local_time, converted_time)
 
+    def test_get_top_stories_play_path(self):
+        xmltext = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/20200322_18_73446_HQ.mp4'
+        self.assertEqual(utils.get_top_stories_play_path(xmltext),'20200322_18_73446_')
+
+    def test_get_ataglance_play_path(self):
+        xmltext = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/aag_handmademask.mp4</file.high>'
+        self.assertEqual(utils.get_ataglance_play_path(xmltext),'aag_handmademask.mp4')
 
 if __name__ == '__main__':
     unittest.main()

@@ -17,6 +17,10 @@ import utils
 from episode import Episode
 
 # Initiate constants and plug-in
+# When <reuselanguageinvoker>true</reuselanguageinvoker> this only happens once per plug-in start!!!
+
+
+xbmc.log('Retrieving plug-in runtime data')
 ADDON = xbmcaddon.Addon()
 NHK_ICON = ADDON.getAddonInfo('icon')
 NHK_FANART = ADDON.getAddonInfo('fanart')
@@ -27,30 +31,38 @@ VIEW_MODE_INFOWALL = 54
 VIEW_MODE_WALL = 500
 VIEW_MODE_WIDELIST = 55
 
-# Define how many items should be displayed in News and At A Glance
-MAX_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_display_items")
-if MAX_DISPLAY_ITEMS == 0:
+# Define how many items should be displayed in News
+MAX_NEWS_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_news_items")
+if MAX_NEWS_DISPLAY_ITEMS == 0:
     # Only happens during DEV/Unit test
-    MAX_DISPLAY_ITEMS=10
+    MAX_NEWS_DISPLAY_ITEMS=20
+
+# Define how many items should be displayed in At A Glance
+MAX_ATAGLANCE_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_ataglance_items")
+if MAX_ATAGLANCE_DISPLAY_ITEMS == 0:
+    # Only happens during DEV/Unit test
+    MAX_ATAGLANCE_DISPLAY_ITEMS=800
+
+# Define how many program should be retrieved from meta data cache
+MAX_PROGRAM_METADATA_CACHE_ITEMS = kodiutils.get_setting_as_int("max_program_metadate_cache_items")
+if MAX_PROGRAM_METADATA_CACHE_ITEMS == 0:
+    # Only happens during DEV/Unit test
+    MAX_PROGRAM_METADATA_CACHE_ITEMS=1000
 
 #
 # Helpers
 #
 
-#  Add the Top Stories menu
-def get_episode_cache():
+def get_program_metdadata_cache():
     # Use NHK World TV Cloud Service to speed-up episode URLlookup
     # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
-    xbmc.log('Getting vod_id/video cache from Azure')
-
-    max_episodes = 2000
-
+    xbmc.log('Getting vod_id/program metadata cache from Azure')
     # Getting top story
-    episodes = utils.get_json(cache_api.url['cache_get_program_list'].format(max_episodes))
-    return (episodes)
+    cache = utils.get_json(cache_api.url['cache_get_program_list'].format(MAX_PROGRAM_METADATA_CACHE_ITEMS))
+    return (cache)
 
 # Episode Cache
-EPISODE_CACHE = get_episode_cache()
+PROGRAM_METADATA_CACHE = get_program_metdadata_cache()
 
 # Start page of the plug-in
 @plugin.route('/')
@@ -108,7 +120,7 @@ def add_top_stories_menu_item():
 def top_stories_index():
     xbmc.log('Displaying Top Stories Index')
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
-    max_row_count = MAX_DISPLAY_ITEMS
+    max_row_count = MAX_NEWS_DISPLAY_ITEMS
     result_row_count = len(api_result_json['data'])
     # Only display MAX ROWS
     if (result_row_count < max_row_count):
@@ -142,18 +154,11 @@ def top_stories_index():
                 time_difference_hours)
 
         if row['videos'] is not None:
+            video = row['videos']
             # Top stories that have a video attached to them
             episode.title = kodiutils.get_string(30070).format(title)
-            vod_id = row['id']
-            episode.vod_id = vod_id
-            video_xml_url = utils.get_NHK_website_url(row['videos']['config'])
-            video_response = utils.get_url(video_xml_url)
-            video_xml = str(video_response.content)
-            start_pos = video_xml.find(vod_id)
-            end_pos = video_xml.find('HQ')
-            video_file = video_xml[start_pos:end_pos]
-            episode.url = nhk_api.rest_url['news_url'].format(video_file)
-            episode.duration = row['videos']['duration']
+            episode.vod_id = row['id']
+            episode.duration = video['duration']
             minutes = int(episode.duration / 60)
             seconds = episode.duration - (minutes * 60)
             duration_text = '{0}m {1}'.format(minutes, seconds)
@@ -161,8 +166,11 @@ def top_stories_index():
             episode.plot = u'{0} | {1}\n\n{2}'.format(duration_text, time_difference, row['description'])
             episode.video_info = kodiutils.get_SD_video_info()
             episode.IsPlayable = True
-            xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item, False)
 
+            api_url = utils.get_NHK_website_url(video['config'])
+            xbmcplugin.addDirectoryItem(plugin.handle,
+                                plugin.url_for(play_news_item, api_url , episode.vod_id, episode.title), episode.kodi_list_item, False)
+            
         else:
             # No video attached to it
             episode.title = title
@@ -170,7 +178,7 @@ def top_stories_index():
             episode.IsPlayable = False
             xbmcplugin.addDirectoryItem(plugin.handle, None, episode.kodi_list_item, False)
 
-    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_DATE, "Descending")
+    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_NONE, "Descending")
 
     # Used for unit testing
     # only successfull if we processed at least top story
@@ -178,6 +186,7 @@ def top_stories_index():
         return (row_count)
     else:
         return (0)
+
 
 #
 # At a glance
@@ -216,7 +225,7 @@ def add_ataglance_menu_item():
 def ataglance_index():
     xbmc.log('Displaying At a Glance Index')
     api_result_json = utils.get_json(nhk_api.rest_url['get_news_ataglance'])
-    max_row_count = MAX_DISPLAY_ITEMS
+    max_row_count = MAX_ATAGLANCE_DISPLAY_ITEMS
     result_row_count = len(api_result_json['data'])
     # Only display MAX ROWS
     if (result_row_count < max_row_count):
@@ -235,7 +244,11 @@ def ataglance_index():
             episode.thumb = NHK_ICON
             episode.fanart = NHK_FANART
         else:
-            episode.thumb = thumbnails['list_sp']
+            if (thumbnails['list_sp'] is not None):
+                episode.thumb = thumbnails['list_sp']
+            else:
+                episode.thumb = thumbnails['list_pc']
+
             episode.fanart = thumbnails['main_pc']
 
         episode.broadcast_start_date = row['posted_at']
@@ -244,27 +257,22 @@ def ataglance_index():
         episode.title = title
         vod_id = row['id']
         episode.vod_id = vod_id
-        video_xml_url = utils.get_NHK_website_url(row['video']['config'])
-        video_response = utils.get_url(video_xml_url)
-        video_xml = str(video_response.content)
-        start_pattern = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/'
-        start_pos = video_xml.find(start_pattern)
-        end_pos = video_xml.find('</file.high>')
-        video_file = video_xml[start_pos+len(start_pattern):end_pos]
-
-        episode.url = nhk_api.rest_url['ataglance_url'].format(video_file)
         episode.duration = row['video']['duration']
-        minutes = int(episode.duration / 60)
-        seconds = episode.duration - (minutes * 60)
-        duration_text = '{0}m {1}'.format(minutes, seconds)
-        
-        episode.plot = u'{0}\n\n{1}'.format(duration_text, row['description'])
+        if (episode.duration is not None):
+            minutes = int(episode.duration / 60)
+            seconds = episode.duration - (minutes * 60)
+            duration_text = '{0}m {1}'.format(minutes, seconds)
+            episode.plot = u'{0}\n\n{1}'.format(duration_text, row['description'])
+        else:
+            episode.plot = row['description']
+
         episode.video_info = kodiutils.get_SD_video_info()
         episode.IsPlayable = True
-        xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item, False)
-
+        api_url = utils.get_NHK_website_url(row['video']['config'])
+        xbmcplugin.addDirectoryItem(plugin.handle,
+                                plugin.url_for(play_ataglance_item, api_url , episode.vod_id, episode.title), episode.kodi_list_item, False)
       
-    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_DATE, "Descending")
+    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, xbmcplugin.SORT_METHOD_NONE, "Descending")
 
     # Used for unit testing
     # only successfull if we processed at least top story
@@ -596,8 +604,8 @@ def add_playable_episode_directory_item(episode, enforce_cache = False):
         use_backend = kodiutils.get_setting_as_bool('use_backend')
 
     if (use_backend):
-        if (episode.vod_id in EPISODE_CACHE):
-            cached_episode = EPISODE_CACHE[episode.vod_id]
+        if (episode.vod_id in PROGRAM_METADATA_CACHE):
+            cached_episode = PROGRAM_METADATA_CACHE[episode.vod_id]
             # In cache - display directly
             episode.url = nhk_api.rest_url['episode_url'].format(cached_episode["PlayPath"])
             episode.aspect = cached_episode['Aspect']
@@ -739,6 +747,49 @@ def show_episode(vod_id, enforce_cache=False):
 
     xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
     return (episode.url)
+
+#  Play News Item
+@plugin.route('/news/play_news_item/<path:api_url>/<news_id>/<title>/')
+def play_news_item(api_url, news_id, title):
+
+    xbmc.log('API_URL: {0}'.format(api_url))
+    xbmc.log('NEWS_ID: {0}'.format(news_id))
+    xbmc.log('TITLE: {0}'.format(title))
+
+    video_xml= utils.get_url(api_url).content
+    play_path = nhk_api.rest_url['news_url'].format(utils.get_top_stories_play_path(video_xml))
+    xbmc.log('Play Path: {0}'.format(play_path))
+    episode = Episode()
+    episode.vod_id = news_id
+    episode.title = title
+    episode.url = play_path
+    episode.video_info = kodiutils.get_SD_video_info()
+    episode.IsPlayable = True
+             
+    xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
+    return (episode.url)
+
+#  Play At a Glance news itme
+@plugin.route('/news/play_ataglance_item/<path:api_url>/<news_id>/<title>/')
+def play_ataglance_item(api_url, news_id, title):
+
+    xbmc.log('API_URL: {0}'.format(api_url))
+    xbmc.log('NEWS_ID: {0}'.format(news_id))
+    xbmc.log('TITLE: {0}'.format(title))
+
+    video_xml= utils.get_url(api_url).content
+    play_path = nhk_api.rest_url['ataglance_url'].format(utils.get_ataglance_play_path(video_xml))
+    xbmc.log('Play Path: {0}'.format(play_path))
+    episode = Episode()
+    episode.vod_id = news_id
+    episode.title = title
+    episode.url = play_path
+    episode.video_info = kodiutils.get_SD_video_info()
+    episode.IsPlayable = True
+             
+    xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
+    return (episode.url)
+
 
 #
 # Main loop
