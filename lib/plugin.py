@@ -710,14 +710,18 @@ def show_episode(vod_id, enforce_cache=False):
         episode.title = cached_episode['Title']
         episode.plot = cached_episode['Plot']
         episode.pgm_no = cached_episode['PgmNo']
-        episode.broadcast_start_date=cached_episode['OnAir']
-        episode.date=episode.broadcast_start_date
-        episode.duration = cached_episode['Duration']
+        if (cached_episode['Duration'] is not None):
+            episode.duration = cached_episode['Duration']
         episode.url = nhk_api.rest_url['episode_url'].format(cached_episode['PlayPath'])
         episode.aspect = cached_episode['Aspect']
         episode.width = cached_episode['Width']
         episode.height = cached_episode['Height']
-        episode.onair = cached_episode['OnAir']
+        if (cached_episode['OnAir'] is not None):
+            episode.onair = cached_episode['OnAir']
+            episode.broadcast_start_date=cached_episode['OnAir']
+            episode.date=episode.broadcast_start_date
+        if (cached_episode['Duration'] is not None):
+            episode.duration = cached_episode['Duration']
     else:
         # Get result from NHK - slow
         xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
