@@ -414,7 +414,6 @@ def live_schedule_index(enforce_cache=False):
         if (len(vod_id) > 0):
             # Can play on-demand
             episode.IsPlayable=True
-            episode.video_info=kodiutils.get_1080_HD_video_info()
             episode.title = kodiutils.get_string(30070).format(title)
         else:
             episode.title = title
@@ -748,9 +747,9 @@ def show_episode(vod_id, enforce_cache=False):
         reference_file_json = utils.get_json(video_url)['response']['WsProgramResponse']['program']['asset']['referenceFile']
         play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
         episode.url = nhk_api.rest_url['episode_url'].format(play_path)
-        episode.aspect = reference_file_json['aspectRatio'],
-        episode.width = reference_file_json['videoWidth'],
-        episode.height = reference_file_json['videoHeight'],
+        episode.aspect = reference_file_json['aspectRatio']
+        episode.width = reference_file_json['videoWidth']
+        episode.height = reference_file_json['videoHeight']
 
     xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
     return (episode.url)
