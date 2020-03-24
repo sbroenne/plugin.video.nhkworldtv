@@ -647,7 +647,7 @@ def vod_episode_list(api_url, show_only_subtitle,
         program_json = api_result_json['playlist'][0]['track']
     else:
         # Unknown source, abort
-        return (False)
+        return None
    
     row_count = 0
     for row in program_json:
@@ -657,11 +657,22 @@ def vod_episode_list(api_url, show_only_subtitle,
         title = row['title_clean']
         subtitle = row['sub_title_clean']
 
-        if (int(show_only_subtitle) == 1) or (len(title) == 0) :
-            # Use the subtitle as the episode name
-            episode_name = subtitle
+        if int(show_only_subtitle) == 1:
+            ## Show only subtitle 
+            if len(subtitle) > 0:
+                # There is a subtitle, use it
+                episode_name = subtitle
+            else:
+                # Use the title instead of the subtitle
+                episode_name = title
         else:
-            episode_name = utils.get_episode_name(title, subtitle)
+            # Show complete title
+            if len(title) == 0 :
+                # Use the subtitle as the episode name because there is no title
+                episode_name = subtitle
+            else:
+                # Use the full episode name
+                episode_name = utils.get_episode_name(title, subtitle)
    
         episode.title=episode_name
         description = row['description_clean']
@@ -689,7 +700,7 @@ def vod_episode_list(api_url, show_only_subtitle,
     kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_INFOWALL, sort_method)
 
     # Used for unit testing
-    # only successfull if we processed at least one episode
+    # only successfull hif we processed at least one episode
     if (row_count > 0):
         return (episode)
     else:
