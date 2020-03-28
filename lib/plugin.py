@@ -31,38 +31,30 @@ VIEW_MODE_INFOWALL = 54
 VIEW_MODE_WALL = 500
 VIEW_MODE_WIDELIST = 55
 
-# Define how many items should be displayed in News
-MAX_NEWS_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_news_items")
-if MAX_NEWS_DISPLAY_ITEMS == 0:
-    # Only happens during DEV/Unit test
+
+if (utils.UNIT_TEST):
+    # Run under unit test - set some default data since we will not be able to retrieve data from settings.xml
     MAX_NEWS_DISPLAY_ITEMS=20
-
-# Define how many items should be displayed in At A Glance
-MAX_ATAGLANCE_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_ataglance_items")
-if MAX_ATAGLANCE_DISPLAY_ITEMS == 0:
-    # Only happens during DEV/Unit test
     MAX_ATAGLANCE_DISPLAY_ITEMS=800
-
-# Define how many program should be retrieved from meta data cache
-MAX_PROGRAM_METADATA_CACHE_ITEMS = kodiutils.get_setting_as_int("max_program_metadate_cache_items")
-if MAX_PROGRAM_METADATA_CACHE_ITEMS == 0:
-    # Only happens during DEV/Unit test
     MAX_PROGRAM_METADATA_CACHE_ITEMS=1000
+    PROGRAM_METADATA_CACHE = utils.get_program_metdadata_cache(MAX_PROGRAM_METADATA_CACHE_ITEMS)
+    USE_CACHE = True
+else:
+    xbmc.log('Retrieving plug-in setting')
+    # Define how many items should be displayed in News
+    MAX_NEWS_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_news_items")
+    # Define how many items should be displayed in At A Glance
+    MAX_ATAGLANCE_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_ataglance_items")
+    # Define how many program should be retrieved from meta data cache
+    MAX_PROGRAM_METADATA_CACHE_ITEMS = kodiutils.get_setting_as_int("max_program_metadate_cache_items")
 
-#
-# Helpers
-#
-
-def get_program_metdadata_cache():
-    # Use NHK World TV Cloud Service to speed-up episode URLlookup
-    # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
-    xbmc.log('Getting vod_id/program metadata cache from Azure')
-    # Getting top story
-    cache = utils.get_json(cache_api.url['cache_get_program_list'].format(MAX_PROGRAM_METADATA_CACHE_ITEMS))
-    return (cache)
-
-# Episode Cache
-PROGRAM_METADATA_CACHE = get_program_metdadata_cache()
+    # Episode Cache
+    if (kodiutils.get_setting_as_bool('use_backend')):
+        PROGRAM_METADATA_CACHE = utils.get_program_metdadata_cache(MAX_PROGRAM_METADATA_CACHE_ITEMS)
+        USE_CACHE = True
+    else:
+        PROGRAM_METADATA_CACHE= {'CACHE_DISABLED', 'CASHHNG DISABLED'}
+        USE_CACHE = False
 
 # Start page of the plug-in
 @plugin.route('/')
@@ -606,7 +598,7 @@ def add_playable_episode_directory_item(episode, enforce_cache = False):
     if (enforce_cache):
         use_backend = True
     else:
-        use_backend = kodiutils.get_setting_as_bool('use_backend')
+        use_backend = USE_CACHE
 
     if (use_backend):
         if (episode.vod_id in PROGRAM_METADATA_CACHE):
@@ -714,7 +706,7 @@ def show_episode(vod_id, enforce_cache=False):
     if (enforce_cache):
         use_backend = True
     else:
-        use_backend = kodiutils.get_setting_as_bool('use_backend')
+        use_backend = USE_CACHE
 
     episode = Episode()
     episode.vod_id = vod_id
@@ -725,7 +717,7 @@ def show_episode(vod_id, enforce_cache=False):
         # The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
         xbmc.log('Using Cloud Service to retrieve vod_id: {0}'.format(vod_id))
         cached_episode = utils.get_json(
-            cache_api.url['cache_get_program'].format(vod_id))
+            cache_api.rest_url['cache_get_program'].format(vod_id))
         episode.title = cached_episode['Title']
         episode.plot = cached_episode['Plot']
         episode.pgm_no = cached_episode['PgmNo']

@@ -1,10 +1,10 @@
 import requests
 import xbmcaddon
 import utils
+import api_keys
 
-
-API_BASE_URL = 'https://api.nhk.or.jp/nhkworld/'
-NHK_BASE_URL = 'https://www3.nhk.or.jp'
+API_BASE_URL = api_keys.NHK_API_BASE_URL
+NHK_BASE_URL = api_keys.NHK_BASE_URL
 API_LANGUAGE = 'en'
 API={}
 
@@ -24,6 +24,15 @@ def get_API_from_NHK():
             nhk_api.update({ command: {'version': version, 'params': params}})
            
     return(nhk_api)
+
+def get_location_params_values (locationParams):
+    """ Get a parameter dictionary from the location params node """
+    values = {}
+    for row in locationParams:
+        if ('default' in row):
+            key = row['paramName']
+            values[key] = row['default']
+    return (values)
 
 
 def get_full_API_url(path):
@@ -117,22 +126,28 @@ def get_categories_episode_list_url():
 # "vod play list
 def get_playlists_url():
     command = create_command('vod','PlayListFetch')
-    version = API[command]['version']
     params = API[command]['params']
+    locationParams = get_location_params_values(params['locationParams'])
+    mode = str(locationParams['mode'])
+    version = str(locationParams['version'])
     path = str(params['path'])
     path = replace_path_parameters_version_language(path, version, API_LANGUAGE)
     path = path.replace('{playlist_id}', 'all')
+    path = path.replace('{mode}', mode)
     path = get_full_API_url(path)
     return(path)
 
 # "vod play list by playlist Id"
 def get_playlists_episode_list_url():
     command = create_command('vod','PlayListFetch')
-    version = API[command]['version']
     params = API[command]['params']
     path = str(params['path'])
+    locationParams = get_location_params_values(params['locationParams'])
+    mode = str(locationParams['mode'])
+    version = str(locationParams['version'])
     path = replace_path_parameters_version_language(path, version, API_LANGUAGE)
     path = path.replace('{playlist_id}', '{0}')
+    path = path.replace('{mode}', mode)
     path = get_full_API_url(path)
     return(path)
 

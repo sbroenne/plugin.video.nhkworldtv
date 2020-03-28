@@ -33,10 +33,10 @@ class Test_NHK_api_parser(unittest.TestCase):
         self.assertEqual(u'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/category/{0}/en/all/all.json', parser.get_categories_episode_list_url())
    
     def test_get_playlists_url(self):
-        self.assertEqual(u'https://api.nhk.or.jp/nhkworld/vodplaylist/v7a/en/all.json', parser.get_playlists_url())
+        self.assertEqual(u'https://api.nhk.or.jp/nhkworld/vodplaylist/v8/en/playlist/all.json', parser.get_playlists_url())
 
     def test_get_playlists_episode_list_url(self):
-        self.assertEqual(u'https://api.nhk.or.jp/nhkworld/vodplaylist/v7a/en/{0}.json', parser.get_playlists_episode_list_url())
+        self.assertEqual(u'https://api.nhk.or.jp/nhkworld/vodplaylist/v8/en/playlist/{0}.json', parser.get_playlists_episode_list_url())
 
     def test_get_latest_episodes_url(self):
         self.assertEqual(u'https://api.nhk.or.jp/nhkworld/vodesdlist/v7a/all/all/en/all/12.json', parser.get_all_episodes_url('12'))

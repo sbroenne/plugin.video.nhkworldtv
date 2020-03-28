@@ -6,8 +6,8 @@ import xbmc
 import xbmcaddon
 from pytz import timezone
 from tzlocal import get_localzone
+import api_keys
 import cache_api
-
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
@@ -15,20 +15,17 @@ plugin_path = ADDON.getAddonInfo('path')
 if (len(plugin_path)>0):
     # Running within Kodi - use that path
     db_name = '{0}/nhk_world_cache'.format(plugin_path)
+    UNIT_TEST = False
 else:
     # Running under unit test
     db_name ='nhk_world_cache'
+    UNIT_TEST = True
 
 # Enable cache for requests
 requests_cache.install_cache(db_name, backend='sqlite', expire_after=3600)
 
 # Instantiate request session
 s = requests.Session()
-
-# FIXME: Adding all API Keys to the request session
-api_key = 'EJfK8jdS57GqlupFgAfAAwr573q01y6k'
-request_params = {'apikey': api_key, "code": cache_api.api_key}
-s.params = request_params
 
 # Get JSON object from a URL with improved error handling
 
@@ -51,6 +48,16 @@ def get_json(url, cached = True):
 
 
 def get_url(url, cached = True):
+   
+    # Populate request_params if needed
+    if (api_keys.NHK_API_BASE_URL in url):
+        request_params = {'apikey': api_keys.NHK_API_KEY}
+    elif (api_keys.CACHE_API_BASE_URL in url):
+        request_params = {'code': api_keys.CACHE_API_KEY}
+    else:
+        request_params = None
+    
+    s.params = request_params
     # maximum number of retries
     max_retries = 3
     current_try = 1
@@ -63,9 +70,8 @@ def get_url(url, cached = True):
             r = s.get(url)
         else:
             with s.cache_disabled():
-                # Don't use session cache
-                r = s.get(url)
-
+               r = s.get(url)
+               
         # Make an API Call
         xbmc.log('Making API Call {0} ({1} of {2})'.format(
             r.url, current_try, max_retries))
@@ -161,3 +167,12 @@ def get_ataglance_play_path(xmltext):
     matches = re.compile('<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>').findall(xmltext)
     play_path = matches[0]
     return play_path
+
+def get_program_metdadata_cache(max_items):
+    """
+    #Use NHK World TV Cloud Service to speed-up episode URLlookup
+    The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
+    """
+    xbmc.log('Getting vod_id/program metadata cache from Azure')
+    cache = get_json(cache_api.rest_url['cache_get_program_list'].format(max_items))
+    return (cache)

@@ -37,5 +37,9 @@ class Test_Test_utils(unittest.TestCase):
         xmltext = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/aag_handmademask.mp4</file.high>'
         self.assertEqual(utils.get_ataglance_play_path(xmltext),'aag_handmademask.mp4')
 
+    def test_get_metadata_cache(self):
+        cache = utils.get_program_metdadata_cache(100)
+        self.assertIsNotNone(cache)
+
 if __name__ == '__main__':
     unittest.main()
