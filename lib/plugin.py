@@ -438,17 +438,17 @@ def vod_index():
     # Programs
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(vod_programs),
-        xbmcgui.ListItem(kodiutils.get_string(30040), iconImage=NHK_ICON),
+        xbmcgui.ListItem(kodiutils.get_string(30040), iconImage=NHK_ICON,thumbnailImage=NHK_FANART),
         True)
     #Categories
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(vod_categories),
-        xbmcgui.ListItem(kodiutils.get_string(30041), iconImage=NHK_ICON),
+        xbmcgui.ListItem(kodiutils.get_string(30041), iconImage=NHK_ICON,thumbnailImage=NHK_FANART ),
         True)
     # Playlists
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(vod_playlists),
-        xbmcgui.ListItem(kodiutils.get_string(30042), iconImage=NHK_ICON),
+        xbmcgui.ListItem(kodiutils.get_string(30042), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
         True)
     # Latest Episodes
     xbmcplugin.addDirectoryItem(
@@ -456,7 +456,7 @@ def vod_index():
         plugin.url_for(vod_episode_list,
                        nhk_api.rest_url['get_latest_episodes'], 0,
                        xbmcplugin.SORT_METHOD_DATE),
-        xbmcgui.ListItem(kodiutils.get_string(30043), iconImage=NHK_ICON),
+        xbmcgui.ListItem(kodiutils.get_string(30043), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
         True)
     # Most Watched
     xbmcplugin.addDirectoryItem(
@@ -464,14 +464,14 @@ def vod_index():
         plugin.url_for(vod_episode_list,
                        nhk_api.rest_url['get_most_watched_episodes'], 0,
                        xbmcplugin.SORT_METHOD_NONE),
-        xbmcgui.ListItem(kodiutils.get_string(30044), iconImage=NHK_ICON),
+        xbmcgui.ListItem(kodiutils.get_string(30044), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
         True)
     # All
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(vod_episode_list, nhk_api.rest_url['get_all_episodes'],
                        0, xbmcplugin.SORT_METHOD_LABEL),
-        xbmcgui.ListItem(kodiutils.get_string(30045), iconImage=NHK_ICON),
+        xbmcgui.ListItem(kodiutils.get_string(30045), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
         True)
     kodiutils.set_view_mode(VIEW_MODE_WIDELIST)
     xbmcplugin.endOfDirectory(plugin.handle)
