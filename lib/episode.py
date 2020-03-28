@@ -142,19 +142,19 @@ class Episode(object):
         # Add Kodi InfoLabels
         info_labels = {}
         info_labels['mediatype'] = 'episode'
-        info_labels['plot'] = self.plot
+        info_labels['Plot'] = self.plot
         
         if (self.duration is not None):
-            info_labels['duration'] = self.duration
+            info_labels['Duration'] = self.duration
 
         if (self.pgm_no is not None):
-            info_labels['pgm_no'] = self.pgm_no
+            info_labels['Episode'] = self.pgm_no
 
         if (self.year is not None):
-            info_labels['year'] = self.year
+            info_labels['Year'] = self.year
         
         if (self._date is not None):
-            info_labels['date'] = self.date
+            info_labels['Date'] = self.date
             
         li.setInfo('video',info_labels)
        

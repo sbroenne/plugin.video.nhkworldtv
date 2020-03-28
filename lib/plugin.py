@@ -137,7 +137,10 @@ def top_stories_index():
         episode.broadcast_start_date = row['updated_at']
         episode.date = episode.broadcast_start_date
         
-        time_difference_hours = datetime.now().hour - episode.broadcast_start_date.hour
+        difference_hours = datetime.now().hour - episode.broadcast_start_date.hour
+        day_difference_hours = (datetime.now().day - episode.broadcast_start_date.day) * 24
+        time_difference_hours = difference_hours + day_difference_hours
+
         if (time_difference_hours <= 1):
             time_difference = kodiutils.get_string(30060).format(
                 time_difference_hours)
@@ -587,13 +590,11 @@ def vod_playlists():
         return (None)
 
 
-#
-# Add a Kodi directory item for a playable episode
-# If the vod_id is in cache and cache is being used, diretly add the URL otherwise dynmaically resolve it
-# via show_epsisode()
-#
-
 def add_playable_episode_directory_item(episode, enforce_cache = False):
+    """ Add a Kodi directory item for a playable episode """ 
+    # If the vod_id is in cache and cache is being used, diretly add the URL otherwise dynmaically resolve it
+    # via show_epsisode()
+    #
     # Use the cache backend or not
     if (enforce_cache):
         use_backend = True
@@ -612,11 +613,11 @@ def add_playable_episode_directory_item(episode, enforce_cache = False):
             xbmcplugin.addDirectoryItem(plugin.handle, episode.url, episode.kodi_list_item)
             return(True)
 
-    # Not inn cache - need to be resolve dynmaically
+    # Not in cache - need to be resolve dynmaically
   
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(show_episode,episode.vod_id), episode.kodi_list_item
+        plugin.url_for(play_vod_episode,episode.vod_id), episode.kodi_list_item
         )
     return(True)
 
@@ -699,10 +700,13 @@ def vod_episode_list(api_url, show_only_subtitle,
         return (None)
 
 
-# Video On Demand - Display Episode
-@plugin.route('/vod/show_episode/<vod_id>/')
-def show_episode(vod_id, enforce_cache=False):
+# Video On Demand - Play Episode
+@plugin.route('/vod/play_episode/<vod_id>/')
+def play_vod_episode(vod_id, enforce_cache=False):
 
+    xbmc.log('VOD_ID: {0}'.format(vod_id))
+    xbmc.log('ENFORCE CACHE: {0}'.format(enforce_cache))
+   
     if (enforce_cache):
         use_backend = True
     else:

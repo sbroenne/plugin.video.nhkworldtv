@@ -43,22 +43,22 @@ class Test_VOD(unittest.TestCase):
                                          xbmcplugin.SORT_METHOD_NONE)
         self.assertGreater(len(episode.title),0)
 
-    def test_show_episode_non_cache(self):
+    def test_play_episode_non_cache(self):
 
         test_url = nhk_api.rest_url['get_most_watched_episodes']
         episode = plugin.vod_episode_list(test_url, 0, 0,
                                          xbmcplugin.SORT_METHOD_NONE)
-        episode_url = plugin.show_episode(episode.vod_id, False)
+        episode_url = plugin.play_vod_episode(episode.vod_id, False)
         print(episode_url)
         self.assertIsNotNone(episode_url)
 
-    def test_show_episode_cache(self):
+    def test_play_episode_cache(self):
 
         test_url = nhk_api.rest_url['get_most_watched_episodes']
         episode = plugin.vod_episode_list(test_url, 0, 0,
                                          xbmcplugin.SORT_METHOD_NONE)
       
-        episode_url = plugin.show_episode(episode.vod_id, True)
+        episode_url = plugin.play_vod_episode(episode.vod_id, True)
         print(episode_url)
         self.assertIsNotNone(episode_url)
 
