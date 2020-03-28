@@ -435,44 +435,45 @@ def live_schedule_index():
 @plugin.route('/vod/index')
 def vod_index():
     xbmc.log('Creating Video On Demand Menu')
+    art = {'thumb': NHK_ICON, 'fanart': NHK_FANART}
     # Programs
-    xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(vod_programs),
-        xbmcgui.ListItem(kodiutils.get_string(30040), iconImage=NHK_ICON,thumbnailImage=NHK_FANART),
-        True)
+    li = xbmcplugin.ListItem(kodiutils.get_string(30040))
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_programs), li,True)
     #Categories
-    xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(vod_categories),
-        xbmcgui.ListItem(kodiutils.get_string(30041), iconImage=NHK_ICON,thumbnailImage=NHK_FANART ),
-        True)
+    li = xbmcplugin.ListItem(kodiutils.get_string(30041))
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_categories),li,True)
     # Playlists
-    xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(vod_playlists),
-        xbmcgui.ListItem(kodiutils.get_string(30042), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
-        True)
+    li = xbmcplugin.ListItem(kodiutils.get_string(30042))
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_playlists),li,True)
     # Latest Episodes
+    li = xbmcplugin.ListItem(kodiutils.get_string(30043))
+    li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(vod_episode_list,
                        nhk_api.rest_url['get_latest_episodes'], 0,
                        xbmcplugin.SORT_METHOD_DATE),
-        xbmcgui.ListItem(kodiutils.get_string(30043), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
-        True)
+                       li, True)
     # Most Watched
+    li = xbmcplugin.ListItem(kodiutils.get_string(30044))
+    li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(vod_episode_list,
                        nhk_api.rest_url['get_most_watched_episodes'], 0,
                        xbmcplugin.SORT_METHOD_NONE),
-        xbmcgui.ListItem(kodiutils.get_string(30044), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
-        True)
+                       li, True)
     # All
+    li = xbmcplugin.ListItem(kodiutils.get_string(30045))
+    li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(vod_episode_list, nhk_api.rest_url['get_all_episodes'],
                        0, xbmcplugin.SORT_METHOD_LABEL),
-        xbmcgui.ListItem(kodiutils.get_string(30045), iconImage=NHK_ICON, thumbnailImage=NHK_FANART),
-        True)
+                       li, True)
     kodiutils.set_view_mode(VIEW_MODE_WIDELIST)
     xbmcplugin.endOfDirectory(plugin.handle)
     return (True)
