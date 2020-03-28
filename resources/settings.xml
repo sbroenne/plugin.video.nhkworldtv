@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
     <setting label="30001" type="lsep"/>
+    <setting id="url_cache_minutes" type="number" label="30004" default="180"/>
     <setting id="set_view_mode" type="bool" label="30005" default="true"/>
     <setting label="30002" type="lsep"/>
     <setting id="use_backend" type="bool" label="30008" default="true"/>

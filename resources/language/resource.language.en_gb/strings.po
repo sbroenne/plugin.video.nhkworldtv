@@ -11,11 +11,15 @@ msgid "General"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Program meta data cloud cache"
+msgid "3rd Party Cloud Program Cache"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Configure program lists"
+msgid "Configure Program lists"
+msgstr ""
+
+msgctxt "#30004"
+msgid "Cache NHK API Results in minutes (minimum 60)"
 msgstr ""
 
 msgctxt "#30005"
@@ -31,11 +35,11 @@ msgid "Max At A Glance items to show"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Enable to speed-up video playback (recommended)"
+msgid "Enable cloud cache to speed-up video playback (recommended)"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Maximum number of programs to retrieve at start-up"
+msgid "Maximum number of cache items to retrieve at start-up"
 msgstr ""
 
 #plugin.py

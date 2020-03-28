@@ -83,7 +83,7 @@ def add_top_stories_menu_item():
     xbmc.log('Adding top stories menu item')
   
     # Getting top story
-    featured_news = utils.get_json(nhk_api.rest_url['homepage_news'])['data'][0]
+    featured_news = utils.get_json(nhk_api.rest_url['homepage_news'], False)['data'][0]
     thumbnails = featured_news['thumbnails']
 
     episode = Episode()
@@ -111,7 +111,7 @@ def add_top_stories_menu_item():
 @plugin.route('/news/top_stories/index')
 def top_stories_index():
     xbmc.log('Displaying Top Stories Index')
-    api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'])
+    api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'], False)
     max_row_count = MAX_NEWS_DISPLAY_ITEMS
     result_row_count = len(api_result_json['data'])
     # Only display MAX ROWS
@@ -377,7 +377,7 @@ def add_live_schedule_menu_item():
 #
 
 @plugin.route('/live_schedule/index')
-def live_schedule_index(enforce_cache=False):
+def live_schedule_index():
     xbmc.log('Adding live schedule inde')
     program_json = utils.get_json(nhk_api.rest_url['get_livestream'], False)['channel']['item']
 
@@ -414,7 +414,7 @@ def live_schedule_index(enforce_cache=False):
        
         if (episode.IsPlayable):
             # Display the playable episode
-            add_playable_episode_directory_item(episode, enforce_cache)   
+            add_playable_episode_directory_item(episode)   
         else:
             # Simply display text
             xbmcplugin.addDirectoryItem(plugin.handle, None, episode.kodi_list_item, False)

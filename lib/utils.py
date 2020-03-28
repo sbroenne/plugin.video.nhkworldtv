@@ -8,6 +8,7 @@ from pytz import timezone
 from tzlocal import get_localzone
 import api_keys
 import cache_api
+import kodiutils
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
@@ -21,8 +22,11 @@ else:
     db_name ='nhk_world_cache'
     UNIT_TEST = True
 
-# Enable cache for requests
-requests_cache.install_cache(db_name, backend='sqlite', expire_after=3600)
+URL_CACHE_MINUTES = kodiutils.get_setting_as_int('url_cache_minutes')
+# Enforce minimu 60 minutes caching
+if URL_CACHE_MINUTES < 60:
+        URL_CACHE_MINUTES = 60
+requests_cache.install_cache(db_name, backend='sqlite', expire_after=URL_CACHE_MINUTES * 60)
 
 # Instantiate request session
 s = requests.Session()
@@ -56,8 +60,7 @@ def get_url(url, cached = True):
         request_params = {'code': api_keys.CACHE_API_KEY}
     else:
         request_params = None
-    
-    s.params = request_params
+   
     # maximum number of retries
     max_retries = 3
     current_try = 1
@@ -67,10 +70,16 @@ def get_url(url, cached = True):
         # Use cached or non-cached result
         if (cached):
             # Use session cache
-            r = s.get(url)
+            if (request_params is not None):
+                r = s.get(url, params = request_params)
+            else:
+                r = s.get(url)
         else:
             with s.cache_disabled():
-               r = s.get(url)
+                if (request_params is not None):
+                    r = s.get(url, params = request_params)
+                else:
+                    r = s.get(url)
                
         # Make an API Call
         xbmc.log('Making API Call {0} ({1} of {2})'.format(

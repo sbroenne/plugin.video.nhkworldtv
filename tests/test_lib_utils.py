@@ -14,9 +14,13 @@ class Test_Test_utils(unittest.TestCase):
             utils.get_url('https://www3.nhk.or.jp/nhkworld/'),
             requests.Response)
 
-    def test_get_JSON(self):
+    def test_get_JSON_cached(self):
         self.assertIsInstance(
             utils.get_json(nhk_api.rest_url['get_livestream']), dict)
+    
+    def test_get_JSON_non_cached(self):
+        self.assertIsInstance(
+            utils.get_json(nhk_api.rest_url['get_livestream'], False), dict)
 
     def test_get_NHK_website_url(self):
         self.assertEqual(utils.get_NHK_website_url('/nhkworld/'),
