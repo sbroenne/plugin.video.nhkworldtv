@@ -437,19 +437,19 @@ def vod_index():
     xbmc.log('Creating Video On Demand Menu')
     art = {'thumb': NHK_ICON, 'fanart': NHK_FANART}
     # Programs
-    li = xbmcplugin.ListItem(kodiutils.get_string(30040))
+    li = xbmcgui.ListItem(kodiutils.get_string(30040))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_programs), li,True)
     #Categories
-    li = xbmcplugin.ListItem(kodiutils.get_string(30041))
+    li = xbmcgui.ListItem(kodiutils.get_string(30041))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_categories),li,True)
     # Playlists
-    li = xbmcplugin.ListItem(kodiutils.get_string(30042))
+    li = xbmcgui.ListItem(kodiutils.get_string(30042))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_playlists),li,True)
     # Latest Episodes
-    li = xbmcplugin.ListItem(kodiutils.get_string(30043))
+    li = xbmcgui.ListItem(kodiutils.get_string(30043))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
@@ -458,7 +458,7 @@ def vod_index():
                        xbmcplugin.SORT_METHOD_DATE),
                        li, True)
     # Most Watched
-    li = xbmcplugin.ListItem(kodiutils.get_string(30044))
+    li = xbmcgui.ListItem(kodiutils.get_string(30044))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
@@ -467,7 +467,7 @@ def vod_index():
                        xbmcplugin.SORT_METHOD_NONE),
                        li, True)
     # All
-    li = xbmcplugin.ListItem(kodiutils.get_string(30045))
+    li = xbmcgui.ListItem(kodiutils.get_string(30045))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
