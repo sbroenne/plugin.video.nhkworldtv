@@ -161,7 +161,7 @@ def top_stories_index():
 
             api_url = utils.get_NHK_website_url(video['config'])
             xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(play_news_item, api_url , episode.vod_id, 'news', episode.title), episode.kodi_list_item, False)
+                                plugin.url_for(play_news_item, api_url , episode.vod_id, 'news', title), episode.kodi_list_item, False)
             
         else:
             # No video attached to it
