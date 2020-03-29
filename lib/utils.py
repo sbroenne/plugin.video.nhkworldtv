@@ -136,7 +136,7 @@ def to_local_time(UTC_timestamp):
 
     # Parse it as UTC
     UTC_datetime = UTC_tz.localize(datetime.fromtimestamp(UTC_timestamp))
-    UTC_datetime = UTC_datetime - timedelta(hours=1)
+    #UTC_datetime = UTC_datetime - timedelta(hours=1)
 
     # Convert to local time
     local_datetime = UTC_datetime.astimezone(local_tz)
@@ -146,7 +146,7 @@ def to_local_time(UTC_timestamp):
         datetime(local_datetime.year, local_datetime.month, local_datetime.day,
                  local_datetime.hour, local_datetime.minute,
                  local_datetime.second))
-    return (dt)
+    return (UTC_datetime)
 
 
 def get_episode_name(title, subtitle):

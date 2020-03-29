@@ -31,6 +31,7 @@ class Test_Test_utils(unittest.TestCase):
         local_tz = tzlocal.get_localzone()
         local_time = local_tz.localize(
             datetime.datetime(year=2020, month=2, day=9, hour=17, minute=40))
+        print(local_time)
         self.assertEqual(local_time, converted_time)
 
     def test_get_top_stories_play_path(self):
