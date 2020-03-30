@@ -1,40 +1,39 @@
-from datetime import datetime, timedelta
 import re
 import requests
 import requests_cache
 import xbmc
 import xbmcaddon
-from pytz import timezone
-from tzlocal import get_localzone
 import api_keys
 import cache_api
 import kodiutils
+import datetime
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
 plugin_path = ADDON.getAddonInfo('path')
-if (len(plugin_path)>0):
+if (len(plugin_path) > 0):
     # Running within Kodi - use that path
     db_name = '{0}/nhk_world_cache'.format(plugin_path)
     UNIT_TEST = False
 else:
     # Running under unit test
-    db_name ='nhk_world_cache'
+    db_name = 'nhk_world_cache'
     UNIT_TEST = True
 
 URL_CACHE_MINUTES = kodiutils.get_setting_as_int('url_cache_minutes')
 # Enforce minimu 60 minutes caching
 if URL_CACHE_MINUTES < 60:
-        URL_CACHE_MINUTES = 60
-requests_cache.install_cache(db_name, backend='sqlite', expire_after=URL_CACHE_MINUTES * 60)
+    URL_CACHE_MINUTES = 60
+requests_cache.install_cache(db_name,
+                             backend='sqlite',
+                             expire_after=URL_CACHE_MINUTES * 60)
 
 # Instantiate request session
 s = requests.Session()
 
-# Get JSON object from a URL with improved error handling
 
-
-def get_json(url, cached = True):
+def get_json(url, cached=True):
+    """ # Get JSON object from a URL with improved error handling """
     r = get_url(url, cached)
     try:
         result = r.json()
@@ -48,11 +47,10 @@ def get_json(url, cached = True):
         r.raise_for_status()
 
 
-# Get a URL with automatic retries - NHK sometimes have intermittent problems with 502 Bad Gateway
+def get_url(url, cached=True):
+    """ Get a URL with automatic retries
+        NHK sometimes have intermittent problems with 502 Bad Gateway """
 
-
-def get_url(url, cached = True):
-   
     # Populate request_params if needed
     if (api_keys.NHK_API_BASE_URL in url):
         request_params = {'apikey': api_keys.NHK_API_KEY}
@@ -60,7 +58,7 @@ def get_url(url, cached = True):
         request_params = {'code': api_keys.CACHE_API_KEY}
     else:
         request_params = None
-   
+
     # maximum number of retries
     max_retries = 3
     current_try = 1
@@ -71,25 +69,25 @@ def get_url(url, cached = True):
         if (cached):
             # Use session cache
             if (request_params is not None):
-                r = s.get(url, params = request_params)
+                r = s.get(url, params=request_params)
             else:
                 r = s.get(url)
         else:
             with s.cache_disabled():
                 if (request_params is not None):
-                    r = s.get(url, params = request_params)
+                    r = s.get(url, params=request_params)
                 else:
                     r = s.get(url)
-               
+
         # Make an API Call
         xbmc.log('Making API Call {0} ({1} of {2})'.format(
             r.url, current_try, max_retries))
 
         if (r.status_code == 200):
             # Call was successfull
-            xbmc.log(
-                'Successfully fetched URL/API: {0} - Status {1} - Retrieved from cache {2}'.format(
-                    r.url, r.status_code, r.from_cache))
+            xbmc.log('Successfully fetched URL/API: {0} - Status {1} \
+                 - Retrieved from cache {2}'.format(r.url, r.status_code,
+                                                    r.from_cache))
             return (r)
         elif (r.status_code == 502):
             # Bad Gateway
@@ -99,54 +97,35 @@ def get_url(url, cached = True):
                 # with the NHK Website
                 # Raise exception
                 xbmc.log(
-                'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'
-                .format(r.url, r.status_code, current_try), xbmc.LOGFATAL)
+                    'Could not get URL {0} - HTTP Status Code {1} \
+                    - Retries {2}'.format(r.url, r.status_code, current_try),
+                    xbmc.LOGFATAL)
                 r.raise_for_status()
             else:
                 # Wait for n seconds and then try again
                 xbmc.log(
                     'Failure fetching URL: {0} with Status {1})'.format(
                         r.url, r.status_code), xbmc.LOGWARNING)
-                current_try = current_try +1
+                current_try = current_try + 1
         else:
             # Other error
             xbmc.log(
-                'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'
-                .format(r.url, r.status_code, current_try), xbmc.LOGFATAL)
+                'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'.
+                format(r.url, r.status_code, current_try), xbmc.LOGFATAL)
             r.raise_for_status()
             exit
 
 
-
-# Return a full URL from the partial URLs in the JSON results
-
-
 def get_NHK_website_url(path):
-    nhk_website = 'https://www3.nhk.or.jp'
+    """ Return a full URL from the partial URLs in the JSON results """
+    nhk_website = api_keys.NHK_BASE_URL
     return nhk_website + path
 
 
-# Convert Timezone from UTC to local TZ
-
-
-def to_local_time(UTC_timestamp):
-    # Convert from JST to local timezone
-    UTC_tz = timezone('Etc/UTC')
-    local_tz = get_localzone()
-
-    # Parse it as UTC
-    UTC_datetime = UTC_tz.localize(datetime.fromtimestamp(UTC_timestamp))
-    #UTC_datetime = UTC_datetime - timedelta(hours=1)
-
-    # Convert to local time
-    local_datetime = UTC_datetime.astimezone(local_tz)
-
-    # Localize time again to get the correct TZINFO
-    dt = local_tz.localize(
-        datetime(local_datetime.year, local_datetime.month, local_datetime.day,
-                 local_datetime.hour, local_datetime.minute,
-                 local_datetime.second))
-    return (UTC_datetime)
+def to_local_time(timestamp):
+    """ Convert from a UNIX timestamp to a valid date time """
+    local_time = datetime.datetime.fromtimestamp(timestamp)
+    return (local_time)
 
 
 def get_episode_name(title, subtitle):
@@ -157,6 +136,7 @@ def get_episode_name(title, subtitle):
         episode_name = u'{0} - {1}'.format(title, subtitle)
     return (episode_name)
 
+
 def get_episodelist_title(title, total_episodes):
     """ Gets a formated episode list title, e.g. '1 episode' or '2 episodes'"""
     if (total_episodes == 1):
@@ -165,23 +145,32 @@ def get_episodelist_title(title, total_episodes):
         episodelist_title = u'{0} - {1} episodes'.format(title, total_episodes)
     return (episodelist_title)
 
+
 def get_top_stories_play_path(xmltext):
     """ Extracts the play path from a top story XML file """
-    matches = re.compile('rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ').findall(xmltext)
+    find = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ'
+
+    matches = re.compile(find).findall(xmltext)
     play_path = matches[0]
     return play_path
 
+
 def get_ataglance_play_path(xmltext):
     """ Extracts the play path from a At a Glance XML file """
-    matches = re.compile('<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>').findall(xmltext)
+    find = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>'
+
+    matches = re.compile(find).findall(xmltext)
     play_path = matches[0]
     return play_path
+
 
 def get_program_metdadata_cache(max_items):
     """
     #Use NHK World TV Cloud Service to speed-up episode URLlookup
-    The service runs on Azure in West Europe but should still speed up the lookup process dramatically since it uses a pre-loaded cache
+    The service runs on Azure in West Europe but should still speed up
+    the lookup process dramatically since it uses a pre-loaded cache
     """
     xbmc.log('Getting vod_id/program metadata cache from Azure')
-    cache = get_json(cache_api.rest_url['cache_get_program_list'].format(max_items))
+    cache = get_json(
+        cache_api.rest_url['cache_get_program_list'].format(max_items))
     return (cache)

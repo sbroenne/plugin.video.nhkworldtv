@@ -1,8 +1,8 @@
 import unittest  # The test framework
 import lib.plugin as plugin
 
-class Test_Navigation_Menus(unittest.TestCase):
 
+class Test_Navigation_Menus(unittest.TestCase):
     def test_main_menu(self):
         self.assertTrue(plugin.index())
 
@@ -23,6 +23,7 @@ class Test_Navigation_Menus(unittest.TestCase):
 
     def test_vod_menu(self):
         self.assertTrue(plugin.vod_index())
-    
+
+
 if __name__ == '__main__':
     unittest.main()

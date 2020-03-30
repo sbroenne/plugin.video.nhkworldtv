@@ -1,6 +1,5 @@
 import xbmcgui
 import utils
-from datetime import datetime, timedelta
 
 
 class Episode(object):
@@ -19,7 +18,7 @@ class Episode(object):
         self.url = None
         self.IsPlayable = False
         self._date = None
-        self._year = None  
+        self._year = None
         self._broadcast_start_date = None
         self._broadcast_end_date = None
         self._thumb = None
@@ -27,6 +26,7 @@ class Episode(object):
         self._video_info = None
         self._kodi_list_item = xbmcgui.ListItem
         self.absolute_image_url = False
+
     #
     # Properties
     #
@@ -80,7 +80,6 @@ class Episode(object):
             self._fanart = utils.get_NHK_website_url(value)
         else:
             self._fanart = value
-            
 
     @property
     def date(self):
@@ -107,13 +106,17 @@ class Episode(object):
         if (self._video_info is not None):
             return self._video_info
         elif (self.aspect is not None):
-            vi = {'aspect': self.aspect, 'width': self.width, 'height': self.height}
+            vi = {
+                'aspect': self.aspect,
+                'width': self.width,
+                'height': self.height
+            }
             self._video_info = vi
             return vi
-            
+
         else:
             return None
-    
+
     @video_info.setter
     def video_info(self, value):
         self._video_info = value
@@ -121,7 +124,7 @@ class Episode(object):
     @property
     def kodi_list_item(self):
         """ Gets the current Kodi List Item """
-        
+
         if (self.url is not None):
             # Path was provided - created the ListItem with path
             li = xbmcgui.ListItem(path=self.url)
@@ -134,16 +137,13 @@ class Episode(object):
             # Playable episode
             li.setProperty('IsPlayable', 'true')
 
-        li.setArt({
-            'thumb': self.thumb,
-            'fanart': self.fanart
-        })
-        
+        li.setArt({'thumb': self.thumb, 'fanart': self.fanart})
+
         # Add Kodi InfoLabels
         info_labels = {}
         info_labels['mediatype'] = 'episode'
         info_labels['Plot'] = self.plot
-        
+
         if (self.duration is not None):
             info_labels['Duration'] = self.duration
 
@@ -152,12 +152,12 @@ class Episode(object):
 
         if (self.year is not None):
             info_labels['Year'] = self.year
-        
+
         if (self._date is not None):
             info_labels['Date'] = self.date
-            
-        li.setInfo('video',info_labels)
-       
+
+        li.setInfo('video', info_labels)
+
         # Only add Stream Info if the the video_info property is not none
         if (self.video_info is not None):
             li.addStreamInfo('video', self.video_info)

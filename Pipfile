@@ -12,10 +12,9 @@ yapf = "*"
 
 [packages]
 requests = "*"
-pytz = "*"
-tzlocal = "*"
 kodistubs = "*"
 requests-cache = "<5"
+black = "*"
 
 [requires]
 python_version = "2.7"

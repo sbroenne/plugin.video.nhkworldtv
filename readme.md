@@ -51,8 +51,6 @@ The plug-in is largely feature complete. You are able to:
 - check the latest Top-Stories & At A Glance stories (in SD)
 - access a "mini EPG"/live schedule with the upcoming shows - if the program is available on-demand, you can play it as well.
 
-Automatic timezone support is implemented and has been tested on MacOs, Windows and Android TV.
-
 Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site.
 
 The plug-in is localized but translation only exists for English (GB).
