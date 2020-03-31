@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "baf3af5f7a21dcb226b9d7d3a5060a4635ec7c296626b7e3972872d174db471d"
+            "sha256": "d60b0f18f788ff30218d45614c8066bbd518ef193e2cef9f441dd3d94c84195c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -45,14 +45,6 @@
             "index": "pypi",
             "version": "==18.0.0"
         },
-        "pytz": {
-            "hashes": [
-                "sha256:1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d",
-                "sha256:b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"
-            ],
-            "index": "pypi",
-            "version": "==2019.3"
-        },
         "requests": {
             "hashes": [
                 "sha256:43999036bfa82904b6af1d99e4882b560e5e2c68e5c4b0aa03b655f3d7d73fee",
@@ -76,14 +68,6 @@
                 "sha256:f38d83c5a7a7086543a0f649564d661859c5146a85775ab90c0d2f93ffaa9714"
             ],
             "version": "==3.7.4.1"
-        },
-        "tzlocal": {
-            "hashes": [
-                "sha256:11c9f16e0a633b4b60e1eede97d8a46340d042e67b670b290ca526576e039048",
-                "sha256:949b9dd5ba4be17190a80c0268167d7e6c92c62b30026cf9764caf3e308e5590"
-            ],
-            "index": "pypi",
-            "version": "==2.0.0"
         },
         "urllib3": {
             "hashes": [
@@ -113,7 +97,7 @@
                 "sha256:0bada4c2f8a43d533e4ecb7a12214d9420e66eb206d54bf2d682581ca4b80848",
                 "sha256:8fde5f188da2d593bd5bc0be98d9abc46c95bb8a9dde93429570192ee6cc2d4a"
             ],
-            "markers": "python_version < '3.2'",
+            "markers": "python_version == '2.7'",
             "version": "==1.6.1"
         },
         "configparser": {
@@ -121,7 +105,7 @@
                 "sha256:254c1d9c79f60c45dfde850850883d5aaa7f19a23f13561243a050d5a7c3fe4c",
                 "sha256:c7d282687a5308319bf3d2e7706e575c635b0a470342641c93bea0ea3b5331df"
             ],
-            "markers": "python_version == '2.7'",
+            "markers": "python_version < '3.2'",
             "version": "==4.0.2"
         },
         "entrypoints": {

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import random
 import re
 from datetime import datetime
@@ -34,7 +32,7 @@ VIEW_MODE_WIDELIST = 55
 if (utils.UNIT_TEST):
     # Run under unit test - set some default data since we will not be able to
     # retrieve data from settings.xml
-    MAX_NEWS_DISPLAY_ITEMS = 20
+    MAX_NEWS_DISPLAY_ITEMS = 100
     MAX_ATAGLANCE_DISPLAY_ITEMS = 800
     MAX_PROGRAM_METADATA_CACHE_ITEMS = 1000
     PROGRAM_METADATA_CACHE = utils.get_program_metdadata_cache(
@@ -147,19 +145,27 @@ def top_stories_index():
         episode.broadcast_start_date = row['updated_at']
         episode.date = episode.broadcast_start_date
 
-        difference_hours = datetime.now(
-        ).hour - episode.broadcast_start_date.hour
+        hours = datetime.now().hour - episode.broadcast_start_date.hour
+        minutes = datetime.now().minute - episode.broadcast_start_date.minute
         day_difference_hours = (datetime.now().day -
                                 episode.broadcast_start_date.day) * 24
-        time_difference_hours = difference_hours + day_difference_hours
+        time_difference_hours = hours + day_difference_hours
 
-        if (time_difference_hours <= 1):
+        if (day_difference_hours >= 24):
+            # Show as absolute date
+            time_difference = episode.broadcast_start_date.strftime('%A, %b %d, %H:%M')
+        if (time_difference_hours < 1):
+            # Show in minutes
+            time_difference = kodiutils.get_string(30062).format(
+                minutes)
+        elif (time_difference_hours == 1):
+            # Show in hour
             time_difference = kodiutils.get_string(30060).format(
                 time_difference_hours)
         else:
+            # Show in hours
             time_difference = kodiutils.get_string(30061).format(
                 time_difference_hours)
-
         if row['videos'] is not None:
             video = row['videos']
             # Top stories that have a video attached to them
@@ -854,7 +860,7 @@ def play_news_item(api_url, news_id, item_type, title):
     xbmc.log('NEWS_ID: {0}'.format(news_id))
     xbmc.log('TITLE: {0}'.format(title))
 
-    video_xml = utils.get_url(api_url).content
+    video_xml = utils.get_url(api_url).text
     if (item_type == 'news'):
         play_path = nhk_api.rest_url['news_url'].format(
             utils.get_top_stories_play_path(video_xml))

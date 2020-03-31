@@ -124,6 +124,10 @@ msgctxt "#30061"
 msgid "{0} hours ago"
 msgstr ""
 
+msgctxt "#30062"
+msgid "{0} min ago"
+msgstr ""
+
 # Live Schedule
 msgctxt "#30070"
 msgid "PLAY: {0}"
