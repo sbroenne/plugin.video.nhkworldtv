@@ -42,6 +42,6 @@ BUGFIX: Removed tinezone - not necesary since NHK return a time stamps that can 
             <screenshot>resources/screenshot02.jpeg</screenshot>
             <screenshot>resources/screenshot03.jpeg</screenshot>
         </assets>
-        <reuselanguageinvoker>false</reuselanguageinvoker>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
     </extension>
 </addon>
