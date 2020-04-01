@@ -65,11 +65,29 @@ def index():
     xbmc.log('Creating Main Menu')
 
     # Add menus
-    add_top_stories_menu_item()
-    add_on_demand_menu_item()
+    
     add_live_stream_menu_item()
+    add_on_demand_menu_item()
     add_live_schedule_menu_item()
+    add_top_stories_menu_item()
     add_ataglance_menu_item()
+
+    # News Programs
+    art = {
+        'thumb':
+        'https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/news/programs/1001_2.jpg',
+        'fanart':
+        'https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/newsline_2020.jpg'
+    }
+    li = xbmcgui.ListItem(kodiutils.get_string(30080))
+    info_labels = {}
+    info_labels['mediatype'] = 'episode'
+    info_labels['Plot'] = kodiutils.get_string(30081)
+    li.setInfo('video', info_labels)
+    li.addStreamInfo('video', kodiutils.get_SD_video_info())
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(plugin.handle,
+                                plugin.url_for(news_programs_index), li, True)
 
     # Set-up view
     xbmcplugin.setContent(plugin.handle, 'videos')
@@ -131,6 +149,7 @@ def top_stories_index():
 
         episode = Episode()
         title = row['title']
+        news_id = row['id']
 
         thumbnails = row['thumbnails']
 
@@ -145,32 +164,30 @@ def top_stories_index():
         episode.broadcast_start_date = row['updated_at']
         episode.date = episode.broadcast_start_date
 
-        hours = datetime.now().hour - episode.broadcast_start_date.hour
-        minutes = datetime.now().minute - episode.broadcast_start_date.minute
-        day_difference_hours = (datetime.now().day -
-                                episode.broadcast_start_date.day) * 24
-        time_difference_hours = hours + day_difference_hours
-
-        if (day_difference_hours >= 24):
+        date_delta = datetime.now() - episode.broadcast_start_date
+        date_delta_minutes = date_delta.seconds / 60
+        date_delta_hours = date_delta_minutes / 60
+        if (date_delta.days > 0):
             # Show as absolute date
-            time_difference = episode.broadcast_start_date.strftime('%A, %b %d, %H:%M')
-        if (time_difference_hours < 1):
+            time_difference = episode.broadcast_start_date.strftime(
+                '%A, %b %d, %H:%M')
+        elif (date_delta_hours < 1):
             # Show in minutes
             time_difference = kodiutils.get_string(30062).format(
-                minutes)
-        elif (time_difference_hours == 1):
-            # Show in hour
+                date_delta_minutes)
+        elif (date_delta_hours == 1):
+            # Show as hour
             time_difference = kodiutils.get_string(30060).format(
-                time_difference_hours)
+                date_delta_hours)
         else:
-            # Show in hours
+            # Show as hours (plural)
             time_difference = kodiutils.get_string(30061).format(
-                time_difference_hours)
+                date_delta_hours)
         if row['videos'] is not None:
             video = row['videos']
             # Top stories that have a video attached to them
             episode.title = kodiutils.get_string(30070).format(title)
-            episode.vod_id = row['id']
+            episode.vod_id = news_id
             episode.duration = video['duration']
             minutes = int(episode.duration / 60)
             seconds = episode.duration - (minutes * 60)
@@ -191,8 +208,17 @@ def top_stories_index():
         else:
             # No video attached to it
             episode.title = title
-            episode.plot = u'{0}\n\n{1}'.format(time_difference,
-                                                row['description'])
+            # Get detailed news information
+            api_url = nhk_api.rest_url['news_detail'].format(news_id)
+            news_detail_json = utils.get_json(api_url)['data']
+            detail = news_detail_json['detail']
+            detail = detail.replace('<br />', '\n')
+            detail = detail.replace('\n\n', '\n')
+            episode.plot = u'{0}\n\n{1}'.format(time_difference, detail)
+            thumbnails = news_detail_json['thumbnails']
+            if (thumbnails is not None):
+                episode.thumb = thumbnails['small']
+                episode.fanart = thumbnails['middle']
             episode.IsPlayable = False
             xbmcplugin.addDirectoryItem(plugin.handle, None,
                                         episode.kodi_list_item, False)
@@ -301,6 +327,44 @@ def ataglance_index():
             plugin.url_for(play_news_item, api_url, episode.vod_id,
                            'ataglance', episode.title), episode.kodi_list_item,
             False)
+
+    kodiutils.set_video_directory_information(plugin.handle,
+                                              VIEW_MODE_INFOWALL,
+                                              xbmcplugin.SORT_METHOD_NONE,
+                                              "Descending")
+
+    # Used for unit testing
+    # only successfull if we processed at least top story
+    if (row_count > 0):
+        return (row_count)
+    else:
+        return (0)
+
+
+# News Programs
+@plugin.route('/news/programs/index')
+def news_programs_index():
+    xbmc.log('Displaying At News Index')
+    api_result_json = utils.get_json(
+        nhk_api.rest_url['news_program_config'])['config']['programs']
+    row_count = 0
+    for row in api_result_json:
+        row_count = row_count + 1
+        episode = Episode()
+        news_program_id = row['id']
+        vod_id = u'news_program_{0}'.format(news_program_id)
+        episode.vod_id = vod_id
+        episode.title = row['name']
+        episode.fanart = row['image']
+        episode.thumb = row['image']
+        api_url = nhk_api.rest_url['news_program_xml'].format(news_program_id)
+        episode.video_info = kodiutils.get_SD_video_info()
+        episode.IsPlayable = True
+        xbmcplugin.addDirectoryItem(
+            plugin.handle,
+            plugin.url_for(play_news_item, api_url, episode.vod_id,
+                           'news_program', episode.title),
+            episode.kodi_list_item, False)
 
     kodiutils.set_video_directory_information(plugin.handle,
                                               VIEW_MODE_INFOWALL,
@@ -854,7 +918,7 @@ def play_vod_episode(vod_id, enforce_cache=False):
 @plugin.route(
     '/news/play_news_item/<path:api_url>/<news_id>/<item_type>/<title>/')
 def play_news_item(api_url, news_id, item_type, title):
-    """ Play a news item - can either be 'news' or 'ataglance' """
+    """ Play a news item - can either be 'news' or 'ataglance' or 'news_program' """
     xbmc.log('ITEM_TYPE: {0}'.format(item_type))
     xbmc.log('API_URL: {0}'.format(api_url))
     xbmc.log('NEWS_ID: {0}'.format(news_id))
@@ -862,11 +926,14 @@ def play_news_item(api_url, news_id, item_type, title):
 
     video_xml = utils.get_url(api_url).text
     if (item_type == 'news'):
-        play_path = nhk_api.rest_url['news_url'].format(
+        play_path = nhk_api.rest_url['news_video_url'].format(
             utils.get_top_stories_play_path(video_xml))
-    elif (item_type == "ataglance"):
-        play_path = nhk_api.rest_url['ataglance_url'].format(
+    elif (item_type == 'ataglance'):
+        play_path = nhk_api.rest_url['ataglance_video_url'].format(
             utils.get_ataglance_play_path(video_xml))
+    elif (item_type == 'news_program'):
+        play_path = nhk_api.rest_url['news_programs_video_url'].format(
+            utils.get_news_program_play_path(video_xml))
     else:
         return (False)
 

@@ -98,7 +98,7 @@ def get_1080_HD_video_info():
 
 # Returns a SD video info array
 def get_SD_video_info():
-    video_info = {'aspect': '1.78', 'width': '640', 'height': '360'}
+    video_info = {'aspect': '1.82', 'width': '640', 'height': '368'}
     return (video_info)
 
 

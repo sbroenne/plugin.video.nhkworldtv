@@ -132,3 +132,12 @@ msgstr ""
 msgctxt "#30070"
 msgid "PLAY: {0}"
 msgstr ""
+
+# News Programs
+msgctxt "#30080"
+msgid "NHK News Programs>"
+msgstr ""
+
+msgctxt "#30081"
+msgid "Watch NHK News Programs like NEWSLINE, NEWKSLINE IN DEPTH & NEWSROOM TOKYO on-demand"
+msgstr ""

@@ -19,6 +19,14 @@ class Test_Play_News_Item(unittest.TestCase):
         self.assertTrue(
             plugin.play_news_item(api_url, news_id, 'ataglance', title))
 
+    def test_play_news_item_from_news_programs(self):
+        api_url_string = u'/nhkworld/data/en/news/programs/1001.xml'
+        api_url = utils.get_NHK_website_url(api_url_string)
+        news_id = u'news_program_1001'
+        title = u'NEWSLINE'
+        self.assertTrue(
+            plugin.play_news_item(api_url, news_id, 'news_program', title))
+
     def test_play_news_item_invalid(self):
         api_url_string = u'/nhkworld/en/news/ataglance/822/video-main.xml'
         api_url = utils.get_NHK_website_url(api_url_string)

@@ -30,10 +30,14 @@ requests_cache.install_cache(db_name,
 
 # Instantiate request session
 s = requests.Session()
+# Act like a browser
+headers = {'agent':
+'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4080.0 Mobile Safari/537.36'}
+s.headers = headers
 
 
 def get_json(url, cached=True):
-    """ # Get JSON object from a URL with improved error handling """
+    """ Get JSON object from a URL with improved error handling """
     r = get_url(url, cached)
     try:
         result = r.json()
@@ -158,6 +162,15 @@ def get_top_stories_play_path(xmltext):
 def get_ataglance_play_path(xmltext):
     """ Extracts the play path from a At a Glance XML file """
     find = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>'
+
+    matches = re.compile(find).findall(xmltext)
+    play_path = matches[0]
+    return play_path
+
+
+def get_news_program_play_path(xmltext):
+    """ Extracts the play path from a news program file """
+    find = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/programs/(.+?)hq.mp4'
 
     matches = re.compile(find).findall(xmltext)
     play_path = matches[0]
