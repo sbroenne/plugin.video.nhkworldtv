@@ -1,3 +1,5 @@
+from __future__ import division
+from past.utils import old_div
 import datetime
 import unittest  # The test framework
 import requests
@@ -25,7 +27,7 @@ class Test_Test_utils(unittest.TestCase):
                          'https://www3.nhk.or.jp/nhkworld/')
 
     def test_to_local_time(self):
-        converted_time = utils.to_local_time(1581266400000 / 1000)
+        converted_time = utils.to_local_time(old_div(1581266400000, 1000))
         local_time = datetime.datetime(year=2020,
                                        month=2,
                                        day=9,

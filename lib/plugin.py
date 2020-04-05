@@ -1,3 +1,6 @@
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from builtins import range
 import random
 import re
 from datetime import datetime
@@ -7,12 +10,12 @@ import xbmcgui
 import xbmcplugin
 import xbmc
 
-import kodiutils
-import nhk_api
-import cache_api
-import routing
-import utils
-from episode import Episode
+from . import kodiutils
+from . import nhk_api
+from . import cache_api
+from . import routing
+from . import utils
+from .episode import Episode
 
 # Initiate constants and plug-in
 # When <reuselanguageinvoker>true</reuselanguageinvoker> this only happens
@@ -56,7 +59,7 @@ else:
 # Start page of the plug-in
 @plugin.route('/')
 def index():
-    xbmc.log('Creating Main Menu')
+    xbmc.log('Creating Main Men')
 
     # Add menus
 
@@ -163,8 +166,8 @@ def top_stories_index():
         episode.date = episode.broadcast_start_date
 
         date_delta = datetime.now() - episode.broadcast_start_date
-        date_delta_minutes = date_delta.seconds / 60
-        date_delta_hours = date_delta_minutes / 60
+        date_delta_minutes = date_delta.seconds // 60
+        date_delta_hours = date_delta_minutes // 60
         if (date_delta.days > 0):
             # Show as absolute date
             time_difference = episode.broadcast_start_date.strftime(
@@ -187,11 +190,11 @@ def top_stories_index():
             episode.title = kodiutils.get_string(30070).format(title)
             episode.vod_id = news_id
             episode.duration = video['duration']
-            minutes = int(episode.duration / 60)
+            minutes = int(episode.duration // 60)
             seconds = episode.duration - (minutes * 60)
             duration_text = '{0}m {1}'.format(minutes, seconds)
 
-            episode.plot = u'{0} | {1}\n\n{2}'.format(duration_text,
+            episode.plot = '{0} | {1}\n\n{2}'.format(duration_text,
                                                       time_difference,
                                                       row['description'])
             episode.video_info = kodiutils.get_SD_video_info()
@@ -215,7 +218,7 @@ def top_stories_index():
             detail = news_detail_json['detail']
             detail = detail.replace('<br />', '\n')
             detail = detail.replace('\n\n', '\n')
-            episode.plot = u'{0}\n\n{1}'.format(time_difference, detail)
+            episode.plot = '{0}\n\n{1}'.format(time_difference, detail)
             thumbnails = news_detail_json['thumbnails']
             if (thumbnails is not None):
                 episode.thumb = thumbnails['small']
@@ -315,10 +318,10 @@ def ataglance_index():
         episode.vod_id = vod_id
         episode.duration = row['video']['duration']
         if (episode.duration is not None):
-            minutes = int(episode.duration / 60)
+            minutes = int(episode.duration // 60)
             seconds = episode.duration - (minutes * 60)
             duration_text = '{0}m {1}'.format(minutes, seconds)
-            episode.plot = u'{0}\n\n{1}'.format(duration_text,
+            episode.plot = '{0}\n\n{1}'.format(duration_text,
                                                 row['description'])
         else:
             episode.plot = row['description']
@@ -356,7 +359,7 @@ def news_programs_index():
         row_count = row_count + 1
         episode = Episode()
         news_program_id = row['id']
-        vod_id = u'news_program_{0}'.format(news_program_id)
+        vod_id = 'news_program_{0}'.format(news_program_id)
         episode.vod_id = vod_id
         episode.title = row['name']
         episode.fanart = row['image']
@@ -440,8 +443,8 @@ def add_live_stream_menu_item():
     episode.url = nhk_api.rest_url['live_stream_url']
 
     # Title and Description
-    full_title = u'{0}\n\n{1}'.format(row['title'], row['description'])
-    episode.plot = u'{0}-{1}: {2}'.format(
+    full_title = '{0}\n\n{1}'.format(row['title'], row['description'])
+    episode.plot = '{0}-{1}: {2}'.format(
         episode.broadcast_start_date.strftime('%H:%M'),
         episode.broadcast_end_date.strftime('%H:%M'), full_title)
 
@@ -478,7 +481,7 @@ def add_live_schedule_menu_item():
     episode.thumb = row['thumbnail_s']
     episode.fanart = row['thumbnail']
 
-    title = u'{0}-{1}: {2}'.format(
+    title = '{0}-{1}: {2}'.format(
         episode.broadcast_start_date.strftime('%H:%M'),
         episode.broadcast_end_date.strftime('%H:%M'), row['title'])
     episode.plot = '{0}\n\n{1}'.format(
@@ -519,7 +522,7 @@ def live_schedule_index():
         episode.thumb = row['thumbnail_s']
         episode.fanart = row['thumbnail']
         episode_name = utils.get_episode_name(row['title'], row['subtitle'])
-        title = u'{0}-{1}: {2}'.format(
+        title = '{0}-{1}: {2}'.format(
             episode.broadcast_start_date.strftime('%H:%M'),
             episode.broadcast_end_date.strftime('%H:%M'), episode_name)
 
@@ -532,7 +535,7 @@ def live_schedule_index():
         else:
             episode.title = title
 
-        episode.plot = u'{0}\n\n{1}'.format(episode_name, row['description'])
+        episode.plot = '{0}\n\n{1}'.format(episode_name, row['description'])
 
         if (episode.IsPlayable):
             # Display the playable episode
@@ -557,7 +560,7 @@ def live_schedule_index():
 
 @plugin.route('/vod/index')
 def vod_index():
-    xbmc.log('Creating Video On Demand Menu')
+    xbmc.log('Creating Video On Demand Men')
     art = {'thumb': NHK_ICON, 'fanart': NHK_FANART}
     # Programs
     li = xbmcgui.ListItem(kodiutils.get_string(30040))

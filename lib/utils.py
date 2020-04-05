@@ -1,10 +1,12 @@
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import re
 import requests
 import requests_cache
 import xbmc
 import xbmcaddon
-import api_keys
-import cache_api
+from . import api_keys
+from . import cache_api
 import datetime
 
 # Get Plug-In path
@@ -140,18 +142,18 @@ def to_local_time(timestamp):
 def get_episode_name(title, subtitle):
     """ Construct an epsidode name from the title and the subtitle"""
     if len(subtitle) == 0:
-        episode_name = u'{0}'.format(title)
+        episode_name = '{0}'.format(title)
     else:
-        episode_name = u'{0} - {1}'.format(title, subtitle)
+        episode_name = '{0} - {1}'.format(title, subtitle)
     return (episode_name)
 
 
 def get_episodelist_title(title, total_episodes):
     """ Gets a formated episode list title, e.g. '1 episode' or '2 episodes'"""
     if (total_episodes == 1):
-        episodelist_title = u'{0} - {1} episode'.format(title, total_episodes)
+        episodelist_title = '{0} - {1} episode'.format(title, total_episodes)
     else:
-        episodelist_title = u'{0} - {1} episodes'.format(title, total_episodes)
+        episodelist_title = '{0} - {1} episodes'.format(title, total_episodes)
     return (episodelist_title)
 
 

@@ -1,4 +1,6 @@
-import nhk_api_parser
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
+from . import nhk_api_parser
 
 # NHK World API - parsed from api.js
 # FIXME: Some URLs cannot be found in api.js and are therefor static

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 import xbmc
 import xbmcaddon
 import xbmcplugin
@@ -30,10 +31,10 @@ def get_string(string_id):
     localized_string = ADDON.getLocalizedString(string_id).encode(
         'utf-8', 'ignore')
     if len(localized_string) > 0:
-        returnString = u'{0}'.format(localized_string)
+        returnString = '{0}'.format(localized_string)
     else:
         # Running under unit test - return a unit test string
-        returnString = u'UNIT TEST LOCALIZED STRING {0}'.format(string_id)
+        returnString = 'UNIT TEST LOCALIZED STRING {0}'.format(string_id)
     return returnString
 
 
