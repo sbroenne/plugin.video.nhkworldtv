@@ -17,6 +17,7 @@ class Episode(object):
         self.height = None
         self.url = None
         self.IsPlayable = False
+        self.playcount = None
         self._date = None
         self._year = None
         self._broadcast_start_date = None
@@ -156,6 +157,9 @@ class Episode(object):
 
         if (self._date is not None):
             info_labels['Date'] = self.date
+
+        if (self.playcount is not None):
+            info_labels['playcount'] = self.playcount
 
         li.setInfo('video', info_labels)
 

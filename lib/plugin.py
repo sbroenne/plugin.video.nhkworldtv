@@ -437,6 +437,7 @@ def add_live_stream_menu_item():
     episode.thumb = row['thumbnail_s']
     episode.fanart = row['thumbnail']
     episode.IsPlayable = True
+    episode.playcount = 0
     episode.url = nhk_api.rest_url['live_stream_url']
 
     # Title and Description
