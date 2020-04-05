@@ -24,11 +24,6 @@ NHK_ICON = ADDON.getAddonInfo('icon')
 NHK_FANART = ADDON.getAddonInfo('fanart')
 plugin = routing.Plugin()
 
-# View Modes from the default Estuary skin
-VIEW_MODE_INFOWALL = 54
-VIEW_MODE_WALL = 500
-VIEW_MODE_WIDELIST = 55
-
 if (utils.UNIT_TEST):
     # Run under unit test - set some default data since we will not be able to
     # retrieve data from settings.xml
@@ -55,7 +50,7 @@ else:
             MAX_PROGRAM_METADATA_CACHE_ITEMS)
         USE_CACHE = True
     else:
-        PROGRAM_METADATA_CACHE = {'CACHE_DISABLED', 'CASHHNG DISABLED'}
+        PROGRAM_METADATA_CACHE = {'CACHE_DISABLED', 'CACHE DISABLED'}
         USE_CACHE = False
 
 
@@ -65,7 +60,7 @@ def index():
     xbmc.log('Creating Main Menu')
 
     # Add menus
-    
+
     add_live_stream_menu_item()
     add_on_demand_menu_item()
     add_live_schedule_menu_item()
@@ -75,9 +70,11 @@ def index():
     # News Programs
     art = {
         'thumb':
-        'https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/news/programs/1001_2.jpg',
+        'https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/' +
+        'news/programs/1001_2.jpg',
         'fanart':
-        'https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/newsline_2020.jpg'
+        'https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/' +
+        'newsline_2020.jpg'
     }
     li = xbmcgui.ListItem(kodiutils.get_string(30080))
     info_labels = {}
@@ -90,9 +87,11 @@ def index():
                                 plugin.url_for(news_programs_index), li, True)
 
     # Set-up view
-    xbmcplugin.setContent(plugin.handle, 'videos')
-    kodiutils.set_view_mode(VIEW_MODE_INFOWALL)
-    xbmcplugin.endOfDirectory(plugin.handle)
+    kodiutils.set_video_directory_information(plugin.handle,
+                                              kodiutils.VIEW_MODE_INFOWALL,
+                                              xbmcplugin.SORT_METHOD_NONE,
+                                              'None')
+
     return (True)
 
 
@@ -200,10 +199,13 @@ def top_stories_index():
             episode.IsPlayable = True
 
             api_url = utils.get_NHK_website_url(video['config'])
-            xbmcplugin.addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(play_news_item, api_url, episode.vod_id, 'news',
-                               title), episode.kodi_list_item, False)
+            xbmcplugin.addDirectoryItem(plugin.handle,
+                                        plugin.url_for(play_news_item, api_url,
+                                                       episode.vod_id, 'news',
+                                                       title),
+                                        episode.kodi_list_item,
+                                        isFolder=False,
+                                        totalItems=max_row_count)
 
         else:
             # No video attached to it
@@ -220,11 +222,14 @@ def top_stories_index():
                 episode.thumb = thumbnails['small']
                 episode.fanart = thumbnails['middle']
             episode.IsPlayable = False
-            xbmcplugin.addDirectoryItem(plugin.handle, None,
-                                        episode.kodi_list_item, False)
+            xbmcplugin.addDirectoryItem(plugin.handle,
+                                        None,
+                                        episode.kodi_list_item,
+                                        isFolder=False,
+                                        totalItems=max_row_count)
 
     kodiutils.set_video_directory_information(plugin.handle,
-                                              VIEW_MODE_INFOWALL,
+                                              kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_NONE,
                                               "Descending")
 
@@ -329,7 +334,7 @@ def ataglance_index():
             False)
 
     kodiutils.set_video_directory_information(plugin.handle,
-                                              VIEW_MODE_INFOWALL,
+                                              kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_NONE,
                                               "Descending")
 
@@ -367,7 +372,7 @@ def news_programs_index():
             episode.kodi_list_item, False)
 
     kodiutils.set_video_directory_information(plugin.handle,
-                                              VIEW_MODE_INFOWALL,
+                                              kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_NONE,
                                               "Descending")
 
@@ -538,8 +543,9 @@ def live_schedule_index():
                                         episode.kodi_list_item, False)
 
     kodiutils.set_video_directory_information(plugin.handle,
-                                              VIEW_MODE_WIDELIST,
-                                              xbmcplugin.SORT_METHOD_NONE)
+                                              kodiutils.VIEW_MODE_WIDELIST,
+                                              xbmcplugin.SORT_METHOD_NONE,
+                                              'Ascending')
 
     return row_count
 
@@ -573,25 +579,23 @@ def vod_index():
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(vod_episode_list,
-                       nhk_api.rest_url['get_latest_episodes'], 0,
-                       xbmcplugin.SORT_METHOD_DATE), li, True)
+        plugin.url_for(vod_episode_list, 'get_latest_episodes', 'None', 0,
+                       xbmcplugin.SORT_METHOD_NONE, 'None'), li, True)
     # Most Watched
     li = xbmcgui.ListItem(kodiutils.get_string(30044))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(vod_episode_list,
-                       nhk_api.rest_url['get_most_watched_episodes'], 0,
-                       xbmcplugin.SORT_METHOD_NONE), li, True)
+        plugin.url_for(vod_episode_list, 'get_most_watched_episodes', 'None',
+                       0, xbmcplugin.SORT_METHOD_NONE, 'None'), li, True)
     # All
     li = xbmcgui.ListItem(kodiutils.get_string(30045))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(vod_episode_list, nhk_api.rest_url['get_all_episodes'],
-                       0, xbmcplugin.SORT_METHOD_LABEL), li, True)
-    kodiutils.set_view_mode(VIEW_MODE_WIDELIST)
+        plugin.url_for(vod_episode_list, 'get_all_episodes', 'None', 0,
+                       xbmcplugin.SORT_METHOD_TITLE, 'Ascending'), li, True)
+    kodiutils.set_view_mode(kodiutils.VIEW_MODE_WIDELIST)
     xbmcplugin.endOfDirectory(plugin.handle)
     return (True)
 
@@ -599,13 +603,17 @@ def vod_index():
 # By Program (Programs Tab on NHK World Site)
 @plugin.route('/vod/programs/')
 def vod_programs():
+    """VOD Programs (Programs Tab on NHK World Site)
+    Returns:
+        [str] -- [Last program ID added]
+    """
 
     program_json = utils.get_json(
         nhk_api.rest_url['get_programs'])['vod_programs']['programs']
     row_count = 0
 
-    for index in program_json:
-        row = program_json[index]
+    for program_id in program_json:
+        row = program_json[program_id]
         row_count = row_count + 1
         total_episodes = int(row['total_episode'])
         if total_episodes > 0:
@@ -619,34 +627,30 @@ def vod_programs():
             episode.video_info = kodiutils.get_1080_HD_video_info()
 
             # Create the directory item
-            api_url = nhk_api.rest_url['get_programs_episode_list'].format(
-                index)
-            xbmc.log('Creating Directory Item {0} - {1}'.format(
-                api_url, episode.title.encode('ascii', 'ignore')))
-
             xbmcplugin.addDirectoryItem(
                 plugin.handle,
-                plugin.url_for(vod_episode_list, api_url, 1,
-                               xbmcplugin.SORT_METHOD_DATE),
-                episode.kodi_list_item, True)
+                plugin.url_for(vod_episode_list, 'get_programs_episode_list',
+                               program_id, 1, xbmcplugin.SORT_METHOD_NONE,
+                               'None'), episode.kodi_list_item, True)
 
     kodiutils.set_video_directory_information(plugin.handle,
-                                              VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_LABEL)
+                                              kodiutils.VIEW_MODE_INFOWALL,
+                                              xbmcplugin.SORT_METHOD_TITLE,
+                                              'Ascending')
 
-    # Return last valid program URL - useful for debugging
+    # Return last valid program program Id - useful for debugging
     if (row_count > 0):
-        return (api_url)
+        return (program_id)
     else:
         return (None)
 
 
-# Categories
-
-
 @plugin.route('/vod/categories/')
 def vod_categories():
-
+    """VOD Categories (Categories Tab on NHK World Site)
+    Returns:
+        [str] -- [Last category ID added]
+    """
     api_result_json = utils.get_json(nhk_api.rest_url['get_categories'])
     row_count = 0
     for row in api_result_json['vod_categories']:
@@ -660,33 +664,31 @@ def vod_categories():
         episode.video_info = kodiutils.get_1080_HD_video_info()
 
         # Create the directory item
-        categoryId = row['category_id']
-        api_url = nhk_api.rest_url['get_categories_episode_list'].format(
-            categoryId)
-        xbmc.log('Creating Directory Item {0} - {1}'.format(
-            api_url, episode.title.encode('ascii', 'ignore')))
+        category_id = row['category_id']
         xbmcplugin.addDirectoryItem(
             plugin.handle,
-            plugin.url_for(vod_episode_list, api_url, 0,
-                           xbmcplugin.SORT_METHOD_DATE),
-            episode.kodi_list_item, True)
+            plugin.url_for(vod_episode_list, 'get_categories_episode_list',
+                           category_id, 0, xbmcplugin.SORT_METHOD_NONE,
+                           'None'), episode.kodi_list_item, True)
 
-    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_WALL,
-                                              xbmcplugin.SORT_METHOD_LABEL)
+    kodiutils.set_video_directory_information(plugin.handle,
+                                              kodiutils.VIEW_MODE_WALL,
+                                              xbmcplugin.SORT_METHOD_TITLE,
+                                              'Ascending')
 
-    # Return last valid program URL - useful for debugging
+    # Return last valid category ID - useful for debugging
     if (row_count > 0):
-        return (api_url)
+        return (category_id)
     else:
         return (None)
 
 
-# Playlists
-
-
 @plugin.route('/vod/playlists/')
 def vod_playlists():
-
+    """VOD Playlists (Playlists Tab on NHK World Site)
+    Returns:
+        [str] -- [Last playlist ID added]
+    """
     api_result_json = utils.get_json(nhk_api.rest_url['get_playlists'])
     row_count = 0
     for row in api_result_json['data']['playlist']:
@@ -698,25 +700,21 @@ def vod_playlists():
         episode.thumb = row['image_square']
         episode.fanart = row['image_square']
 
-        playlistId = row['playlist_id']
-        api_url = nhk_api.rest_url['get_playlists_episode_list'].format(
-            playlistId)
-
-        xbmc.log('Creating Directory Item {0} - {1}'.format(
-            api_url, episode.title.encode('ascii', 'ignore')))
-
+        playlist_id = row['playlist_id']
         xbmcplugin.addDirectoryItem(
             plugin.handle,
-            plugin.url_for(vod_episode_list, api_url, 0,
-                           xbmcplugin.SORT_METHOD_LABEL),
-            episode.kodi_list_item, True)
+            plugin.url_for(vod_episode_list, 'get_playlists_episode_list',
+                           playlist_id, 0, xbmcplugin.SORT_METHOD_TITLE,
+                           'Ascending'), episode.kodi_list_item, True)
 
-    kodiutils.set_video_directory_information(plugin.handle, VIEW_MODE_WALL,
-                                              xbmcplugin.SORT_METHOD_LABEL)
+    kodiutils.set_video_directory_information(plugin.handle,
+                                              kodiutils.VIEW_MODE_WALL,
+                                              xbmcplugin.SORT_METHOD_TITLE,
+                                              'Ascending')
 
-    # Return last valid program URL - useful for debugging
+    # Return last valid playlist ID - useful for debugging
     if (row_count > 0):
-        return (api_url)
+        return (playlist_id)
     else:
         return (None)
 
@@ -755,15 +753,30 @@ def add_playable_episode_directory_item(episode, enforce_cache=False):
     return (True)
 
 
-# Video On Demand - Episode List
-@plugin.route(
-    '/vod/episode_list/<path:api_url>/<show_only_subtitle>/<sort_method>/')
-def vod_episode_list(api_url,
+@plugin.route('/vod/episode_list/<api_method>/<id>/<show_only_subtitle>/' +
+              '<sort_method>/<sort_direction>/')
+def vod_episode_list(api_method,
+                     id,
                      show_only_subtitle,
                      sort_method,
+                     sort_direction,
                      enforceCache=False):
-    xbmc.log('Displaying Episode List for URL: {0} - {1}'.format(
-        api_url, show_only_subtitle))
+    """[summary]
+        Video On Demand - Episode List
+
+        Creates a folded with list items based on the requested NHK API Method
+        (e.g. Programs, Categories, etc.)
+    Returns:
+        [Episode] -- [Last Episode that was added]
+    """
+
+    # Only format api_url when a non-0 valze for id was provided
+    # some APIs do not need an id
+    if (id != 'None'):
+        api_url = nhk_api.rest_url[api_method].format(id)
+    else:
+        api_url = nhk_api.rest_url[api_method]
+
     api_result_json = utils.get_json(api_url)['data']
 
     if ('episodes' in api_result_json):
@@ -828,7 +841,8 @@ def vod_episode_list(api_url,
 
     sort_method = int(sort_method)
     kodiutils.set_video_directory_information(plugin.handle,
-                                              VIEW_MODE_INFOWALL, sort_method)
+                                              kodiutils.VIEW_MODE_INFOWALL,
+                                              sort_method, sort_direction)
 
     # Used for unit testing
     # only successfull hif we processed at least one episode
@@ -918,7 +932,8 @@ def play_vod_episode(vod_id, enforce_cache=False):
 @plugin.route(
     '/news/play_news_item/<path:api_url>/<news_id>/<item_type>/<title>/')
 def play_news_item(api_url, news_id, item_type, title):
-    """ Play a news item - can either be 'news' or 'ataglance' or 'news_program' """
+    """ Play a news item - can either be 'news' or 'ataglance'
+     or 'news_program' """
     xbmc.log('ITEM_TYPE: {0}'.format(item_type))
     xbmc.log('API_URL: {0}'.format(api_url))
     xbmc.log('NEWS_ID: {0}'.format(news_id))

@@ -143,6 +143,7 @@ class Episode(object):
         info_labels = {}
         info_labels['mediatype'] = 'episode'
         info_labels['Plot'] = self.plot
+        info_labels['Title'] = self.title
 
         if (self.duration is not None):
             info_labels['Duration'] = self.duration
