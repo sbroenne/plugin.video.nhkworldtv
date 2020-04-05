@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.83" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.85" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -17,7 +17,7 @@
         <description lang="en_GB">
 Watch NHK World in HD - includes live stream, news and on-demand programs.
 
-The plugin is optimized for an Internet connection with at least 10 MBIT. Tested on Kodi 18.6.
+The plugin is optimized for an Internet connection with at least 10 MBIT. Tested on Kodi 18.6 with the default Estuary skin.
     
 I built this plugin because NHK does not support Android TV (yet).
 
@@ -42,6 +42,6 @@ BUGFIX: Removed tinezone - not necesary since NHK return a time stamps that can 
             <screenshot>resources/screenshot02.jpeg</screenshot>
             <screenshot>resources/screenshot03.jpeg</screenshot>
         </assets>
-        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <reuselanguageinvoker>false</reuselanguageinvoker>
     </extension>
 </addon>

@@ -7,17 +7,19 @@ import xbmcplugin
 
 # read settings
 ADDON = xbmcaddon.Addon()
+
 # View Modes from the default Estuary skin
 VIEW_MODE_INFOWALL = 54
 VIEW_MODE_WALL = 500
 VIEW_MODE_WIDELIST = 55
 
-view_modes = {
+# Reverse values to handle feedback from Kodi GUI
+VIEW_MODES_REVERSE = {
     VIEW_MODE_INFOWALL: 'InfoWall',
     VIEW_MODE_WIDELIST: 'WideList',
     VIEW_MODE_WALL: 'Wall'
 }
-sort_methods = {
+SORT_METHODS_REVERSE = {
     xbmcplugin.SORT_METHOD_DATE: 'Date',
     xbmcplugin.SORT_METHOD_NONE: 'None',
     xbmcplugin.SORT_METHOD_TITLE: 'Title'
@@ -79,12 +81,13 @@ def set_view_mode(view_mode_id):
     if (get_setting_as_bool('set_view_mode')):
         # Change view mode
         xbmc.log('Switching to View Mode: {0}'.format(
-            view_modes[view_mode_id]))
+            VIEW_MODES_REVERSE[view_mode_id]))
         xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
     else:
         # Setting was disabled - do not change view mode
         xbmc.log('SETTING NOT ENABLED: View Mode mot changed\
-                 - requested view mode: {0}'.format(view_modes[view_mode_id]))
+                 - requested view mode: {0}'.format(
+            VIEW_MODES_REVERSE[view_mode_id]))
 
 
 # Returns a Full-HD (1080p) video info array
@@ -119,32 +122,35 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
     xbmc.log('Current view mode/sort method/order: {0}/{1}/{2}'.format(
         current_viewmode, current_sort_method, current_sort_direction))
     xbmc.log('Requested view mode/sort method/direction: {0}/{1}/{2}'.format(
-        view_modes[view_mode], sort_methods[sort_method], sort_direction))
+        VIEW_MODES_REVERSE[view_mode], SORT_METHODS_REVERSE[sort_method],
+        sort_direction))
 
-    # Set the view mode
+    # Set the view mode (e.g. InfoWall)
     set_view_mode(view_mode)
 
     # Set sorg method
     if (sort_method != 'None'):
         xbmcplugin.addSortMethod(plugin_handle, sort_method)
 
-    # Sort Order can be Ascending or Descending
+    # Sort Order can be Ascending, Descending or None
     #
     # FIXME: This seems to be broken in Kodi 18.6 - current sort order always
-    # returns Ascending
-    # even if it is descendingg
-    #
-    if sort_direction != 'None':
+    # returns Ascending - even if it is descendingg
+    # t looks like Kodi always return from values from the
+    # parent container and not the the current container
+    # that we are creating here
+    # Not sure if this is by design
+    """  if sort_direction != 'None':
         if (current_sort_direction != sort_direction):
             xbmc.log('Toggling sort direction from {0} to {1}'.format(
                 current_sort_direction, sort_direction))
-            # xbmc.executebuiltin('Container.SetSortDirection')
+            xbmc.executebuiltin('Container.SetSortDirection') """
 
-    xbmcplugin.endOfDirectory(plugin_handle, cacheToDisc=False)
+    xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
 
     # Debug logging
     current_viewmode = xbmc.getInfoLabel('Container.Viewmode')
     current_sort_method = xbmc.getInfoLabel('Container.SortMethod')
     current_sort_direction = xbmc.getInfoLabel('Container.SortOrder')
-    xbmc.log('Updated view mode/sort method/order: {0}/{1}/{2}'.format(
+    xbmc.log('New view mode/sort method/order: {0}/{1}/{2}'.format(
         current_viewmode, current_sort_method, current_sort_direction))
