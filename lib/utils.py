@@ -27,12 +27,15 @@ if URL_CACHE_MINUTES < 60:
 requests_cache.install_cache(db_name,
                              backend='sqlite',
                              expire_after=URL_CACHE_MINUTES * 60)
+requests_cache.remove_expired_responses()
 
 # Instantiate request session
 s = requests.Session()
 # Act like a browser
-headers = {'agent':
-'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4080.0 Mobile Safari/537.36'}
+headers = {
+    'agent':
+    'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4080.0 Mobile Safari/537.36'
+}
 s.headers = headers
 
 
