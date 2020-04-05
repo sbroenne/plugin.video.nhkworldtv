@@ -2,7 +2,6 @@
 
 import xbmc
 import xbmcaddon
-import xbmcgui
 import xbmcplugin
 
 # read settings
@@ -26,44 +25,6 @@ SORT_METHODS_REVERSE = {
 }
 
 
-def notification(header,
-                 message,
-                 time=5000,
-                 icon=ADDON.getAddonInfo('icon'),
-                 sound=True):
-    xbmcgui.Dialog().notification(header, message, icon, time, sound)
-
-
-def show_settings():
-    ADDON.openSettings()
-
-
-def get_setting(setting):
-    return ADDON.getSetting(setting).strip().decode('utf-8')
-
-
-def set_setting(setting, value):
-    ADDON.setSetting(setting, str(value))
-
-
-def get_setting_as_bool(setting):
-    return get_setting(setting).lower() == "true"
-
-
-def get_setting_as_float(setting):
-    try:
-        return float(get_setting(setting))
-    except ValueError:
-        return 0
-
-
-def get_setting_as_int(setting):
-    try:
-        return int(get_setting_as_float(setting))
-    except ValueError:
-        return 0
-
-
 def get_string(string_id):
     # FIXME: Force returnString to be Unicode - simple .encode did not work!
     localized_string = ADDON.getLocalizedString(string_id).encode(
@@ -78,7 +39,7 @@ def get_string(string_id):
 
 # Set the Kodi View Mode
 def set_view_mode(view_mode_id):
-    if (get_setting_as_bool('set_view_mode')):
+    if (ADDON.getSettingBool('set_view_mode')):
         # Change view mode
         xbmc.log('Switching to View Mode: {0}'.format(
             VIEW_MODES_REVERSE[view_mode_id]))

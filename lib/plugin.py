@@ -36,16 +36,15 @@ if (utils.UNIT_TEST):
 else:
     xbmc.log('Retrieving plug-in setting')
     # Define how many items should be displayed in News
-    MAX_NEWS_DISPLAY_ITEMS = kodiutils.get_setting_as_int("max_news_items")
+    MAX_NEWS_DISPLAY_ITEMS = ADDON.getSettingInt("max_news_items")
     # Define how many items should be displayed in At A Glance
-    MAX_ATAGLANCE_DISPLAY_ITEMS = kodiutils.get_setting_as_int(
-        "max_ataglance_items")
+    MAX_ATAGLANCE_DISPLAY_ITEMS = ADDON.getSettingInt("max_ataglance_items")
     # Define how many program should be retrieved from meta data cache
-    MAX_PROGRAM_METADATA_CACHE_ITEMS = kodiutils.get_setting_as_int(
+    MAX_PROGRAM_METADATA_CACHE_ITEMS = ADDON.getSettingInt(
         "max_program_metadate_cache_items")
 
     # Episode Cache
-    if (kodiutils.get_setting_as_bool('use_backend')):
+    if (ADDON.getSettingBool('use_backend')):
         PROGRAM_METADATA_CACHE = utils.get_program_metdadata_cache(
             MAX_PROGRAM_METADATA_CACHE_ITEMS)
         USE_CACHE = True

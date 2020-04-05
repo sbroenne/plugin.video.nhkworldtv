@@ -5,7 +5,6 @@ import xbmc
 import xbmcaddon
 import api_keys
 import cache_api
-import kodiutils
 import datetime
 
 # Get Plug-In path
@@ -20,10 +19,12 @@ else:
     db_name = 'nhk_world_cache'
     UNIT_TEST = True
 
-URL_CACHE_MINUTES = kodiutils.get_setting_as_int('url_cache_minutes')
+URL_CACHE_MINUTES = ADDON.getSettingInt('url_cache_minutes')
 # Enforce minimu 60 minutes caching
 if URL_CACHE_MINUTES < 60:
     URL_CACHE_MINUTES = 60
+
+# Install the cache for requests
 requests_cache.install_cache(db_name,
                              backend='sqlite',
                              expire_after=URL_CACHE_MINUTES * 60)
@@ -34,7 +35,8 @@ s = requests.Session()
 # Act like a browser
 headers = {
     'agent':
-    'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/82.0.4080.0 Mobile Safari/537.36'
+    'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 \
+    (KHTML, like Gecko) Chrome/82.0.4080.0 Mobile Safari/537.36'
 }
 s.headers = headers
 
