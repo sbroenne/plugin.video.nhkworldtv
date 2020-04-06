@@ -20,4 +20,14 @@ jobs:
           pip install pipenv
           pipenv install --deploy --dev
 
+       - name: Install latest Kodi module six from Github repo
+        run: |
+          wget https://github.com/romanvm/kodi.six/archive/master.zip
+          unzip master.zip
+          rm -f master.zip
+          cd kodi.six-master
+          pipenv run python setup.py install
+          cd ..
+          rm -rf kodi.six-master
+          
       - run: pipenv run pytest
