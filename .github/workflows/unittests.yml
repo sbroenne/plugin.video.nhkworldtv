@@ -13,11 +13,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
-          python-version: 2.7.7
+          python-version: 2.7
 
       - name: Install dependencies with pipenv
         run: |
           pip install pipenv
           pipenv install --deploy --dev
 
-      - run: pipenv run pytest --cov --cov-fail-under=100
+      - run: pipenv run pytest
