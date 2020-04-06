@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.90" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.91" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -34,8 +34,6 @@ Originally based on Misty's Best Of NHK plugin (https://forum.kodi.tv/showthread
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <news>
 NEW: Added NHK News Programs like NEWSLINE and NEWSROOM Tokyo
-BUGFIX: Alligned Top Stories date formatting with NHK App
-BUGFIX: Removed tinezone - not necesary since NHK return a time stamps that can safely be converted into local time
         </news>
         <assets>
             <icon>resources/icon.png</icon>
