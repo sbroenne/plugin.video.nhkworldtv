@@ -62,7 +62,7 @@ msgctxt "#30015"
 msgid "At a Glance >"
 msgstr ""
 
-#On-Demand Menu Item
+# On-Demand Menu Item
 
 msgctxt "#30020"
 msgid "Watch on demand >"
@@ -72,7 +72,7 @@ msgctxt "#30022"
 msgid "Image from:\n\n{0}"
 msgstr ""
 
-#Live Menu Item
+# Live Menu Item
 
 msgctxt "#30030"
 msgid "Watch live now >"
@@ -84,7 +84,7 @@ msgctxt "#30036"
 msgid "Live Schedule >"
 msgstr ""
 
-#On-Demand Menu
+# On-Demand Menu
 
 msgctxt "#30040"
 msgid "Programs"
@@ -110,7 +110,7 @@ msgctxt "#30045"
 msgid "All Episodes"
 msgstr ""
 
-#Episode List
+# Episode List
 msgctxt "#30050"
 msgid "Broadcast on: {0} / Available until: {1}\n\n{2}"
 msgstr ""

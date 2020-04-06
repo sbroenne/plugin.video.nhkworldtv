@@ -30,7 +30,7 @@ The repo also contains an updated version of [requests-cache](https://github.com
 
 "Snappiness" was one of my design goals when developing this plug-in. For example, most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to two hours)
 
-The plug-in also uses companion cloud service to speed up video play-back because these NHK APIs are very slow. You can disabe this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer and that you will use a bit of UI functionality (e.g. Kodi will not store how much of a program you have already watched)
+The plug-in also uses companion cloud service to speed up video play-back because these NHK APIs are very slow. You can disabe this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer and that you will loose a bit of UI functionality (e.g. Kodi will not store how much of a program you have already watched)
 
 You can find the source code for the cloud service at [NHK World TV Azure Backend](https://github.com/sbroenne/nhkworldtv-backend).
 
