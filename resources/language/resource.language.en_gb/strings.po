@@ -42,7 +42,7 @@ msgctxt "#30009"
 msgid "Maximum number of cache items to retrieve at start-up"
 msgstr ""
 
-#plugin.py
+# plugin.py
 
 # Top Stories Menu Item
 msgctxt "#30010"
