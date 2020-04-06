@@ -3,8 +3,7 @@ from __future__ import (absolute_import, division, print_function,
 import re
 import requests
 import requests_cache
-import xbmc
-import xbmcaddon
+from kodi_six import xbmc, xbmcaddon
 from . import api_keys
 from . import cache_api
 import datetime

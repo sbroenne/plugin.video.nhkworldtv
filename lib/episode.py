@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 from builtins import object
-import xbmcgui
+from kodi_six import xbmcgui
 from . import utils
 
 

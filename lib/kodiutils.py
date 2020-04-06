@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
-import xbmc
-import xbmcaddon
-import xbmcplugin
+from __future__ import (absolute_import, unicode_literals)
+from kodi_six import xbmc, xbmcaddon, xbmcplugin
 
 # read settings
 ADDON = xbmcaddon.Addon()

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from __future__ import (unicode_literals)
 # NHK
 NHK_API_KEY = 'EJfK8jdS57GqlupFgAfAAwr573q01y6k'
 NHK_API_BASE_URL = 'https://api.nhk.or.jp/nhkworld/'

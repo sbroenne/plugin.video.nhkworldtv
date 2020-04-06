@@ -1,15 +1,11 @@
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 from builtins import range
 import random
 import re
 from datetime import datetime
 
-import xbmcaddon
-import xbmcgui
-import xbmcplugin
-import xbmc
-
+from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 from . import kodiutils
 from . import nhk_api
 from . import cache_api
@@ -195,8 +191,8 @@ def top_stories_index():
             duration_text = '{0}m {1}'.format(minutes, seconds)
 
             episode.plot = '{0} | {1}\n\n{2}'.format(duration_text,
-                                                      time_difference,
-                                                      row['description'])
+                                                     time_difference,
+                                                     row['description'])
             episode.video_info = kodiutils.get_SD_video_info()
             episode.IsPlayable = True
 
@@ -322,7 +318,7 @@ def ataglance_index():
             seconds = episode.duration - (minutes * 60)
             duration_text = '{0}m {1}'.format(minutes, seconds)
             episode.plot = '{0}\n\n{1}'.format(duration_text,
-                                                row['description'])
+                                               row['description'])
         else:
             episode.plot = row['description']
 
