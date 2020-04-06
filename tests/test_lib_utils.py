@@ -1,5 +1,4 @@
 from __future__ import division
-from past.utils import old_div
 import datetime
 import unittest  # The test framework
 import requests
@@ -27,13 +26,8 @@ class Test_Test_utils(unittest.TestCase):
                          'https://www3.nhk.or.jp/nhkworld/')
 
     def test_to_local_time(self):
-        converted_time = utils.to_local_time(old_div(1581266400000, 1000))
-        local_time = datetime.datetime(year=2020,
-                                       month=2,
-                                       day=9,
-                                       hour=17,
-                                       minute=40)
-        self.assertEqual(local_time, converted_time)
+        converted_time = utils.to_local_time(1581266400000 // 1000)
+        self.assertIsInstance(converted_time, datetime.datetime)
 
     def test_get_top_stories_play_path(self):
         xmltext = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/20200322_18_73446_HQ.mp4'
