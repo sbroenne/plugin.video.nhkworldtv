@@ -9,6 +9,7 @@ autopep8 = "*"
 rope = "*"
 flake8 = "*"
 yapf = "*"
+pytest = "*"
 
 [packages]
 requests = "*"

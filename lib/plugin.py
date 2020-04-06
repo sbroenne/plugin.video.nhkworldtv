@@ -229,7 +229,7 @@ def top_stories_index():
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_NONE,
-                                              "Descending")
+                                              "None")
 
     # Used for unit testing
     # only successfull if we processed at least top story
@@ -334,7 +334,7 @@ def ataglance_index():
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_NONE,
-                                              "Descending")
+                                              "None")
 
     # Used for unit testing
     # only successfull if we processed at least top story
