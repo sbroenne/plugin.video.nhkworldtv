@@ -2,7 +2,13 @@
 
 name: UnitTests
 
-on: [push, pull_request]
+on:
+  push:
+      paths:
+        - '**.py'
+  schedule:
+    # Run every Saturday at 01:00
+    - cron:  '0 1 * * 5'
 
 jobs:
   pytest:
