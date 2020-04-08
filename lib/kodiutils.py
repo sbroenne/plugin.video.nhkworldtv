@@ -24,15 +24,13 @@ SORT_METHODS_REVERSE = {
 
 
 def get_string(string_id):
-    # FIXME: Force returnString to be Unicode - simple .encode did not work!
-    localized_string = ADDON.getLocalizedString(string_id).encode(
-        'utf-8', 'ignore')
+    localized_string = ADDON.getLocalizedString(string_id)
     if len(localized_string) > 0:
-        returnString = '{0}'.format(localized_string)
+        return localized_string
     else:
         # Running under unit test - return a unit test string
         returnString = 'UNIT TEST LOCALIZED STRING {0}'.format(string_id)
-    return returnString
+        return returnString
 
 
 # Set the Kodi View Mode
