@@ -5,14 +5,14 @@ name: UnitTests
 on: [push, pull_request]
 
 jobs:
-  test:
+  pytest:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [2.7]
   
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@master
       
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
