@@ -130,4 +130,5 @@ dmypy.json
 .DS_Store
 *.code-workspace
 *.sqlite
-build/*
+build/leia/*
+

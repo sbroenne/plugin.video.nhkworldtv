@@ -9,7 +9,7 @@ from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 from . import kodiutils
 from . import nhk_api
 from . import cache_api
-from . import routing
+import routing
 from . import utils
 from .episode import Episode
 
