@@ -55,7 +55,7 @@ jobs:
 
       - name: Install routing.py locally
         run: |
-          cp build/routing.py $(pipenv --venv)/lib/python2.7/site-packages
+          cp build/routing/routing.py $(pipenv --venv)/lib/python2.7/site-packages
       
       - name: Run Unit Tests with pytest
         run: |
