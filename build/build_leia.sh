@@ -21,3 +21,5 @@ mkdir plugin.video.nhkworldtv/resources
 cp ../plugin.video.nhkworldtv/resources/*.jpeg plugin.video.nhkworldtv/resources
 cp ../plugin.video.nhkworldtv/resources/*.jpg plugin.video.nhkworldtv/resources
 cp ../plugin.video.nhkworldtv/resources/*.png plugin.video.nhkworldtv/resources
+# Clean addon.xml - created by create_repository but not needed here
+rm -f addons*
