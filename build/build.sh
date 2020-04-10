@@ -29,6 +29,8 @@ cd $KODI_VERSION/dist
 
 # Pack plug-in with create_repository
 ../../create_repository.py ../plugin.video.nhkworldtv
+cp ./plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION.zip plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip
+
 # Copy resources so that the Install Plug-in dialogi in Kodi can display them
 mkdir plugin.video.nhkworldtv/resources
 cp ../plugin.video.nhkworldtv/resources/*.jpeg plugin.video.nhkworldtv/resources
