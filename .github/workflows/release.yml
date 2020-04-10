@@ -23,7 +23,8 @@ jobs:
         run: |
           chmod u+x build_leia.sh
           ./build_leia.sh
-          echo "::set-output name=archive::./build/leia/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
+          echo "::set-output name=plugin_zip::./build/leia/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
+          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
         working-directory: build
       - name: Create Release
         id: create_release
@@ -42,6 +43,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ${{ steps.build_zip_leia.outputs.archive }}
-          asset_name: NHK World TV Kodi Plug-in ${{ github.ref }}
+          asset_path: ${{ steps.build_zip_leia.outputs.plugin_zip }}
+          asset_name: ${{ steps.build_zip_leia.outputs.plugin_name }}
           asset_content_type: application/zip
