@@ -18,8 +18,8 @@ rm -f leia/plugin.video.nhkworldtv/tests
 rm -f leia/plugin.video.nhkworldtv/lib/routing.py
 
 # Set the plugin version in addon.xml
-# This uses GNU SED - so if your are on Mac, you need to install this
-gsed -i "s/{PLUGIN_VERSION}/$PLUGIN_VERSION/g" leia/plugin.video.nhkworldtv/addon.xml
+# This uses GNU SED - so if your are on Mac, you need to install this and change your path accordingly
+sed -i "s/{PLUGIN_VERSION}/$PLUGIN_VERSION/g" leia/plugin.video.nhkworldtv/addon.xml
 
 # Create distribution folder
 mkdir leia/dist

@@ -28,7 +28,7 @@ jobs:
       - name: Change Python version in the Pipfile
         run: |
           rm -f Pipfile.lock
-          gsed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
+          sed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
       
       - name: Install dependencies with pipenv
         run: |
