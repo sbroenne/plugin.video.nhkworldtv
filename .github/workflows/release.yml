@@ -5,8 +5,7 @@ on:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 name: Upload NHK World TV plug-in as a ZIP Archive
-env:
-  GIT_TAG: ${{ github.ref }}
+
 
 jobs:
   build:
@@ -15,9 +14,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set Plugin version
-        run: |
-          echo "::set-env name=PLUGIN_VERSION::${GIT_TAG:1}"
+      - name: Set GIT tag # https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/td-p/31595
+        run: echo "::set-env name=GIT_TAG::${GITHUB_REF##*/}"
+      - name: Set Plugin version # GIT_TAG without the preceding v
+        run: echo "::set-env name=PLUGIN_VERSION::${GIT_TAG:1}"
       - name: Build NHK World TV for Kodi Leia # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
         id: build_zip_leia
         run: |
