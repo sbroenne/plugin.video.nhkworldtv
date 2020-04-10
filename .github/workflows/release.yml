@@ -4,8 +4,7 @@ on:
     tags:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-name: Upload NHK World TV plug-in as a ZIP Archive
-
+name: Create NHK World TV Release for Kodi Leia and Matrix
 
 jobs:
   build:
@@ -20,11 +19,25 @@ jobs:
         run: echo "::set-env name=PLUGIN_VERSION::${GIT_TAG:1}"
       - name: Build NHK World TV for Kodi Leia # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
         id: build_zip_leia
+        env:
+          KODI_VERSION: "leia"
+          XBMC_PYTHON_VERSION: "2.26.0"
         run: |
-          chmod u+x build_leia.sh
-          ./build_leia.sh
-          echo "::set-output name=plugin_zip::./build/leia/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
-          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
+          chmod u+x build.sh
+          ./build.sh
+          echo "::set-output name=plugin_zip::./build/leia/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
+          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
+        working-directory: build
+      - name: Build NHK World TV for Kodi Matrix # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
+        id: build_zip_matrix
+        env:
+          KODI_VERSION: "matrix"
+          XBMC_PYTHON_VERSION: "3.0.0"
+        run: |
+          chmod u+x build.sh
+          ./build.sh
+          echo "::set-output name=plugin_zip::./build/leia/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
+          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
         working-directory: build
       - name: Create Release
         id: create_release
@@ -35,9 +48,9 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           draft: false
-          prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset 
+          prerelease: true
+      - name: Upload Leia Matrix Release Asset
+        id: upload-release-asset_leia
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,4 +58,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
           asset_path: ${{ steps.build_zip_leia.outputs.plugin_zip }}
           asset_name: ${{ steps.build_zip_leia.outputs.plugin_name }}
+          asset_content_type: application/zip
+      - name: Upload Kodi Matrix Release Asset
+        id: upload-release-asset_matrix
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ${{ steps.build_zip_matrix.outputs.plugin_zip }}
+          asset_name: ${{ steps.build_zip_matrix.outputs.plugin_name }}
           asset_content_type: application/zip
