@@ -18,7 +18,7 @@ jobs:
         python-version: [2.7]
   
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
@@ -28,7 +28,7 @@ jobs:
       - name: Change Python version in the Pipfile
         run: |
           rm -f Pipfile.lock
-          sed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
+          gsed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
       
       - name: Install dependencies with pipenv
         run: |
