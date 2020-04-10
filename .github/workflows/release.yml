@@ -25,7 +25,7 @@ jobs:
         run: |
           chmod u+x build.sh
           ./build.sh
-          echo "::set-output name=plugin_zip::./build/leia/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
+          echo "::set-output name=plugin_zip::./build/$KODI_VERSION/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION $KODI_VERSION.zip"
           echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
         working-directory: build
       - name: Build NHK World TV for Kodi Matrix # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
@@ -36,7 +36,7 @@ jobs:
         run: |
           chmod u+x build.sh
           ./build.sh
-          echo "::set-output name=plugin_zip::./build/leia/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
+          echo "::set-output name=plugin_zip::./build/$KODI_VERSION/dist/plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION $KODI_VERSION.zip"
           echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION_$KODI_VERSION.zip"
         working-directory: build
       - name: Create Release
