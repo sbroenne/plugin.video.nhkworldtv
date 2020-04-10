@@ -1,9 +1,8 @@
 #!/bin/bash
 # Build NK World TV for Kodi Leia (18.5+)
 
-# Set plugin version
-export GIT_TAG=$(git describe --abbrev=0)
-export PLUGIN_VERSION=${GIT_TAG:1}
+# Requires that ENV variable PLUGIN_VERSION is set (e.g. 0.0.1)
+echo "Building NHK World TV version: $PLUGIN_VERSION"
 
 # Clean-up
 rm -rf leia
@@ -12,8 +11,8 @@ rm -rf leia/dist
 mkdir leia
 cp -r ../plugin.video.nhkworldtv leia
 rm -rf leia/plugin.video.nhkworldtv/tests
-rm -f leia/plugin.video.nhkworldtv/*pyc
-rm -f leia/plugin.video.nhkworldtv/lib/*pyc
+#rm -f leia/plugin.video.nhkworldtv/*.pyc
+rm -f leia/plugin.video.nhkworldtv/lib/*.pyc
 rm -f leia/plugin.video.nhkworldtv/tests
 rm -f leia/plugin.video.nhkworldtv/lib/routing.py
 
@@ -35,3 +34,4 @@ cp ../plugin.video.nhkworldtv/resources/*.png plugin.video.nhkworldtv/resources
 
 # Clean addon.xml - created by create_repository but not needed here
 rm -f addons*
+cd ../..
