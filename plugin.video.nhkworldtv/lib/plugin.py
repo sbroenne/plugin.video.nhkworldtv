@@ -3,7 +3,6 @@ from __future__ import (absolute_import, division, print_function,
 from builtins import range
 import random
 import re
-from datetime import datetime
 
 from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 from . import kodiutils
@@ -56,40 +55,18 @@ else:
 @plugin.route('/')
 def index():
     xbmc.log('Creating Main Men')
-
     # Add menus
-
     add_live_stream_menu_item()
     add_on_demand_menu_item()
     add_live_schedule_menu_item()
     add_top_stories_menu_item()
     add_ataglance_menu_item()
-
-    # News Programs
-    art = {
-        'thumb':
-        'https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/' +
-        'news/programs/1001_2.jpg',
-        'fanart':
-        'https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/' +
-        'newsline_2020.jpg'
-    }
-    li = xbmcgui.ListItem(kodiutils.get_string(30080))
-    info_labels = {}
-    info_labels['mediatype'] = 'episode'
-    info_labels['Plot'] = kodiutils.get_string(30081)
-    li.setInfo('video', info_labels)
-    li.addStreamInfo('video', kodiutils.get_SD_video_info())
-    li.setArt(art)
-    xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(news_programs_index), li, True)
-
+    add_news_programs_menu_item()
     # Set-up view
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_NONE,
-                                              'None')
-
+                                              xbmcplugin.SORT_METHOD_UNSORTED,
+                                              "None")
     return (True)
 
 
@@ -131,7 +108,7 @@ def add_top_stories_menu_item():
 
 
 # List
-@plugin.route('/news/top_stories/index')
+@plugin.route('/top_stories/index')
 def top_stories_index():
     xbmc.log('Displaying Top Stories Index')
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'], False)
@@ -161,26 +138,9 @@ def top_stories_index():
 
         episode.broadcast_start_date = row['updated_at']
         episode.date = episode.broadcast_start_date
+        time_difference = kodiutils.get_time_difference(
+            episode.broadcast_start_date)
 
-        date_delta = datetime.now() - episode.broadcast_start_date
-        date_delta_minutes = date_delta.seconds // 60
-        date_delta_hours = date_delta_minutes // 60
-        if (date_delta.days > 0):
-            # Show as absolute date
-            time_difference = episode.broadcast_start_date.strftime(
-                '%A, %b %d, %H:%M')
-        elif (date_delta_hours < 1):
-            # Show in minutes
-            time_difference = kodiutils.get_string(30062).format(
-                date_delta_minutes)
-        elif (date_delta_hours == 1):
-            # Show as hour
-            time_difference = kodiutils.get_string(30060).format(
-                date_delta_hours)
-        else:
-            # Show as hours (plural)
-            time_difference = kodiutils.get_string(30061).format(
-                date_delta_hours)
         if row['videos'] is not None:
             video = row['videos']
             # Top stories that have a video attached to them
@@ -222,7 +182,7 @@ def top_stories_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_NONE,
+                                              xbmcplugin.SORT_METHOD_UNSORTED,
                                               "None")
 
     # Used for unit testing
@@ -270,7 +230,7 @@ def add_ataglance_menu_item():
 
 
 # List
-@plugin.route('/news/ataglance/index')
+@plugin.route('/at_a_glance/index')
 def ataglance_index():
     xbmc.log('Displaying At a Glance Index')
     api_result_json = utils.get_json(nhk_api.rest_url['get_news_ataglance'])
@@ -301,6 +261,8 @@ def ataglance_index():
 
         episode.broadcast_start_date = row['posted_at']
         episode.date = episode.broadcast_start_date
+        time_difference = kodiutils.get_time_difference(
+            episode.broadcast_start_date)
 
         episode.title = title
         vod_id = row['id']
@@ -310,10 +272,12 @@ def ataglance_index():
             minutes = int(episode.duration // 60)
             seconds = episode.duration - (minutes * 60)
             duration_text = '{0}m {1}'.format(minutes, seconds)
-            episode.plot = '{0}\n\n{1}'.format(duration_text,
-                                               row['description'])
+            episode.plot = '{0} | {1}\n\n{2}'.format(duration_text,
+                                                     time_difference,
+                                                     row['description'])
         else:
-            episode.plot = row['description']
+            episode.plot = '{0}\n\n{1}'.format(time_difference,
+                                               row['description'])
 
         episode.video_info = kodiutils.get_SD_video_info()
         episode.IsPlayable = True
@@ -326,7 +290,7 @@ def ataglance_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_NONE,
+                                              xbmcplugin.SORT_METHOD_UNSORTED,
                                               "None")
 
     # Used for unit testing
@@ -337,7 +301,34 @@ def ataglance_index():
         return (0)
 
 
+#
 # News Programs
+#
+
+
+# Menu item
+def add_news_programs_menu_item():
+    art = {
+        'thumb':
+        'https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/' +
+        'news/programs/1001_2.jpg',
+        'fanart':
+        'https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/' +
+        'newsline_2020.jpg'
+    }
+    li = xbmcgui.ListItem(kodiutils.get_string(30080))
+    info_labels = {}
+    info_labels['mediatype'] = 'episode'
+    info_labels['Plot'] = kodiutils.get_string(30081)
+    li.setInfo('video', info_labels)
+    li.addStreamInfo('video', kodiutils.get_SD_video_info())
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(plugin.handle,
+                                plugin.url_for(news_programs_index), li, True)
+    return (True)
+
+
+# List
 @plugin.route('/news/programs/index')
 def news_programs_index():
     xbmc.log('Displaying At News Index')
@@ -365,7 +356,7 @@ def news_programs_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_NONE,
+                                              xbmcplugin.SORT_METHOD_UNSORTED,
                                               "None")
 
     # Used for unit testing
@@ -537,7 +528,7 @@ def live_schedule_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_WIDELIST,
-                                              xbmcplugin.SORT_METHOD_NONE,
+                                              xbmcplugin.SORT_METHOD_UNSORTED,
                                               'None')
 
     return row_count
@@ -573,14 +564,14 @@ def vod_index():
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(vod_episode_list, 'get_latest_episodes', 'None', 0,
-                       xbmcplugin.SORT_METHOD_NONE, 'None'), li, True)
+                       xbmcplugin.SORT_METHOD_UNSORTED, 'None'), li, True)
     # Most Watched
     li = xbmcgui.ListItem(kodiutils.get_string(30044))
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(vod_episode_list, 'get_most_watched_episodes', 'None',
-                       0, xbmcplugin.SORT_METHOD_NONE, 'None'), li, True)
+                       0, xbmcplugin.SORT_METHOD_UNSORTED, 'None'), li, True)
     # All
     li = xbmcgui.ListItem(kodiutils.get_string(30045))
     li.setArt(art)
@@ -588,8 +579,11 @@ def vod_index():
         plugin.handle,
         plugin.url_for(vod_episode_list, 'get_all_episodes', 'None', 0,
                        xbmcplugin.SORT_METHOD_TITLE, 'Ascending'), li, True)
-    kodiutils.set_view_mode(kodiutils.VIEW_MODE_WIDELIST)
+    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED)
     xbmcplugin.endOfDirectory(plugin.handle)
+
+    kodiutils.set_view_mode(kodiutils.VIEW_MODE_WIDELIST)
+
     return (True)
 
 
@@ -600,7 +594,6 @@ def vod_programs():
     Returns:
         [str] -- [Last program ID added]
     """
-
     program_json = utils.get_json(
         nhk_api.rest_url['get_programs'])['vod_programs']['programs']
     row_count = 0
@@ -623,7 +616,7 @@ def vod_programs():
             # Create the directory item
             episodes.append(
                 (plugin.url_for(vod_episode_list, 'get_programs_episode_list',
-                                program_id, 1, xbmcplugin.SORT_METHOD_NONE,
+                                program_id, 1, xbmcplugin.SORT_METHOD_UNSORTED,
                                 'None'), episode.kodi_list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
@@ -662,7 +655,7 @@ def vod_categories():
         category_id = row['category_id']
         episodes.append(
             (plugin.url_for(vod_episode_list, 'get_categories_episode_list',
-                            category_id, 0, xbmcplugin.SORT_METHOD_NONE,
+                            category_id, 0, xbmcplugin.SORT_METHOD_UNSORTED,
                             'None'), episode.kodi_list_item, True))
 
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
@@ -705,8 +698,8 @@ def vod_playlists():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_WALL,
-                                              xbmcplugin.SORT_METHOD_TITLE,
-                                              'Ascending')
+                                              xbmcplugin.SORT_METHOD_UNSORTED,
+                                              'None')
 
     # Return last valid playlist ID - useful for debugging
     if (row_count > 0):
@@ -764,7 +757,6 @@ def vod_episode_list(api_method,
     Returns:
         [Episode] -- [Last Episode that was added]
     """
-
     # Only format api_url when a non-0 valze for id was provided
     # some APIs do not need an id
     if (id != 'None'):
@@ -967,4 +959,5 @@ def play_news_item(api_url, news_id, item_type, title):
 
 
 def run():
+    xbmcplugin.setContent(plugin.handle, 'videos')
     plugin.run()

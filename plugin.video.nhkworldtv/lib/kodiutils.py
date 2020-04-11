@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, unicode_literals)
 from kodi_six import xbmc, xbmcaddon, xbmcplugin
+from datetime import datetime
 
 # read settings
 ADDON = xbmcaddon.Addon()
@@ -83,7 +84,6 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
         sort_direction))
 
     # Set sort method
-    xbmcplugin.setContent(plugin_handle, 'videos')
     xbmcplugin.addSortMethod(plugin_handle, sort_method)
     xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
 
@@ -110,3 +110,31 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
     current_sort_direction = xbmc.getInfoLabel('Container.SortOrder')
     xbmc.log('New view mode/sort method/order: {0}/{1}/{2}'.format(
         current_viewmode, current_sort_method, current_sort_direction))
+
+
+def get_time_difference(start_date):
+    """Get the time difference (e.g. 9 hours ago) between the
+    start_date and Now as a localized string
+
+    Arguments:
+        start_date {datetime} -- [Date to compare with]
+
+    Returns:
+        [str] -- [description]
+    """
+    date_delta = datetime.now() - start_date
+    date_delta_minutes = date_delta.seconds // 60
+    date_delta_hours = date_delta_minutes // 60
+    if (date_delta.days > 0):
+        # Show as absolute date
+        time_difference = start_date.strftime('%A, %b %d, %H:%M')
+    elif (date_delta_hours < 1):
+        # Show in minutes
+        time_difference = get_string(30062).format(date_delta_minutes)
+    elif (date_delta_hours == 1):
+        # Show as hour
+        time_difference = get_string(30060).format(date_delta_hours)
+    else:
+        # Show as hours (plural)
+        time_difference = get_string(30061).format(date_delta_hours)
+    return (time_difference)
