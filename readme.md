@@ -43,9 +43,7 @@ The cache runs on Azure implemented as Azure Functions backed by Cosmos DB. It g
 
     2. The start of the plug-in can take a litte while - subsequent starts should be faster.
 
-2. If you have a problem **after an update**, simply exit Kodi and start it again - or start a different plug-in. This will usually fix it.
-
-This is caused by Kodi when you re-use the Pyhton language invoker - which the plug-in does since it improves performance dramatically.
+2. If you have a problem **after an update**, simply exit Kodi and start it again - or start a different plug-in. This will usually fix it. This is caused by Kodi when you re-use the Pyhton language invoker - which the plug-in does since it improves performance dramatically.
 
 ## Current Development Status
 
@@ -65,10 +63,13 @@ The plug-in is localized but translation only exists for English (GB). It is als
 
 Main open topics are:
 
-- Implement CI/CD via github actions
 - code fixes to comply with the Kodi plugin guidelines
 - more unit tests for fringe cases
 - preparations to be able to submit the plugin to the official Kodi repo
+
+## Local Development
+
+You will find scripts to build the plugin in locally in the [build](./build/) folder. [More Information](./build/readme.md)
 
 ## Bugs & Issues
 

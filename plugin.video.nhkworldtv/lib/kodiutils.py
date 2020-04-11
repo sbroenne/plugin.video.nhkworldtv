@@ -19,7 +19,8 @@ VIEW_MODES_REVERSE = {
 SORT_METHODS_REVERSE = {
     xbmcplugin.SORT_METHOD_DATE: 'Date',
     xbmcplugin.SORT_METHOD_NONE: 'None',
-    xbmcplugin.SORT_METHOD_TITLE: 'Title'
+    xbmcplugin.SORT_METHOD_TITLE: 'Title',
+    xbmcplugin.SORT_METHOD_UNSORTED: 'Unsorted'
 }
 
 
@@ -39,7 +40,7 @@ def set_view_mode(view_mode_id):
         # Change view mode
         xbmc.log('Switching to View Mode: {0}'.format(
             VIEW_MODES_REVERSE[view_mode_id]))
-        xbmc.executebuiltin('Container.SetViewMode(%d)' % view_mode_id)
+        xbmc.executebuiltin('Container.SetViewMode({0})'.format(view_mode_id))
     else:
         # Setting was disabled - do not change view mode
         xbmc.log('SETTING NOT ENABLED: View Mode mot changed\
@@ -70,7 +71,6 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
     # This plugin displays videos
     # Important to set because otherwise you cannot chang the view mode
     # to InfoWall, etc.
-    xbmcplugin.setContent(plugin_handle, 'videos')
 
     # Debug logging
     current_viewmode = xbmc.getInfoLabel('Container.ViewMode')
@@ -82,12 +82,13 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
         VIEW_MODES_REVERSE[view_mode], SORT_METHODS_REVERSE[sort_method],
         sort_direction))
 
+    # Set sort method
+    xbmcplugin.setContent(plugin_handle, 'videos')
+    xbmcplugin.addSortMethod(plugin_handle, sort_method)
+    xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
+
     # Set the view mode (e.g. InfoWall)
     set_view_mode(view_mode)
-
-    # Set sorg method
-    if (sort_method != 'None'):
-        xbmcplugin.addSortMethod(plugin_handle, sort_method)
 
     # Sort Order can be Ascending, Descending or None
     #
@@ -102,8 +103,6 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
             xbmc.log('Toggling sort direction from {0} to {1}'.format(
                 current_sort_direction, sort_direction))
             xbmc.executebuiltin('Container.SetSortDirection') """
-
-    xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
 
     # Debug logging
     current_viewmode = xbmc.getInfoLabel('Container.Viewmode')

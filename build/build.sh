@@ -12,8 +12,9 @@ rm -rf $KODI_VERSION/dist
 mkdir $KODI_VERSION
 cp -r ../plugin.video.nhkworldtv $KODI_VERSION
 rm -rf $KODI_VERSION/plugin.video.nhkworldtv/tests
-#rm -f $KODI_VERSION/plugin.video.nhkworldtv/*.pyc
+rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/api_json.js
 rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/*.pyc
+rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/*.pyo
 rm -f $KODI_VERSION/plugin.video.nhkworldtv/tests
 rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/routing.py
 
