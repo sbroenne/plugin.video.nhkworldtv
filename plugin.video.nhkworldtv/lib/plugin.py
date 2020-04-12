@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from builtins import range
@@ -65,8 +66,7 @@ def index():
     # Set-up view
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_UNSORTED,
-                                              "None")
+                                              xbmcplugin.SORT_METHOD_UNSORTED)
     return (True)
 
 
@@ -137,23 +137,15 @@ def top_stories_index():
             episode.fanart = thumbnails['middle']
 
         episode.broadcast_start_date = row['updated_at']
-        episode.date = episode.broadcast_start_date
-        time_difference = kodiutils.get_time_difference(
-            episode.broadcast_start_date)
-
         if row['videos'] is not None:
             video = row['videos']
             # Top stories that have a video attached to them
             episode.title = kodiutils.get_string(30070).format(title)
             episode.vod_id = news_id
             episode.duration = video['duration']
-            minutes = int(episode.duration // 60)
-            seconds = episode.duration - (minutes * 60)
-            duration_text = '{0}m {1}'.format(minutes, seconds)
-
-            episode.plot = '{0} | {1}\n\n{2}'.format(duration_text,
-                                                     time_difference,
-                                                     row['description'])
+            episode.plot = '{0} | {1}\n\n{2}'.format(
+                episode.duration_text, episode.get_time_difference(),
+                row['description'])
             episode.video_info = kodiutils.get_SD_video_info()
             episode.IsPlayable = True
 
@@ -171,7 +163,8 @@ def top_stories_index():
             detail = news_detail_json['detail']
             detail = detail.replace('<br />', '\n')
             detail = detail.replace('\n\n', '\n')
-            episode.plot = '{0}\n\n{1}'.format(time_difference, detail)
+            episode.plot = '{0}\n\n{1}'.format(episode.get_time_difference(),
+                                               detail)
             thumbnails = news_detail_json['thumbnails']
             if (thumbnails is not None):
                 episode.thumb = thumbnails['small']
@@ -182,8 +175,7 @@ def top_stories_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_UNSORTED,
-                                              "None")
+                                              xbmcplugin.SORT_METHOD_UNSORTED)
 
     # Used for unit testing
     # only successfull if we processed at least top story
@@ -260,23 +252,16 @@ def ataglance_index():
             episode.fanart = thumbnails['main_pc']
 
         episode.broadcast_start_date = row['posted_at']
-        episode.date = episode.broadcast_start_date
-        time_difference = kodiutils.get_time_difference(
-            episode.broadcast_start_date)
-
         episode.title = title
         vod_id = row['id']
         episode.vod_id = vod_id
         episode.duration = row['video']['duration']
         if (episode.duration is not None):
-            minutes = int(episode.duration // 60)
-            seconds = episode.duration - (minutes * 60)
-            duration_text = '{0}m {1}'.format(minutes, seconds)
-            episode.plot = '{0} | {1}\n\n{2}'.format(duration_text,
-                                                     time_difference,
-                                                     row['description'])
+            episode.plot = '{0} | {1}\n\n{2}'.format(
+                episode.duration_text, episode.get_time_difference(),
+                row['description'])
         else:
-            episode.plot = '{0}\n\n{1}'.format(time_difference,
+            episode.plot = '{0}\n\n{1}'.format(episode.get_time_difference(),
                                                row['description'])
 
         episode.video_info = kodiutils.get_SD_video_info()
@@ -290,8 +275,7 @@ def ataglance_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_UNSORTED,
-                                              "None")
+                                              xbmcplugin.SORT_METHOD_UNSORTED)
 
     # Used for unit testing
     # only successfull if we processed at least top story
@@ -356,8 +340,7 @@ def news_programs_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
-                                              xbmcplugin.SORT_METHOD_UNSORTED,
-                                              "None")
+                                              xbmcplugin.SORT_METHOD_UNSORTED)
 
     # Used for unit testing
     # only successfull if we processed at least top story
@@ -458,13 +441,11 @@ def add_live_schedule_menu_item():
     # Schedule Information
     episode.broadcast_start_date = row['pubDate']
     episode.broadcast_end_date = row['endDate']
-    episode.date = episode.broadcast_start_date
     episode.thumb = row['thumbnail_s']
     episode.fanart = row['thumbnail']
 
-    title = '{0}-{1}: {2}'.format(
-        episode.broadcast_start_date.strftime('%H:%M'),
-        episode.broadcast_end_date.strftime('%H:%M'), row['title'])
+    title = utils.get_schedule_title(episode.broadcast_start_date,
+                                     episode.broadcast_end_date, row['title'])
     episode.plot = '{0}\n\n{1}'.format(
         kodiutils.get_string(30022).format(title), row['description'])
 
@@ -494,23 +475,20 @@ def live_schedule_index():
         # Schedule Information
         episode.broadcast_start_date = row['pubDate']
         episode.broadcast_end_date = row['endDate']
-        episode.date = episode.broadcast_start_date
-        duration_diff = episode.broadcast_start_date \
-            - episode.broadcast_end_date
-        episode.duration = duration_diff.seconds
 
         # Live program
         episode.thumb = row['thumbnail_s']
         episode.fanart = row['thumbnail']
         episode_name = utils.get_episode_name(row['title'], row['subtitle'])
-        title = '{0}-{1}: {2}'.format(
-            episode.broadcast_start_date.strftime('%H:%M'),
-            episode.broadcast_end_date.strftime('%H:%M'), episode_name)
+        title = utils.get_schedule_title(episode.broadcast_start_date,
+                                         episode.broadcast_end_date,
+                                         episode_name)
 
         vod_id = row['vod_id']
         episode.vod_id = vod_id
         if (len(vod_id) > 0):
-            # Can play on-demand
+            # Can play on-demand -> Add "Play:" before the title
+            # and make it playable
             episode.IsPlayable = True
             episode.title = kodiutils.get_string(30070).format(title)
         else:
@@ -528,10 +506,9 @@ def live_schedule_index():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_WIDELIST,
-                                              xbmcplugin.SORT_METHOD_UNSORTED,
-                                              'None')
+                                              xbmcplugin.SORT_METHOD_UNSORTED)
 
-    return row_count
+    return (row_count)
 
 
 #
@@ -579,10 +556,10 @@ def vod_index():
         plugin.handle,
         plugin.url_for(vod_episode_list, 'get_all_episodes', 'None', 0,
                        xbmcplugin.SORT_METHOD_TITLE, 'Ascending'), li, True)
-    xbmcplugin.addSortMethod(plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED)
-    xbmcplugin.endOfDirectory(plugin.handle)
 
-    kodiutils.set_view_mode(kodiutils.VIEW_MODE_WIDELIST)
+    kodiutils.set_video_directory_information(plugin.handle,
+                                              kodiutils.VIEW_MODE_WIDELIST,
+                                              xbmcplugin.SORT_METHOD_UNSORTED)
 
     return (True)
 
@@ -606,7 +583,7 @@ def vod_programs():
         if total_episodes > 0:
             # Only show programs that have at lease on episode
             episode = Episode()
-            episode.title = utils.get_episodelist_title(
+            episode.title = kodiutils.get_episodelist_title(
                 row['title_clean'], total_episodes)
             episode.plot = row['description_clean']
             episode.thumb = row['image']
@@ -645,7 +622,8 @@ def vod_categories():
         row_count = row_count + 1
         episode = Episode()
 
-        episode.title = utils.get_episodelist_title(row['name'], row['count'])
+        episode.title = kodiutils.get_episodelist_title(
+            row['name'], row['count'])
         episode.absolute_image_url = True
         episode.thumb = row['icon_l']
         episode.fanart = row['icon_l']
@@ -684,8 +662,8 @@ def vod_playlists():
         row_count = row_count + 1
 
         episode = Episode()
-        episode.title = utils.get_episodelist_title(row['title_clean'],
-                                                    row['track_total'])
+        episode.title = kodiutils.get_episodelist_title(
+            row['title_clean'], row['track_total'])
         episode.thumb = row['image_square']
         episode.fanart = row['image_square']
 
@@ -698,8 +676,7 @@ def vod_playlists():
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_WALL,
-                                              xbmcplugin.SORT_METHOD_UNSORTED,
-                                              'None')
+                                              xbmcplugin.SORT_METHOD_UNSORTED)
 
     # Return last valid playlist ID - useful for debugging
     if (row_count > 0):
@@ -817,7 +794,6 @@ def vod_episode_list(api_method,
         if (broadcast_start_timestamp is not None):
             episode.broadcast_start_date = broadcast_start_timestamp
             episode.broadcast_end_date = row['vod_to']
-            episode.date = episode.broadcast_start_date
             episode.plot = kodiutils.get_string(30050).format(
                 episode.broadcast_start_date.strftime('%Y-%m-%d'),
                 episode.broadcast_end_date.strftime('%Y-%m-%d'), description)
@@ -878,9 +854,6 @@ def play_vod_episode(vod_id, enforce_cache=False):
         if (cached_episode['OnAir'] is not None):
             episode.onair = cached_episode['OnAir']
             episode.broadcast_start_date = cached_episode['OnAir']
-            episode.date = episode.broadcast_start_date
-        if (cached_episode['Duration'] is not None):
-            episode.duration = cached_episode['Duration']
     else:
         # Get result from NHK - slow
         xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
@@ -898,7 +871,6 @@ def play_vod_episode(vod_id, enforce_cache=False):
                 vod_id))['data']['episodes'][0]
         episode.title = episode_detail['title_clean']
         episode.broadcast_start_date = episode_detail['onair']
-        episode.date = episode.broadcast_start_date
         episode.plot = episode_detail['description_clean']
         episode.pgm_no = episode_detail['pgm_no']
         episode.duration = episode_detail['movie_duration']
@@ -959,5 +931,4 @@ def play_news_item(api_url, news_id, item_type, title):
 
 
 def run():
-    xbmcplugin.setContent(plugin.handle, 'videos')
     plugin.run()

@@ -1,6 +1,8 @@
 from __future__ import print_function
 import unittest  # The test framework
 from lib.episode import Episode
+from datetime import datetime, timedelta
+import time
 
 
 class Test_Test_Episode(unittest.TestCase):
@@ -33,6 +35,43 @@ class Test_Test_Episode(unittest.TestCase):
         episode.height = 3
         vi = episode.video_info
         self.assertIsNotNone(vi)
+
+    def test_get_time_difference(self):
+        episode = Episode()
+        start_date = datetime.now() - timedelta(hours=1)
+        timestamp = time.mktime(start_date.timetuple()) * 1000
+        episode.broadcast_start_date = timestamp
+        compare_date = datetime.now()
+        time_difference = episode.get_time_difference(compare_date)
+        self.assertIsNotNone(time_difference)
+        time_difference = episode.get_time_difference()
+        self.assertIsNotNone(time_difference)
+
+    def test_get_calculated_duration(self):
+        episode = Episode()
+        # Set the start date
+        start_date = datetime.now()
+        timestamp = time.mktime(start_date.timetuple()) * 1000
+        episode.broadcast_start_date = timestamp
+
+        # Set the end date (60 seeconds later)
+        end_date = start_date + timedelta(seconds=60)
+        timestamp = time.mktime(end_date.timetuple()) * 1000
+        episode.broadcast_end_date = timestamp
+        self.assertIs(episode.duration, 60)
+
+    def test_get_duration_text(self):
+        episode = Episode()
+        # Set the start date
+        start_date = datetime.now()
+        timestamp = time.mktime(start_date.timetuple()) * 1000
+        episode.broadcast_start_date = timestamp
+
+        # Set the end date (60 seeconds later)
+        end_date = start_date + timedelta(seconds=90)
+        timestamp = time.mktime(end_date.timetuple()) * 1000
+        episode.broadcast_end_date = timestamp
+        self.assertIsNotNone(episode.duration_text)
 
 
 if __name__ == '__main__':

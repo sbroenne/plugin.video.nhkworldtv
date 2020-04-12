@@ -1,8 +1,11 @@
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+# -*- coding: utf-8 -*-
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 from builtins import object
 from kodi_six import xbmcgui
 from . import utils
+from . import kodiutils
+from datetime import datetime
 
 
 class Episode(object):
@@ -25,6 +28,7 @@ class Episode(object):
         self._year = None
         self._broadcast_start_date = None
         self._broadcast_end_date = None
+        self._duration_text = None
         self._thumb = None
         self._fanart = None
         self._video_info = None
@@ -46,6 +50,7 @@ class Episode(object):
         timestamp = int(value) // 1000
         local_date = utils.to_local_time(timestamp)
         self._broadcast_start_date = local_date
+        self._date = local_date
 
     @property
     def broadcast_end_date(self):
@@ -58,6 +63,28 @@ class Episode(object):
         timestamp = int(value) // 1000
         local_date = utils.to_local_time(timestamp)
         self._broadcast_end_date = local_date
+        # Calculate the duration if it has not been set before
+        if (self.duration is None):
+            duration_diff = self._broadcast_end_date \
+                - self._broadcast_start_date
+            self.duration = duration_diff.seconds
+
+    @property
+    def duration_text(self):
+        """ Returns the duration as a localized text
+            Duration is always is in secondes
+        """
+        if (self.duration is not None):
+            minutes = self.duration // 60
+            seconds = self.duration - (minutes * 60)
+            if (minutes > 0):
+                if (seconds == 0):
+                    return (kodiutils.get_string(30095).format(minutes))
+                else:
+                    return (kodiutils.get_string(30096).format(
+                        minutes, seconds))
+            else:
+                return (kodiutils.get_string(30097).format(seconds))
 
     @property
     def thumb(self):
@@ -92,10 +119,6 @@ class Episode(object):
             return self._date.strftime('%d/%m/%Y')
         else:
             return None
-
-    @date.setter
-    def date(self, value):
-        self._date = value
 
     @property
     def year(self):
@@ -173,3 +196,41 @@ class Episode(object):
         self._kodi_list_item = li
 
         return self._kodi_list_item
+
+    #
+    # Methods
+    #
+
+    def get_time_difference(self, compare_date=datetime.now()):
+        """Get the time difference between the
+        Start date and the compare_date
+
+        Mirrors the hebaviour from the NHK Website
+
+        Arguments:
+            compare_date {datetime} -- Date to compare with
+            must be be newer than start_date
+
+        Returns:
+            {unicode} -- e.g 9 hours ago or 25.01.2020
+        """
+        date_delta = compare_date - self.broadcast_start_date
+        date_delta_minutes = date_delta.seconds // 60
+        date_delta_hours = date_delta_minutes // 60
+        if (date_delta.days > 0):
+            # Show as absolute date
+            time_difference = self.broadcast_start_date.strftime(
+                '%A, %b %d, %H:%M')
+        elif (date_delta_hours < 1):
+            # Show in minutes
+            time_difference = kodiutils.get_string(30062).format(
+                date_delta_minutes)
+        elif (date_delta_hours == 1):
+            # Show as hour
+            time_difference = kodiutils.get_string(30060).format(
+                date_delta_hours)
+        else:
+            # Show as hours (plural)
+            time_difference = kodiutils.get_string(30061).format(
+                date_delta_hours)
+        return (time_difference)

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import re
@@ -147,15 +148,6 @@ def get_episode_name(title, subtitle):
     return (episode_name)
 
 
-def get_episodelist_title(title, total_episodes):
-    """ Gets a formated episode list title, e.g. '1 episode' or '2 episodes'"""
-    if (total_episodes == 1):
-        episodelist_title = '{0} - {1} episode'.format(title, total_episodes)
-    else:
-        episodelist_title = '{0} - {1} episodes'.format(title, total_episodes)
-    return (episodelist_title)
-
-
 def get_top_stories_play_path(xmltext):
     """ Extracts the play path from a top story XML file """
     find = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ'
@@ -184,12 +176,31 @@ def get_news_program_play_path(xmltext):
 
 
 def get_program_metdadata_cache(max_items):
-    """
-    #Use NHK World TV Cloud Service to speed-up episode URLlookup
+    """Use NHK World TV Cloud Service to speed-up episode URLlookup.
     The service runs on Azure in West Europe but should still speed up
     the lookup process dramatically since it uses a pre-loaded cache
+
+    Arguments:
+        max_items {int} -- Amount of items to retrievve
+
+    Returns:
+        {dict} -- A JSON dict with the cache items
     """
     xbmc.log('Getting vod_id/program metadata cache from Azure')
     cache = get_json(
         cache_api.rest_url['cache_get_program_list'].format(max_items))
     return (cache)
+
+
+def get_schedule_title(start_date, end_date, title):
+    """Returns a title formatted for a schedule (e.g. live stream, live)
+
+    Arguments:
+        start_date {datetime} -- Start date
+        end_date {datetime} -- End date
+        title {unicode} -- Title
+     Returns:
+        {unicode} -- 11:30-12:30: Journeys in Japan
+    """
+    return ('{0}-{1}: {2}'.format(start_date.strftime('%H:%M'),
+                                  end_date.strftime('%H:%M'), title))

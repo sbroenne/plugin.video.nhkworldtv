@@ -141,3 +141,25 @@ msgstr ""
 msgctxt "#30081"
 msgid "Watch NHK News Programs like NEWSLINE, NEWKSLINE IN DEPTH & NEWSROOM TOKYO on-demand"
 msgstr ""
+
+# kodiutils.py
+msgctxt "#30090"
+msgid "{0} - {1} episode"
+msgstr ""
+
+msgctxt "#30091"
+msgid "{0} - {1} episodes"
+msgstr ""
+
+# episode.py
+msgctxt "#30095"
+msgid "{0}m"
+msgstr ""
+
+msgctxt "#30096"
+msgid "{0}m {1}s"
+msgstr ""
+
+msgctxt "#30097"
+msgid "{0}s"
+msgstr "

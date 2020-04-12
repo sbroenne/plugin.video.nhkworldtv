@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, unicode_literals)
 from kodi_six import xbmc, xbmcaddon, xbmcplugin
-from datetime import datetime
 
 # read settings
 ADDON = xbmcaddon.Addon()
@@ -62,17 +61,19 @@ def get_SD_video_info():
 
 
 # Sets the metadatalike VIEW_MODE and SORT_METHOD on the current Kodi directory
-def set_video_directory_information(plugin_handle, view_mode, sort_method,
-                                    sort_direction):
-    """ Sets the metadate like VIEW_MODE and SORT_METHOD on the c
-    urrent Kodi directory
-    sort_direction can be either Ascending or Descending
+def set_video_directory_information(plugin_handle,
+                                    view_mode,
+                                    sort_method,
+                                    sort_direction='None'):
+    """Sets the metadate like VIEW_MODE and SORT_METHOD on the
+    current Kodi directory
+
+    Arguments:
+        plugin_handle {int} -- Plugin handle
+        view_mode {int} -- e.g kodiutils.VIEW_MODE_INFOWALL
+        sort_method {int} -- xbmcplugin.SORT_METHOD_TITLE
+        sort_direction {unicode} -- Ascending, Descending or None (default)
     """
-
-    # This plugin displays videos
-    # Important to set because otherwise you cannot chang the view mode
-    # to InfoWall, etc.
-
     # Debug logging
     current_viewmode = xbmc.getInfoLabel('Container.ViewMode')
     current_sort_method = xbmc.getInfoLabel('Container.SortMethod')
@@ -83,14 +84,17 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
         VIEW_MODES_REVERSE[view_mode], SORT_METHODS_REVERSE[sort_method],
         sort_direction))
 
+    # This plugin displays videos
+    # Important to set because otherwise you cannot chang the view mode
+    # to InfoWall, etc.
+    xbmcplugin.setContent(plugin_handle, 'episodes')
     # Set sort method
     xbmcplugin.addSortMethod(plugin_handle, sort_method)
-    xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
-
     # Set the view mode (e.g. InfoWall)
     set_view_mode(view_mode)
+    # End of Directory
+    xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
 
-    # Sort Order can be Ascending, Descending or None
     #
     # FIXME: This seems to be broken in Kodi 18.6 - current sort order always
     # returns Ascending - even if it is descendingg
@@ -112,29 +116,17 @@ def set_video_directory_information(plugin_handle, view_mode, sort_method,
         current_viewmode, current_sort_method, current_sort_direction))
 
 
-def get_time_difference(start_date):
-    """Get the time difference (e.g. 9 hours ago) between the
-    start_date and Now as a localized string
-
+def get_episodelist_title(title, total_episodes):
+    """Returns a formated episode list title
     Arguments:
-        start_date {datetime} -- [Date to compare with]
-
+        title {unicode} -- episode list title
+        total_episodes {unicode} -- number of episodes
     Returns:
-        [str] -- [description]
+        {unicode} -- Journeys in Japan - 2 Episodes
     """
-    date_delta = datetime.now() - start_date
-    date_delta_minutes = date_delta.seconds // 60
-    date_delta_hours = date_delta_minutes // 60
-    if (date_delta.days > 0):
-        # Show as absolute date
-        time_difference = start_date.strftime('%A, %b %d, %H:%M')
-    elif (date_delta_hours < 1):
-        # Show in minutes
-        time_difference = get_string(30062).format(date_delta_minutes)
-    elif (date_delta_hours == 1):
-        # Show as hour
-        time_difference = get_string(30060).format(date_delta_hours)
+
+    if (total_episodes == 1):
+        episodelist_title = get_string(30090).format(title, total_episodes)
     else:
-        # Show as hours (plural)
-        time_difference = get_string(30061).format(date_delta_hours)
-    return (time_difference)
+        episodelist_title = get_string(30091).format(title, total_episodes)
+    return (episodelist_title)
