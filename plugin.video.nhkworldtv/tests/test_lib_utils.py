@@ -39,6 +39,11 @@ class Test_Test_utils(unittest.TestCase):
         self.assertEqual(utils.get_ataglance_play_path(xmltext),
                          'aag_handmademask.mp4')
 
+    def test_get_news_program_play_path(self):
+        xmltext = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/programs/1001_20200413171930_hq.mp4'
+        self.assertEqual(utils.get_news_program_play_path(xmltext),
+                         '1001_20200413171930_')
+
     def test_get_metadata_cache(self):
         cache = utils.get_program_metdadata_cache(100)
         self.assertIsNotNone(cache)

@@ -153,7 +153,10 @@ def get_top_stories_play_path(xmltext):
     find = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ'
 
     matches = re.compile(find).findall(xmltext)
-    play_path = matches[0]
+    if len(matches) == 1:
+        play_path = matches[0]
+    else:
+        play_path = None
     return play_path
 
 
@@ -162,7 +165,10 @@ def get_ataglance_play_path(xmltext):
     find = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>'
 
     matches = re.compile(find).findall(xmltext)
-    play_path = matches[0]
+    if len(matches) == 1:
+        play_path = matches[0]
+    else:
+        play_path = None
     return play_path
 
 
@@ -171,7 +177,10 @@ def get_news_program_play_path(xmltext):
     find = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/programs/(.+?)hq.mp4'
 
     matches = re.compile(find).findall(xmltext)
-    play_path = matches[0]
+    if len(matches) == 1:
+        play_path = matches[0]
+    else:
+        play_path = None
     return play_path
 
 

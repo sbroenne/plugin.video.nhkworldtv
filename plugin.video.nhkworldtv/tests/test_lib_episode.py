@@ -73,6 +73,22 @@ class Test_Test_Episode(unittest.TestCase):
         episode.broadcast_end_date = timestamp
         self.assertIsNotNone(episode.duration_text)
 
+    def test_get_plot_duration_time_difference(self):
+        episode = Episode()
+        # Set the start date
+        start_date = datetime.now()
+        timestamp = time.mktime(start_date.timetuple()) * 1000
+        episode.broadcast_start_date = timestamp
+
+        # Set the end date (60 seeconds later)
+        end_date = start_date + timedelta(seconds=90)
+        timestamp = time.mktime(end_date.timetuple()) * 1000
+        episode.broadcast_end_date = timestamp
+        episode.plot_include_duration = True
+        episode.plot_include_time_difference = True
+        episode.plot = 'Unit Test Plot'
+        self.assertIsNotNone(episode.kodi_list_item)
+
 
 if __name__ == '__main__':
     unittest.main()

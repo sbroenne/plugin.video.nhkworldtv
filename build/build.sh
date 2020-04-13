@@ -23,6 +23,8 @@ rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/routing.py
 sed -i "s/{PLUGIN_VERSION}/$PLUGIN_VERSION/g" $KODI_VERSION/plugin.video.nhkworldtv/addon.xml
 # Set the XMBC Python Version (different for Leia and Matrix)
 sed -i "s/{XBMC_PYTHON_VERSION}/$XBMC_PYTHON_VERSION/g" $KODI_VERSION/plugin.video.nhkworldtv/addon.xml
+# Set the Requests Cache Version (different for Leia and Matrix)
+sed -i "s/{REQUESTS_CACHE_VERSION}/$REQUESTS_CACHE_VERSION/g" $KODI_VERSION/plugin.video.nhkworldtv/addon.xml
 
 # Create distribution folder
 mkdir $KODI_VERSION/dist

@@ -35,11 +35,16 @@ def get_string(string_id):
 
 
 # Set the Kodi View Mode
-def set_view_mode(view_mode_id):
+def set_view_mode(view_mode_id, plugin_handle):
     if (ADDON.getSettingBool('set_view_mode')):
         # Change view mode
         xbmc.log('Switching to View Mode: {0}'.format(
             VIEW_MODES_REVERSE[view_mode_id]))
+
+        if (view_mode_id != VIEW_MODE_WIDELIST):
+            # INFOWALL can only be set if the Content is set to
+            # videos or episodes
+            xbmcplugin.setContent(plugin_handle, 'episodes')
         xbmc.executebuiltin('Container.SetViewMode({0})'.format(view_mode_id))
     else:
         # Setting was disabled - do not change view mode
@@ -84,14 +89,10 @@ def set_video_directory_information(plugin_handle,
         VIEW_MODES_REVERSE[view_mode], SORT_METHODS_REVERSE[sort_method],
         sort_direction))
 
-    # This plugin displays videos
-    # Important to set because otherwise you cannot chang the view mode
-    # to InfoWall, etc.
-    xbmcplugin.setContent(plugin_handle, 'episodes')
     # Set sort method
     xbmcplugin.addSortMethod(plugin_handle, sort_method)
-    # Set the view mode (e.g. InfoWall)
-    set_view_mode(view_mode)
+    # Set the view mode (e.g. InfoWall) for Estuary if enabled in settings
+    set_view_mode(view_mode, plugin_handle)
     # End of Directory
     xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
 

@@ -16,8 +16,11 @@ class Episode(object):
         self.vod_id = None
         self.pgm_no = None
         self.title = None
-        self.plot = None
-        self.duration = None
+        self._plot = None
+        self.plot_include_time_difference = False
+        self.plot_include_duration = False
+        self.plot_include_broadcast_detail = False
+        self._duration = None
         self.aspect = None
         self.width = None
         self.height = None
@@ -32,12 +35,38 @@ class Episode(object):
         self._thumb = None
         self._fanart = None
         self._video_info = None
+        self._cast = None
         self._kodi_list_item = xbmcgui.ListItem
         self.absolute_image_url = False
 
     #
     # Properties
     #
+
+    @property
+    def duration(self):
+        """ Gets the duration info label """
+        if (self._duration is not None):
+            return self._duration
+        elif ((self.broadcast_start_date is not None)
+              and (self.broadcast_end_date is not None)):
+            duration = self.broadcast_end_date - self.broadcast_start_date
+            return duration.seconds
+
+    @duration.setter
+    def duration(self, value):
+        """ Sets the duration info label """
+        self._duration = value
+
+    @property
+    def plot(self):
+        """ Gets the plot info label """
+        return self._plot
+
+    @plot.setter
+    def plot(self, value):
+        """ Sets the plot info label """
+        self._plot = value
 
     @property
     def broadcast_start_date(self):
@@ -63,11 +92,6 @@ class Episode(object):
         timestamp = int(value) // 1000
         local_date = utils.to_local_time(timestamp)
         self._broadcast_end_date = local_date
-        # Calculate the duration if it has not been set before
-        if (self.duration is None):
-            duration_diff = self._broadcast_end_date \
-                - self._broadcast_start_date
-            self.duration = duration_diff.seconds
 
     @property
     def duration_text(self):
@@ -146,7 +170,22 @@ class Episode(object):
 
     @video_info.setter
     def video_info(self, value):
+        """ Sets a Kodi Video Info """
         self._video_info = value
+
+    @property
+    def cast(self):
+        """ Gets a cast info label
+        If it has not been set before, a default one will
+        be created from other fields
+        """
+        if (self._cast is not None):
+            return self._cast
+
+    @cast.setter
+    def cast(self, value):
+        """ Sets the cast info label """
+        self._cast = value
 
     @property
     def kodi_list_item(self):
@@ -169,7 +208,24 @@ class Episode(object):
         # Add Kodi InfoLabels
         info_labels = {}
         info_labels['mediatype'] = 'episode'
-        info_labels['Plot'] = self.plot
+
+        if ((self.plot_include_duration is True)
+                and (self.plot_include_time_difference is True)):
+            # Include duration and time difference in plot
+            info_labels['Plot'] = '{0} | {1}\n\n{2}'.format(
+                self.duration_text, self.get_time_difference(), self.plot)
+        elif (self.plot_include_time_difference is True):
+            # Include time difference in plot
+            info_labels['Plot'] = '{0}\n\n{1}'.format(
+                self.get_time_difference(), self.plot)
+        elif (self.plot_include_broadcast_detail):
+            # Include broadcast detail
+            info_labels['Plot'] = kodiutils.get_string(30050).format(
+                self.broadcast_start_date.strftime('%Y-%m-%d'),
+                self.broadcast_end_date.strftime('%Y-%m-%d'), self.plot)
+        else:
+            info_labels['Plot'] = self.plot
+
         info_labels['Title'] = self.title
 
         if (self.duration is not None):

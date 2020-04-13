@@ -6,6 +6,7 @@ import random
 import re
 
 from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
+import xml.etree.ElementTree as ET
 from . import kodiutils
 from . import nhk_api
 from . import cache_api
@@ -26,9 +27,9 @@ plugin = routing.Plugin()
 if (utils.UNIT_TEST):
     # Run under unit test - set some default data since we will not be able to
     # retrieve data from settings.xml
-    MAX_NEWS_DISPLAY_ITEMS = 100
+    MAX_NEWS_DISPLAY_ITEMS = 20
     MAX_ATAGLANCE_DISPLAY_ITEMS = 800
-    MAX_PROGRAM_METADATA_CACHE_ITEMS = 1000
+    MAX_PROGRAM_METADATA_CACHE_ITEMS = 2000
     PROGRAM_METADATA_CACHE = utils.get_program_metdadata_cache(
         MAX_PROGRAM_METADATA_CACHE_ITEMS)
     USE_CACHE = True
@@ -143,9 +144,9 @@ def top_stories_index():
             episode.title = kodiutils.get_string(30070).format(title)
             episode.vod_id = news_id
             episode.duration = video['duration']
-            episode.plot = '{0} | {1}\n\n{2}'.format(
-                episode.duration_text, episode.get_time_difference(),
-                row['description'])
+            episode.plot_include_duration = True
+            episode.plot_include_time_difference = True
+            episode.plot = row['description']
             episode.video_info = kodiutils.get_SD_video_info()
             episode.IsPlayable = True
 
@@ -163,8 +164,8 @@ def top_stories_index():
             detail = news_detail_json['detail']
             detail = detail.replace('<br />', '\n')
             detail = detail.replace('\n\n', '\n')
-            episode.plot = '{0}\n\n{1}'.format(episode.get_time_difference(),
-                                               detail)
+            episode.plot_include_time_difference = True
+            episode.plot = detail
             thumbnails = news_detail_json['thumbnails']
             if (thumbnails is not None):
                 episode.thumb = thumbnails['small']
@@ -257,12 +258,12 @@ def ataglance_index():
         episode.vod_id = vod_id
         episode.duration = row['video']['duration']
         if (episode.duration is not None):
-            episode.plot = '{0} | {1}\n\n{2}'.format(
-                episode.duration_text, episode.get_time_difference(),
-                row['description'])
+            episode.plot_include_duration = True
+            episode.plot_include_time_difference = True
+            episode.plot = row['description']
         else:
-            episode.plot = '{0}\n\n{1}'.format(episode.get_time_difference(),
-                                               row['description'])
+            episode.plot_include_time_difference = True
+            episode.plot = row['description']
 
         episode.video_info = kodiutils.get_SD_video_info()
         episode.IsPlayable = True
@@ -316,26 +317,50 @@ def add_news_programs_menu_item():
 @plugin.route('/news/programs/index')
 def news_programs_index():
     xbmc.log('Displaying At News Index')
-    api_result_json = utils.get_json(
-        nhk_api.rest_url['news_program_config'])['config']['programs']
+    api_result_json = utils.get_json(nhk_api.rest_url['news_program_config'],
+                                     False)
+    news_programs = api_result_json['config']['programs']
     row_count = 0
     episodes = []
-    for row in api_result_json:
+    for news_program in news_programs:
         row_count = row_count + 1
-        episode = Episode()
-        news_program_id = row['id']
-        vod_id = 'news_program_{0}'.format(news_program_id)
-        episode.vod_id = vod_id
-        episode.title = row['name']
-        episode.fanart = row['image']
-        episode.thumb = row['image']
+        news_program_id = news_program['id']
         api_url = nhk_api.rest_url['news_program_xml'].format(news_program_id)
-        episode.video_info = kodiutils.get_SD_video_info()
-        episode.IsPlayable = True
-        episodes.append(
-            (plugin.url_for(play_news_item, api_url, episode.vod_id,
-                            'news_program',
-                            episode.title), episode.kodi_list_item, False))
+        news_program_xml = utils.get_url(api_url, False).text
+        try:
+            root = ET.fromstring(news_program_xml)
+            success = True
+        except ET.ParseError:
+            xbmc.log('Couldnt load Program XML {0}'.format(news_program_id))
+            success = False
+
+        if (success):
+            play_path = nhk_api.rest_url['news_programs_video_url'].format(
+                utils.get_news_program_play_path(root.find('file.high').text))
+            episode = Episode()
+            vod_id = 'news_program_{0}'.format(news_program_id)
+            episode.vod_id = vod_id
+            episode.title = root.find('media.title').text
+            # Extract the original Tokyo broadcast time
+            description = root.find('description').text
+            broadcast_detail = description.split('<br />', 1)[0]
+            program_name = news_program['name']
+            # Check if we can find the program name in the broadcast detaol
+            if (broadcast_detail.find(program_name) != -1):
+                # Found it, now extract the broadcast date
+                tokyo_broadcast_time = broadcast_detail.replace(
+                    news_program['name'], '').strip()
+                if (len(tokyo_broadcast_time) > 0):
+                    # Broadcast date found
+                    episode.plot = kodiutils.get_string(30016).format(
+                        tokyo_broadcast_time)
+
+            episode.fanart = news_program['image']
+            episode.thumb = news_program['image']
+            episode.duration = root.find('media.time').text
+            episode.video_info = kodiutils.get_SD_video_info()
+            episode.IsPlayable = True
+            episodes.append((play_path, episode.kodi_list_item, False))
 
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
@@ -407,10 +432,9 @@ def add_live_stream_menu_item():
     episode.url = nhk_api.rest_url['live_stream_url']
 
     # Title and Description
-    full_title = '{0}\n\n{1}'.format(row['title'], row['description'])
-    episode.plot = '{0}-{1}: {2}'.format(
-        episode.broadcast_start_date.strftime('%H:%M'),
-        episode.broadcast_end_date.strftime('%H:%M'), full_title)
+    plot = '{0}\n\n{1}'.format(row['title'], row['description'])
+    episode.plot_include_broadcast_detail = True
+    episode.plot = plot
 
     episode.video_info = kodiutils.get_1080_HD_video_info()
     xbmcplugin.addDirectoryItem(plugin.handle, episode.url,
@@ -794,11 +818,9 @@ def vod_episode_list(api_method,
         if (broadcast_start_timestamp is not None):
             episode.broadcast_start_date = broadcast_start_timestamp
             episode.broadcast_end_date = row['vod_to']
-            episode.plot = kodiutils.get_string(30050).format(
-                episode.broadcast_start_date.strftime('%Y-%m-%d'),
-                episode.broadcast_end_date.strftime('%Y-%m-%d'), description)
-        else:
-            episode.plot = description
+            episode.plot_include_broadcast_detail = True
+
+        episode.plot = description
 
         # Add the current episode directory item
         episodes.append((add_playable_episode_directory_item(episode)))
@@ -893,8 +915,9 @@ def play_vod_episode(vod_id, enforce_cache=False):
 @plugin.route(
     '/news/play_news_item/<path:api_url>/<news_id>/<item_type>/<title>/')
 def play_news_item(api_url, news_id, item_type, title):
-    """ Play a news item - can either be 'news' or 'ataglance'
-     or 'news_program' """
+    """ Play a news item
+    can either be 'news' or 'ataglance'
+    """
     xbmc.log('ITEM_TYPE: {0}'.format(item_type))
     xbmc.log('API_URL: {0}'.format(api_url))
     xbmc.log('NEWS_ID: {0}'.format(news_id))
@@ -907,22 +930,23 @@ def play_news_item(api_url, news_id, item_type, title):
     elif (item_type == 'ataglance'):
         play_path = nhk_api.rest_url['ataglance_video_url'].format(
             utils.get_ataglance_play_path(video_xml))
-    elif (item_type == 'news_program'):
-        play_path = nhk_api.rest_url['news_programs_video_url'].format(
-            utils.get_news_program_play_path(video_xml))
     else:
         return (False)
 
     xbmc.log('Play Path: {0}'.format(play_path))
-    episode = Episode()
-    episode.vod_id = news_id
-    episode.title = title
-    episode.url = play_path
-    episode.video_info = kodiutils.get_SD_video_info()
-    episode.IsPlayable = True
-
-    xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
-    return (True)
+    if (play_path is not None):
+        episode = Episode()
+        episode.vod_id = news_id
+        episode.title = title
+        episode.url = play_path
+        episode.video_info = kodiutils.get_SD_video_info()
+        episode.IsPlayable = True
+        xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
+        return (True)
+    else:
+        # Couldn't find video
+        xbmc.log('Couldnt find video {0}'.format(api_url))
+        return (False)
 
 
 #

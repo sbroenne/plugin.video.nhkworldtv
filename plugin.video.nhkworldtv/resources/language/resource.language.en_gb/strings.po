@@ -11,35 +11,35 @@ msgid "General"
 msgstr ""
 
 msgctxt "#30002"
-msgid "3rd Party Cloud Program Cache"
+msgid "Azure Cache"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Configure Program lists"
+msgid "Display Limits"
 msgstr ""
 
 msgctxt "#30004"
-msgid "Cache NHK API Results in minutes (minimum 60)"
+msgid "Cache NHK API results (minutes)"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Enable setting default Kodi view modes (recommended)"
+msgid "Estuary: Set Kodi view modes (e.g. InfoWall) (recommended)"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Max News items to show"
+msgid "Max 'News'-items (the more the slower)"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Max At A Glance items to show"
+msgid "Max 'At A Glance'-items"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Enable cloud cache to speed-up video playback (recommended)"
+msgid "Enable to speed-up video playback (recommended)"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Maximum number of cache items to retrieve at start-up"
+msgid "Maximum episodes to cache"
 msgstr ""
 
 # plugin.py
@@ -50,7 +50,7 @@ msgid "Top Stories >"
 msgstr ""
 
 msgctxt "#30012"
-msgid "{0}\n\n{1}\n\n"
+msgid "{0}\n\n{1}"
 msgstr ""
 
 msgctxt "#30013"
@@ -61,6 +61,12 @@ msgstr ""
 msgctxt "#30015"
 msgid "At a Glance >"
 msgstr ""
+
+# News Program - Tokyo Broadcast Detail
+msgctxt "#30016"
+msgid "Originally broadcasted in Tokyo at: {0}"
+msgstr ""
+
 
 # On-Demand Menu Item
 
@@ -135,11 +141,11 @@ msgstr ""
 
 # News Programs
 msgctxt "#30080"
-msgid "NHK News Programs>"
+msgid "News Programs >"
 msgstr ""
 
 msgctxt "#30081"
-msgid "Watch NHK News Programs like NEWSLINE, NEWKSLINE IN DEPTH & NEWSROOM TOKYO on-demand"
+msgid "Watch NHK News Programs like NEWSLINE, NEWKSLINE IN DEPTH & NEWSROOM TOKYO on-demand.\n\nOnly currently broadcasted programs will be shown."
 msgstr ""
 
 # kodiutils.py
