@@ -57,6 +57,7 @@ else:
 @plugin.route('/')
 def index():
     xbmc.log('Creating Main Men')
+    xbmcplugin.setContent(plugin.handle, 'videos')
     # Add menus
     add_live_stream_menu_item()
     add_on_demand_menu_item()
@@ -112,6 +113,7 @@ def add_top_stories_menu_item():
 @plugin.route('/top_stories/index')
 def top_stories_index():
     xbmc.log('Displaying Top Stories Index')
+    xbmcplugin.setContent(plugin.handle, 'videos')
     api_result_json = utils.get_json(nhk_api.rest_url['homepage_news'], False)
     max_row_count = MAX_NEWS_DISPLAY_ITEMS
     result_row_count = len(api_result_json['data'])
@@ -226,6 +228,7 @@ def add_ataglance_menu_item():
 @plugin.route('/at_a_glance/index')
 def ataglance_index():
     xbmc.log('Displaying At a Glance Index')
+    xbmcplugin.setContent(plugin.handle, 'videos')
     api_result_json = utils.get_json(nhk_api.rest_url['get_news_ataglance'])
     max_row_count = MAX_ATAGLANCE_DISPLAY_ITEMS
     result_row_count = len(api_result_json['data'])
@@ -317,6 +320,7 @@ def add_news_programs_menu_item():
 @plugin.route('/news/programs/index')
 def news_programs_index():
     xbmc.log('Displaying At News Index')
+    xbmcplugin.setContent(plugin.handle, 'videos')
     api_result_json = utils.get_json(nhk_api.rest_url['news_program_config'],
                                      False)
     news_programs = api_result_json['config']['programs']
@@ -378,6 +382,7 @@ def news_programs_index():
 # Add on-demand menu item
 def add_on_demand_menu_item():
     xbmc.log('Adding on-demand menu item')
+    xbmcplugin.setContent(plugin.handle, 'videos')
     # Getting random on-demand episode to show
     featured_episodes = utils.get_json(
         nhk_api.rest_url['homepage_ondemand'])['data']['items']
@@ -528,10 +533,7 @@ def live_schedule_index():
             episodes.append((None, episode.kodi_list_item, False))
 
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
-    kodiutils.set_video_directory_information(plugin.handle,
-                                              kodiutils.VIEW_MODE_WIDELIST,
-                                              xbmcplugin.SORT_METHOD_UNSORTED)
-
+    xbmcplugin.endOfDirectory(plugin.handle, succeeded=True, cacheToDisc=False)
     return (row_count)
 
 
@@ -581,9 +583,7 @@ def vod_index():
         plugin.url_for(vod_episode_list, 'get_all_episodes', 'None', 0,
                        xbmcplugin.SORT_METHOD_TITLE, 'Ascending'), li, True)
 
-    kodiutils.set_video_directory_information(plugin.handle,
-                                              kodiutils.VIEW_MODE_WIDELIST,
-                                              xbmcplugin.SORT_METHOD_UNSORTED)
+    xbmcplugin.endOfDirectory(plugin.handle, succeeded=True, cacheToDisc=False)
 
     return (True)
 
@@ -620,6 +620,7 @@ def vod_programs():
                                 program_id, 1, xbmcplugin.SORT_METHOD_UNSORTED,
                                 'None'), episode.kodi_list_item, True))
 
+    xbmcplugin.setContent(plugin.handle, 'seasons')
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
                                               kodiutils.VIEW_MODE_INFOWALL,
@@ -660,9 +661,10 @@ def vod_categories():
                             category_id, 0, xbmcplugin.SORT_METHOD_UNSORTED,
                             'None'), episode.kodi_list_item, True))
 
+    xbmcplugin.setContent(plugin.handle, 'seasons')
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
-                                              kodiutils.VIEW_MODE_WALL,
+                                              kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_TITLE,
                                               'Ascending')
 
@@ -697,9 +699,10 @@ def vod_playlists():
                             playlist_id, 0, xbmcplugin.SORT_METHOD_TITLE,
                             'Ascending'), episode.kodi_list_item, True))
 
+    xbmcplugin.setContent(plugin.handle, 'seasons')
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     kodiutils.set_video_directory_information(plugin.handle,
-                                              kodiutils.VIEW_MODE_WALL,
+                                              kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_UNSORTED)
 
     # Return last valid playlist ID - useful for debugging
@@ -825,6 +828,7 @@ def vod_episode_list(api_method,
         # Add the current episode directory item
         episodes.append((add_playable_episode_directory_item(episode)))
 
+    xbmcplugin.setContent(plugin.handle, 'episodes')
     xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
     sort_method = int(sort_method)
     kodiutils.set_video_directory_information(plugin.handle,

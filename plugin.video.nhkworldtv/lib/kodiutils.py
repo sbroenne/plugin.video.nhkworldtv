@@ -44,8 +44,8 @@ def set_view_mode(view_mode_id, plugin_handle):
         if (view_mode_id != VIEW_MODE_WIDELIST):
             # INFOWALL can only be set if the Content is set to
             # videos or episodes
-            xbmcplugin.setContent(plugin_handle, 'episodes')
-        xbmc.executebuiltin('Container.SetViewMode({0})'.format(view_mode_id))
+            xbmc.executebuiltin(
+                'Container.SetViewMode({0})'.format(view_mode_id))
     else:
         # Setting was disabled - do not change view mode
         xbmc.log('SETTING NOT ENABLED: View Mode mot changed\

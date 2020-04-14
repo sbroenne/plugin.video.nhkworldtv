@@ -23,7 +23,7 @@ msgid "Cache NHK API results (minutes)"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Estuary: Set Kodi view modes (e.g. InfoWall) (recommended)"
+msgid "Recommended: Set Kodi view modes (e.g. InfoWall)"
 msgstr ""
 
 msgctxt "#30006"
