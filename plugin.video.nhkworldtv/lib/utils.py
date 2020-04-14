@@ -43,6 +43,20 @@ headers = {
 s.headers = headers
 
 
+def check_url_exists(url):
+    """Check if a URL exists of it returns a 404
+
+    Arguments:
+        url {str} -- URL to check
+    """
+    with s.cache_disabled():
+        r = s.get(url)
+        if (r.status_code == 404):
+            return (False)
+        else:
+            return (True)
+
+
 def get_json(url, cached=True):
     """ Get JSON object from a URL with improved error handling """
     r = get_url(url, cached)

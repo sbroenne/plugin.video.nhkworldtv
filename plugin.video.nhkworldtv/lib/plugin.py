@@ -583,6 +583,7 @@ def vod_index():
         plugin.url_for(vod_episode_list, 'get_all_episodes', 'None', 0,
                        xbmcplugin.SORT_METHOD_TITLE, 'Ascending'), li, True)
 
+    xbmcplugin.setContent(plugin.handle, 'videos')
     xbmcplugin.endOfDirectory(plugin.handle, succeeded=True, cacheToDisc=False)
 
     return (True)
@@ -728,8 +729,9 @@ def add_playable_episode_directory_item(episode, enforce_cache=False):
         if (episode.vod_id in PROGRAM_METADATA_CACHE):
             cached_episode = PROGRAM_METADATA_CACHE[episode.vod_id]
             # In cache - display directly
-            episode.url = nhk_api.rest_url['episode_url'].format(
-                cached_episode["PlayPath"])
+            m3u8_play_path = nhk_api.rest_url['episode-m3u_generator'].format(
+                cached_episode['M3u8Path'])
+            episode.url = m3u8_play_path
             episode.aspect = cached_episode['Aspect']
             episode.width = cached_episode['Width']
             episode.height = cached_episode['Height']
@@ -923,7 +925,12 @@ def play_vod_episode(vod_id, disable_cache=False):
         m3u8_path = play_path.replace(directory, '')
         bitrate = reference_file_json['videoBitrate']
         m3u8_element = '{0}:{1}'.format(bitrate, m3u8_path)
-        m3u8_elements.append(m3u8_element)
+
+        # Only add the reference URL if exists (sometimes it doesn't!!)
+        reference_url = nhk_api.rest_url['episode_url'].format(
+                play_path)
+        if (utils.check_url_exists(reference_url) is True):
+            m3u8_elements.append(m3u8_element)
 
         # Loop through the assets
         for asset in assets_json['assetFiles']:
