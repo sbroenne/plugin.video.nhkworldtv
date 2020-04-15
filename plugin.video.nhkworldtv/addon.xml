@@ -17,11 +17,11 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Watch NHK World Japan in HD - live stream and on-demand programs</summary>
         <description lang="en_GB">
-Watch NHK World Japan in HD - includes live stream, news and on-demand programs.
+Watch NHK World Japan in HD (1080P) - includes live stream, news and on-demand programs.
 
-The plugin is optimized for an Internet connection with at least 10 MBIT. Tested on Kodi 18.6 with the default Estuary skin.
-    
-I built this plugin because NHK does not support Android TV (yet).
+Tested on Kodi 18.6 and 19. I built this plugin because NHK does not support Android TV (yet).
+
+Plug-in honors Kodi-"Internet bandwidth limitations" and selects quality accordingly (LQ, SD, 720P, 1080P). Everything over "1536 kbps" will disable 1080P (requires at least 11.264 kbps).
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -32,7 +32,7 @@ I built this plugin because NHK does not support Android TV (yet).
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
         <news>
-Plug-in now honors Internet bandwidth limitations and selects quality accordingly (LQ, SD, 720P, 1080P).
+Plug-in now honors Kodi "Internet bandwidth limitations"-settings and selects quality accordingly (LQ, SD, 720P, 1080P).
 
 You can set this in Kodi-settings: "(Gears incons) - System - Settings - Internet access - Internet connection bandwidth limitation"
 

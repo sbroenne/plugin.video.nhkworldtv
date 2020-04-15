@@ -28,7 +28,7 @@ class Episode(object):
         self.IsPlayable = False
         self.playcount = None
         self._date = None
-        self._dateadded = None
+        self._aired = None
         self._year = None
         self._broadcast_start_date = None
         self._broadcast_end_date = None
@@ -81,7 +81,7 @@ class Episode(object):
         local_date = utils.to_local_time(timestamp)
         self._broadcast_start_date = local_date
         self._date = local_date
-        self._dateadded = local_date
+        self._aired = local_date
 
     @property
     def broadcast_end_date(self):
@@ -140,21 +140,21 @@ class Episode(object):
 
     @property
     def date(self):
-        """ Get the sort date in Kodi date format
-        01.01.2009
+        """ Get the sort date
+        Date Format: 01.01.2009
         """
         if (self._date is not None):
-            return self._date.strftime('%d/%m/%Y')
+            return self._date.strftime('%d.%m.%Y')
         else:
             return None
 
     @property
-    def dateadded(self):
-        """ Get the date added in Kodi date format
-        Y-m-d h:m:s = 2009-04-05 23:16:04
+    def aired(self):
+        """ Get the aired date
+        Date Format: 2008-12-07
         """
-        if (self._dateadded is not None):
-            return self._dateadded.strftime('%Y-%m-%d %H:%M:%S')
+        if (self._aired is not None):
+            return self._aired.strftime('%Y-%m-%d')
         else:
             return None
 
@@ -213,15 +213,17 @@ class Episode(object):
             # Create ListItem with title
             li = xbmcgui.ListItem(self.title)
 
-        if (self.IsPlayable):
-            # Playable episode
-            li.setProperty('IsPlayable', 'true')
-
         li.setArt({'thumb': self.thumb, 'fanart': self.fanart})
 
         # Add Kodi InfoLabels
         info_labels = {}
-        info_labels['mediatype'] = 'episode'
+
+        if (self.IsPlayable):
+            # Playable episode
+            li.setProperty('IsPlayable', 'true')
+            info_labels['mediatype'] = 'episode'
+        else:
+            info_labels['mediatype'] = 'video'
 
         if ((self.plot_include_duration is True)
                 and (self.plot_include_time_difference is True)):
@@ -235,12 +237,12 @@ class Episode(object):
         elif (self.plot_include_broadcast_detail):
             # Include broadcast detail
             info_labels['Plot'] = kodiutils.get_string(30050).format(
-                self.broadcast_start_date.strftime('%Y-%m-%d'),
-                self.broadcast_end_date.strftime('%Y-%m-%d'), self.plot)
+                self.plot, self.broadcast_end_date.strftime('%Y-%m-%d'))
         else:
             info_labels['Plot'] = self.plot
 
         info_labels['Title'] = self.title
+        li.setLabel(self.title)
 
         if (self.duration is not None):
             info_labels['Duration'] = self.duration
@@ -254,8 +256,8 @@ class Episode(object):
         if (self._date is not None):
             info_labels['date'] = self.date
 
-        if (self._dateadded is not None):
-            info_labels['dateadded'] = self.dateadded
+        if (self._aired is not None):
+            info_labels['aired'] = self.aired
 
         if (self.playcount is not None):
             info_labels['playcount'] = self.playcount

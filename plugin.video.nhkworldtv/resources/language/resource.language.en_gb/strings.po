@@ -118,7 +118,7 @@ msgstr ""
 
 # Episode List
 msgctxt "#30050"
-msgid "Broadcast on: {0} / Available until: {1}\n\n{2}"
+msgid "{0}\n\nAvailable until: {1}"
 msgstr ""
 
 # Top Stories
