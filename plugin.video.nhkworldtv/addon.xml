@@ -32,7 +32,13 @@ I built this plugin because NHK does not support Android TV (yet).
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
         <news>
-Bug fixes and performance improvements
+Plug-in now honors Internet bandwidth limitations and selects quality accordingly (LQ, SD, 720P, 1080P).
+
+You can set this in Kodi-settings: "(Gears incons) - System - Settings - Internet access - Internet connection bandwidth limitation"
+
+Everything over "1536 kbps" will disable 1080P (requires at least 11.264 kbps).
+
+Default setting is "off" (play 1080P where available). This is a Kodi-wide setting.
         </news>
         <assets>
             <icon>resources/icon.png</icon>

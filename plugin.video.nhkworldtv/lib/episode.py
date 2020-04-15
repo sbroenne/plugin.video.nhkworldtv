@@ -28,6 +28,7 @@ class Episode(object):
         self.IsPlayable = False
         self.playcount = None
         self._date = None
+        self._dateadded = None
         self._year = None
         self._broadcast_start_date = None
         self._broadcast_end_date = None
@@ -80,6 +81,7 @@ class Episode(object):
         local_date = utils.to_local_time(timestamp)
         self._broadcast_start_date = local_date
         self._date = local_date
+        self._dateadded = local_date
 
     @property
     def broadcast_end_date(self):
@@ -138,9 +140,21 @@ class Episode(object):
 
     @property
     def date(self):
-        """ Get the sort date in Kodi date format """
+        """ Get the sort date in Kodi date format
+        01.01.2009
+        """
         if (self._date is not None):
             return self._date.strftime('%d/%m/%Y')
+        else:
+            return None
+
+    @property
+    def dateadded(self):
+        """ Get the date added in Kodi date format
+        Y-m-d h:m:s = 2009-04-05 23:16:04
+        """
+        if (self._dateadded is not None):
+            return self._dateadded.strftime('%Y-%m-%d %H:%M:%S')
         else:
             return None
 
@@ -238,7 +252,10 @@ class Episode(object):
             info_labels['Year'] = self.year
 
         if (self._date is not None):
-            info_labels['Date'] = self.date
+            info_labels['date'] = self.date
+
+        if (self._dateadded is not None):
+            info_labels['dateadded'] = self.dateadded
 
         if (self.playcount is not None):
             info_labels['playcount'] = self.playcount

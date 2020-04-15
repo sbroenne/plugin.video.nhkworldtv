@@ -731,6 +731,7 @@ def add_playable_episode_directory_item(episode, enforce_cache=False):
             # In cache - display directly
             m3u8_play_path = nhk_api.rest_url['episode-m3u_generator'].format(
                 cached_episode['M3u8Path'])
+
             episode.url = m3u8_play_path
             episode.aspect = cached_episode['Aspect']
             episode.width = cached_episode['Width']
@@ -887,7 +888,6 @@ def play_vod_episode(vod_id, disable_cache=False):
         episode.width = cached_episode['Width']
         episode.height = cached_episode['Height']
         if (cached_episode['OnAir'] is not None):
-            episode.onair = cached_episode['OnAir']
             episode.broadcast_start_date = cached_episode['OnAir']
     else:
         # Get result from NHK - slow
@@ -920,26 +920,40 @@ def play_vod_episode(vod_id, disable_cache=False):
 
         # Get the reference file (HD)
         reference_file_json = assets_json['referenceFile']
-        directory = reference_file_json['rtmp']['directory'] + '/'
         play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
-        m3u8_path = play_path.replace(directory, '')
-        bitrate = reference_file_json['videoBitrate']
-        m3u8_element = '{0}:{1}'.format(bitrate, m3u8_path)
 
+        hasReferenceFile = False
         # Only add the reference URL if exists (sometimes it doesn't!!)
         reference_url = nhk_api.rest_url['episode_url'].format(
                 play_path)
         if (utils.check_url_exists(reference_url) is True):
+            directory = reference_file_json['rtmp']['directory'] + '/'
+            m3u8_path = play_path.replace(directory, '')
+            bitrate = reference_file_json['videoBitrate']
+            m3u8_element = '{0}:{1}'.format(bitrate, m3u8_path)
+            episode.aspect = reference_file_json['aspectRatio']
+            episode.width = reference_file_json['videoWidth']
+            episode.height = reference_file_json['videoHeight']
+            hasReferenceFile = True
             m3u8_elements.append(m3u8_element)
 
         # Loop through the assets
+        index = 0
         for asset in assets_json['assetFiles']:
             directory = asset['rtmp']['directory'] + '/'
             play_path = asset['rtmp']['play_path'].split('?')[0]
             m3u8_path = play_path.replace(directory, '')
             bitrate = asset['videoBitrate']
+            if (index == 0):
+                # First Asset
+                if (hasReferenceFile is False):
+                    # No reference file, use first asset information
+                    episode.aspect = asset['aspectRatio']
+                    episode.width = asset['videoWidth']
+                    episode.height = asset['videoHeight']
             m3u8_element = '{0}:{1}'.format(bitrate, m3u8_path)
             m3u8_elements.append(m3u8_element)
+            index = index + 1
 
         # Create a valid m3U8 generator URL
         m3u8_delimiter = ','
