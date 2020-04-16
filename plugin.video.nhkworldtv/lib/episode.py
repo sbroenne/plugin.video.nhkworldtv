@@ -18,7 +18,6 @@ class Episode(object):
         self.title = None
         self._plot = None
         self.plot_include_time_difference = False
-        self.plot_include_duration = False
         self.plot_include_broadcast_detail = False
         self._duration = None
         self.aspect = None
@@ -32,7 +31,6 @@ class Episode(object):
         self._year = None
         self._broadcast_start_date = None
         self._broadcast_end_date = None
-        self._duration_text = None
         self._thumb = None
         self._fanart = None
         self._video_info = None
@@ -94,23 +92,6 @@ class Episode(object):
         timestamp = int(value) // 1000
         local_date = utils.to_local_time(timestamp)
         self._broadcast_end_date = local_date
-
-    @property
-    def duration_text(self):
-        """ Returns the duration as a localized text
-            Duration is always is in secondes
-        """
-        if (self.duration is not None):
-            minutes = self.duration // 60
-            seconds = self.duration - (minutes * 60)
-            if (minutes > 0):
-                if (seconds == 0):
-                    return (kodiutils.get_string(30095).format(minutes))
-                else:
-                    return (kodiutils.get_string(30096).format(
-                        minutes, seconds))
-            else:
-                return (kodiutils.get_string(30097).format(seconds))
 
     @property
     def thumb(self):
@@ -225,12 +206,7 @@ class Episode(object):
         else:
             info_labels['mediatype'] = 'video'
 
-        if ((self.plot_include_duration is True)
-                and (self.plot_include_time_difference is True)):
-            # Include duration and time difference in plot
-            info_labels['Plot'] = '{0} | {1}\n\n{2}'.format(
-                self.duration_text, self.get_time_difference(), self.plot)
-        elif (self.plot_include_time_difference is True):
+        if (self.plot_include_time_difference is True):
             # Include time difference in plot
             info_labels['Plot'] = '{0}\n\n{1}'.format(
                 self.get_time_difference(), self.plot)

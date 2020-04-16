@@ -146,7 +146,6 @@ def top_stories_index():
             episode.title = kodiutils.get_string(30070).format(title)
             episode.vod_id = news_id
             episode.duration = video['duration']
-            episode.plot_include_duration = True
             episode.plot_include_time_difference = True
             episode.plot = row['description']
             episode.video_info = kodiutils.get_SD_video_info()
@@ -261,7 +260,6 @@ def ataglance_index():
         episode.vod_id = vod_id
         episode.duration = row['video']['duration']
         if (episode.duration is not None):
-            episode.plot_include_duration = True
             episode.plot_include_time_difference = True
             episode.plot = row['description']
         else:
@@ -345,14 +343,12 @@ def news_programs_index():
             vod_id = 'news_program_{0}'.format(news_program_id)
             episode.vod_id = vod_id
 
-            # Extract the Title & original Tokyo broadcast time
+            # Extract the Title
             description = root.find('description').text
-            broadcast_title = description.split('<br />', 1)[0]
-            episode.title = broadcast_title
-            broadcast_datestring = (description.split('<br />', 1)[1]).strip()
-            broadcast_timestamp = utils.get_timestamp_from_datestring(
-                broadcast_datestring)
-            episode.broadcast_start_date = broadcast_timestamp
+            episode.title = description.split('<br />', 1)[0]
+            # Extract the broadcast time and convert it to local time
+            episode.broadcast_start_date = utils.get_timestamp_from_datestring(
+                (description.split('<br />', 1)[1]).strip())
             episode.plot_include_time_difference = True
             episode.plot = ''
             episode.fanart = news_program['image']
