@@ -234,7 +234,7 @@ def get_schedule_title(start_date, end_date, title):
 
 def get_timestamp_from_datestring(datestring):
     """Converts a news item date string into a NHK timestamp
-    NHK Timestamp ? Unix Timestamp * 1000
+    NHK Timestamp = Unix Timestamp * 1000
 
     Arguments:
         date_string {unicode} -- News item date string (e.g. '20200416130000')
