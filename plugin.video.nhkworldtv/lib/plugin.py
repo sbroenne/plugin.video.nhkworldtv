@@ -347,9 +347,9 @@ def news_programs_index():
 
             # Extract the Title & original Tokyo broadcast time
             description = root.find('description').text
-            broadcast_detail = description.split('<br />', 1)[0]
+            broadcast_title = description.split('<br />', 1)[0]
+            episode.title = broadcast_title
             broadcast_datestring = (description.split('<br />', 1)[1]).strip()
-            episode.title = broadcast_detail
             broadcast_timestamp = utils.get_timestamp_from_datestring(
                 broadcast_datestring)
             episode.broadcast_start_date = broadcast_timestamp

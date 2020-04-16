@@ -234,10 +234,14 @@ def get_schedule_title(start_date, end_date, title):
 
 def get_timestamp_from_datestring(datestring):
     """Converts a news item date string into a NHK timestamp
+    NHK Timestamp ? Unix Timestamp * 1000
 
     Arguments:
-        date_string {str} -- News item date string
+        date_string {unicode} -- News item date string (e.g. '20200416130000')
+     Returns:
+        {unicode} -- NHK Timestamp (e.g. 1587008460000)
     """
+    # Convert news date string to a Tokyo date
     tokyo = pytz.timezone('Asia/Tokyo')
     tokyo_dt = datetime(year=int(datestring[0:4]),
                         month=int(datestring[4:6]),
@@ -246,7 +250,10 @@ def get_timestamp_from_datestring(datestring):
                         minute=int(datestring[10:12]),
                         second=int(datestring[12:14]),
                         tzinfo=tokyo)
+    # Convert to local time zone
     local_tz = get_localzone()
     local_dt = tokyo_dt.astimezone(local_tz)
+    # Convert to NHK timestamp that can be used to populate
+    # episode.broadcast_start_date etc.
     timestamp = int(time.mktime(local_dt.timetuple()) * 1000)
     return (timestamp)
