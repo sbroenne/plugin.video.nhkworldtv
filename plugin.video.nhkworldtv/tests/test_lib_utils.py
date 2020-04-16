@@ -48,6 +48,12 @@ class Test_Test_utils(unittest.TestCase):
         cache = utils.get_program_metdadata_cache(100)
         self.assertIsNotNone(cache)
 
+    def test_get_local_timestamp_from_news_datestring(self):
+        datestring = '20200416130000'
+        local_datetime = utils.get_timestamp_from_datestring(
+            datestring)
+        self.assertIsNotNone(local_datetime)
+
 
 if __name__ == '__main__':
     unittest.main()

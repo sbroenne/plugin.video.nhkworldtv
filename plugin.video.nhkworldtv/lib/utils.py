@@ -7,7 +7,10 @@ import requests_cache
 from kodi_six import xbmc, xbmcaddon
 from . import api_keys
 from . import cache_api
-import datetime
+from datetime import datetime
+import time
+import pytz
+from tzlocal import get_localzone
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
@@ -149,7 +152,7 @@ def get_NHK_website_url(path):
 
 def to_local_time(timestamp):
     """ Convert from a UNIX timestamp to a valid date time """
-    local_time = datetime.datetime.fromtimestamp(timestamp)
+    local_time = datetime.fromtimestamp(timestamp)
     return (local_time)
 
 
@@ -227,3 +230,23 @@ def get_schedule_title(start_date, end_date, title):
     """
     return ('{0}-{1}: {2}'.format(start_date.strftime('%H:%M'),
                                   end_date.strftime('%H:%M'), title))
+
+
+def get_timestamp_from_datestring(datestring):
+    """Converts a news item date string into a NHK timestamp
+
+    Arguments:
+        date_string {str} -- News item date string
+    """
+    tokyo = pytz.timezone('Asia/Tokyo')
+    tokyo_dt = datetime(year=int(datestring[0:4]),
+                        month=int(datestring[4:6]),
+                        day=int(datestring[6:8]),
+                        hour=int(datestring[8:10]),
+                        minute=int(datestring[10:12]),
+                        second=int(datestring[12:14]),
+                        tzinfo=tokyo)
+    local_tz = get_localzone()
+    local_dt = tokyo_dt.astimezone(local_tz)
+    timestamp = int(time.mktime(local_dt.timetuple()) * 1000)
+    return (timestamp)

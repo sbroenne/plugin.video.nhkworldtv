@@ -344,21 +344,17 @@ def news_programs_index():
             episode = Episode()
             vod_id = 'news_program_{0}'.format(news_program_id)
             episode.vod_id = vod_id
-            episode.title = root.find('media.title').text
-            # Extract the original Tokyo broadcast time
+
+            # Extract the Title & original Tokyo broadcast time
             description = root.find('description').text
             broadcast_detail = description.split('<br />', 1)[0]
-            program_name = news_program['name']
-            # Check if we can find the program name in the broadcast detaol
-            if (broadcast_detail.find(program_name) != -1):
-                # Found it, now extract the broadcast date
-                tokyo_broadcast_time = broadcast_detail.replace(
-                    news_program['name'], '').strip()
-                if (len(tokyo_broadcast_time) > 0):
-                    # Broadcast date found
-                    episode.plot = kodiutils.get_string(30016).format(
-                        tokyo_broadcast_time)
-
+            broadcast_datestring = (description.split('<br />', 1)[1]).strip()
+            episode.title = broadcast_detail
+            broadcast_timestamp = utils.get_timestamp_from_datestring(
+                broadcast_datestring)
+            episode.broadcast_start_date = broadcast_timestamp
+            episode.plot_include_time_difference = True
+            episode.plot = ''
             episode.fanart = news_program['image']
             episode.thumb = news_program['image']
             episode.duration = root.find('media.time').text
@@ -924,8 +920,7 @@ def play_vod_episode(vod_id, disable_cache=False):
 
         hasReferenceFile = False
         # Only add the reference URL if exists (sometimes it doesn't!!)
-        reference_url = nhk_api.rest_url['episode_url'].format(
-                play_path)
+        reference_url = nhk_api.rest_url['episode_url'].format(play_path)
         if (utils.check_url_exists(reference_url) is True):
             directory = reference_file_json['rtmp']['directory'] + '/'
             m3u8_path = play_path.replace(directory, '')

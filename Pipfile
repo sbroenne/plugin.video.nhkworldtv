@@ -17,6 +17,8 @@ kodistubs = "*"
 requests-cache = "==0.5.2"
 future = "*"
 gitpython = "*"
+pytz = "*"
+tzlocal = "*"
 
 [requires]
 python_version = "2.7"

@@ -62,12 +62,6 @@ msgctxt "#30015"
 msgid "At a Glance >"
 msgstr ""
 
-# News Program - Tokyo Broadcast Detail
-msgctxt "#30016"
-msgid "Originally broadcasted in Tokyo at: {0}"
-msgstr ""
-
-
 # On-Demand Menu Item
 
 msgctxt "#30020"
