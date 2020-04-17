@@ -60,7 +60,6 @@ class Test_Test_Episode(unittest.TestCase):
         episode.broadcast_end_date = timestamp
         self.assertIs(episode.duration, 60)
 
-
     def test_get_plot_duration_time_difference(self):
         episode = Episode()
         # Set the start date

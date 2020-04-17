@@ -202,8 +202,6 @@ class Episode(object):
         if (self.IsPlayable):
             # Playable episode
             li.setProperty('IsPlayable', 'true')
-            info_labels['mediatype'] = 'episode'
-        else:
             info_labels['mediatype'] = 'video'
 
         if (self.plot_include_time_difference is True):
