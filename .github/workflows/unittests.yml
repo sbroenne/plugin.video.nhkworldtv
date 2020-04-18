@@ -30,9 +30,6 @@ jobs:
           rm -f Pipfile.lock
           sed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
  
-      - name: Set PYTHON_VERSION
-        run: echo "::set-env name=PYTHON_VERSION::{{ matrix.python-version }}"
-
       - name: Set GIT tag # https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/td-p/31595
         run: echo "::set-env name=GIT_TAG::${GITHUB_REF##*/}"
 
@@ -45,6 +42,8 @@ jobs:
           pipenv install --deploy --dev
 
       - name: Install pre-requisites (Kodi Six/Routing)
+        env:
+          PYTHON_VERSION: ${{ matrix.python-version }}
         run: |
           chmod u+x install_packages.sh
           ./install_packages.sh
