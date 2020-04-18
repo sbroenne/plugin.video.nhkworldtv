@@ -41,7 +41,7 @@ jobs:
           PYTHON_VERSION: ${{ matrix.python-version }}
         run: |
           chmod u+x install_packages.sh
-          ./install_packages.sh
+          pipenv run ./install_packages.sh
         working-directory: build
 
       - name: Lint with flake8
