@@ -4,8 +4,8 @@ name: UnitTests
 
 on:
   push:
-    paths:
-      - "**.py"
+    #paths:
+      #- "**.py"
   schedule:
     # Run every Saturday at 01:00
     - cron: "0 1 * * 5"
@@ -29,12 +29,6 @@ jobs:
         run: |
           rm -f Pipfile.lock
           sed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
- 
-      - name: Set GIT tag # https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/td-p/31595
-        run: echo "::set-env name=GIT_TAG::${GITHUB_REF##*/}"
-
-      - name: Set Plugin version # GIT_TAG without the preceding v
-        run: echo "::set-env name=PLUGIN_VERSION::${GIT_TAG:1}"
 
       - name: Install dependencies with pipenv
         run: |
@@ -49,9 +43,10 @@ jobs:
           ./install_packages.sh
         working-directory: build
 
-      - name: Build NHK World TV for Kodi Leia # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
-        id: build_leia
+      - name: Build NHK World TV for Leia
+        id: build
         env:
+          PLUGIN_VERSION: "0.0.0" # Set hardcoded version for unit tests
           KODI_VERSION: "leia"
           XBMC_PYTHON_VERSION: "2.26.0"
         run: |
@@ -60,19 +55,19 @@ jobs:
           echo "::set-output name=plugin_directory::./build/$KODI_VERSION/plugin.video.nhkworldtv"
         working-directory: build
 
-      - name: Replace plugin.video.nhkworldtv with build results
+      - name: Replace plugin.video.nhkworldtv directory with build results
         run: |
           rm -rf plugin.video.nhkworldtv
-          cp -r ${{ steps.build_leia.outputs.plugin_directory }} .
+          cp -r ${{ steps.build.outputs.plugin_directory }} .
       
-      - name: Lint with flake8
+      - name: Lint with flake8 on plugin.video.nhkworldtv
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          pipenv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings.
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=200 --statistics
+          pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=200 --statistics
         working-directory: plugin.video.nhkworldtv
 
-      - name: Run Unit Tests with pytest
+      - name: Run Unit Tests with pytest on plugin.video.nhkworldtv
         run: pipenv run pytest
         working-directory: plugin.video.nhkworldtv
