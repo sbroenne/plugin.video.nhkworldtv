@@ -28,6 +28,7 @@ jobs:
       - name: Change Python version in the Pipfile
         run: |
           rm -f Pipfile.lock
+          echo "Pipfile Python version: ${{ matrix.python-version }}"
           sed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
 
       - name: Install dependencies with pipenv
@@ -41,7 +42,7 @@ jobs:
         run: |
           chmod u+x install_packages.sh
           ./install_packages.sh
-        working-directory: build
+        working-directory: ${{ github.workspace }}/build
 
       - name: Build NHK World TV for Leia
         id: build
@@ -53,7 +54,7 @@ jobs:
           chmod u+x build.sh
           ./build.sh
           echo "::set-output name=plugin_directory::./build/$KODI_VERSION/plugin.video.nhkworldtv"
-        working-directory: build
+        working-directory: ${{ github.workspace }}/build
 
       - name: Replace plugin.video.nhkworldtv directory with build results
         run: |
@@ -66,8 +67,8 @@ jobs:
           pipenv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings.
           pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=200 --statistics
-        working-directory: plugin.video.nhkworldtv
+        working-directory: ${{ github.workspace }}/plugin.video.nhkworldtv
 
       - name: Run Unit Tests with pytest on plugin.video.nhkworldtv
         run: pipenv run pytest
-        working-directory: plugin.video.nhkworldtv
+        working-directory: ${{ github.workspace }}/plugin.video.nhkworldtv
