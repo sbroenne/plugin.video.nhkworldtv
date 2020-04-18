@@ -44,24 +44,7 @@ jobs:
           ./install_packages.sh
         working-directory: build
 
-      - name: Build NHK World TV for Leia
-        id: build
-        env:
-          PLUGIN_VERSION: "0.0.0" # Set hardcoded version for unit tests
-          KODI_VERSION: "leia"
-          XBMC_PYTHON_VERSION: "2.26.0"
-        run: |
-          chmod u+x build.sh
-          ./build.sh
-          echo "::set-output name=plugin_directory::./build/$KODI_VERSION/plugin.video.nhkworldtv"
-        working-directory: build
-
-      - name: Replace plugin.video.nhkworldtv directory with build results
-        run: |
-          rm -rf plugin.video.nhkworldtv
-          cp -r ${{ steps.build.outputs.plugin_directory }} .
-      
-      - name: Lint with flake8 on plugin.video.nhkworldtv
+      - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
           pipenv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -69,8 +52,6 @@ jobs:
           pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=200 --statistics
         working-directory: plugin.video.nhkworldtv
 
-      - name: Run Unit Tests with pytest on plugin.video.nhkworldtv
-        run: |
-          echo "Workdir ${{ github.workspace }}"
-          pipenv run pytest
+      - name: Run Unit Tests with pytest
+        run:  pipenv run pytest
         working-directory: plugin.video.nhkworldtv

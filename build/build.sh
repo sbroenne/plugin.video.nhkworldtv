@@ -16,7 +16,6 @@ rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/api_json.js
 rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/*.pyc
 rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/*.pyo
 rm -f $KODI_VERSION/plugin.video.nhkworldtv/tests
-rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/routing.py
 
 # Set the plugin version in addon.xml
 # This uses GNU SED - so if your are on Mac, you need to install this and change your path accordingly
