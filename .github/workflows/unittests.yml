@@ -71,4 +71,4 @@ jobs:
 
       - name: Run Unit Tests with pytest on plugin.video.nhkworldtv
         run: pipenv run pytest
-        working-directory: ${{ github.workspace }}/plugin.video.nhkworldtv
+        #working-directory: ${{ github.workspace }}/plugin.video.nhkworldtv
