@@ -4,11 +4,11 @@ name: UnitTests
 
 on:
   push:
-      paths:
-        - '**.py'
+    paths:
+      - "**.py"
   schedule:
     # Run every Saturday at 01:00
-    - cron:  '0 1 * * 5'
+    - cron: "0 1 * * 5"
 
 jobs:
   pytest:
@@ -16,47 +16,64 @@ jobs:
     strategy:
       matrix:
         python-version: [2.7]
-  
+
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
-        
+
       - name: Change Python version in the Pipfile
         run: |
           rm -f Pipfile.lock
           sed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
-      
+ 
+      - name: Set PYTHON_VERSION
+        run: echo "::set-env name=PYTHON_VERSION::{{ matrix.python-version }}"
+
+      - name: Set GIT tag # https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/td-p/31595
+        run: echo "::set-env name=GIT_TAG::${GITHUB_REF##*/}"
+
+      - name: Set Plugin version # GIT_TAG without the preceding v
+        run: echo "::set-env name=PLUGIN_VERSION::${GIT_TAG:1}"
+
       - name: Install dependencies with pipenv
         run: |
           pip install pipenv
           pipenv install --deploy --dev
-    
+
+      - name: Install pre-requisites (Kodi Six/Routing)
+        run: |
+          chmod u+x install_packages.sh
+          ./install_packages.sh
+        working-directory: build
+
+      - name: Build NHK World TV for Kodi Leia # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
+        id: build_leia
+        env:
+          KODI_VERSION: "leia"
+          XBMC_PYTHON_VERSION: "2.26.0"
+        run: |
+          chmod u+x build.sh
+          ./build.sh
+          echo "::set-output name=plugin_directory::./build/$KODI_VERSION/plugin.video.nhkworldtv"
+        working-directory: build
+
+      - name: Replace plugin.video.nhkworldtv with build results
+        run: |
+          rm -rf plugin.video.nhkworldtv
+          cp -r ${{ steps.build_leia.outputs.plugin_directory }} .
+      
       - name: Lint with flake8
         run: |
-          pip install flake8
           # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings.
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=200 --statistics
- 
-      - name: Install latest Kodi Six module from Github repo
-        run: |
-          wget https://github.com/romanvm/kodi.six/archive/master.zip
-          unzip master.zip
-          rm -f master.zip
-          cd kodi.six-master
-          pipenv run python setup.py install
-          cd ..
-          rm -rf kodi.six-master
+        working-directory: plugin.video.nhkworldtv
 
-      - name: Install routing.py locally
-        run: |
-          cp build/routing/routing.py $(pipenv --venv)/lib/python2.7/site-packages
-      
       - name: Run Unit Tests with pytest
-        run: |
-          pipenv run pytest
+        run: pipenv run pytest
+        working-directory: plugin.video.nhkworldtv
