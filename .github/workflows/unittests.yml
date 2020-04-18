@@ -70,5 +70,7 @@ jobs:
         working-directory: ${{ github.workspace }}/plugin.video.nhkworldtv
 
       - name: Run Unit Tests with pytest on plugin.video.nhkworldtv
-        run: pipenv run pytest
-        #working-directory: ${{ github.workspace }}/plugin.video.nhkworldtv
+        run: |
+          echo "Workdir cd ${{ github.workspace }}/plugin.video.nhkworldtv"
+          cd ${{ github.workspace }}/plugin.video.nhkworldtv
+          pipenv run pytest
