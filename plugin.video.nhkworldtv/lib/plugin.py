@@ -570,7 +570,10 @@ def vod_index():
         plugin.url_for(vod_episode_list, 'get_all_episodes', 'None', 0,
                        xbmcplugin.SORT_METHOD_TITLE), li, True)
 
-    xbmcplugin.endOfDirectory(plugin.handle, succeeded=True, cacheToDisc=False)
+    kodiutils.set_video_directory_information(plugin.handle,
+                                              kodiutils.VIEW_MODE_WIDELIST,
+                                              xbmcplugin.SORT_METHOD_NONE,
+                                              'videos')
 
     return (True)
 

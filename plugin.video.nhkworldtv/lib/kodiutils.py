@@ -70,7 +70,9 @@ def set_video_directory_information(plugin_handle,
         xbmc.log('Switching to View Mode: {0}'.format(
             VIEW_MODES_REVERSE[view_mode]))
         # Set the content
-        xbmcplugin.setContent(plugin_handle, content_type)
+        if (view_mode != VIEW_MODE_WIDELIST):
+            # Do not set the content typ for WideList
+            xbmcplugin.setContent(plugin_handle, content_type)
         xbmc.executebuiltin('Container.SetViewMode({0})'.format(view_mode))
     else:
         # Setting was disabled - do not change view mode

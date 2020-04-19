@@ -2,7 +2,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from builtins import object
-from kodi_six import xbmcgui
+from kodi_six import xbmcgui, xbmc
 from . import utils
 from . import kodiutils
 from datetime import datetime
@@ -18,7 +18,11 @@ class Episode(object):
         self.title = None
         self._plot = None
         self.plot_include_time_difference = False
+        """ Optional: Include time difference (3 minutes ago) in the Plot
+        """
         self.plot_include_broadcast_detail = False
+        """ Optional: Include broadcast detail (available until) in the Plot
+        """
         self._duration = None
         self.aspect = None
         self.width = None
@@ -34,6 +38,9 @@ class Episode(object):
         self._thumb = None
         self._fanart = None
         self._video_info = None
+        self.bandwidth = 0
+        """ Optional: Set Internet Bandwidth Restriction
+        """
         self._cast = None
         self._kodi_list_item = xbmcgui.ListItem
         self.absolute_image_url = False
@@ -195,60 +202,78 @@ class Episode(object):
             li = xbmcgui.ListItem(self.title)
 
         li.setArt({'thumb': self.thumb, 'fanart': self.fanart})
-
-        # Add Kodi InfoLabels
-        info_labels = {}
-
-        if (self.IsPlayable):
-            # Playable episode
-            li.setProperty('IsPlayable', 'true')
-            info_labels['mediatype'] = 'episode'
-
-        if (self.plot_include_time_difference is True):
-            # Include time difference in plot
-            info_labels['Plot'] = '{0}\n\n{1}'.format(
-                self.get_time_difference(), self.plot)
-        elif (self.plot_include_broadcast_detail):
-            # Include broadcast detail
-            info_labels['Plot'] = kodiutils.get_string(30050).format(
-                self.plot, self.broadcast_end_date.strftime('%Y-%m-%d'))
-        else:
-            info_labels['Plot'] = self.plot
-
-        info_labels['Title'] = self.title
         li.setLabel(self.title)
 
-        if (self.duration is not None):
-            info_labels['Duration'] = self.duration
+        # Get info label
+        info_label = self.get_info_label()
 
-        if (self.pgm_no is not None):
-            info_labels['Episode'] = self.pgm_no
-
-        if (self.year is not None):
-            info_labels['Year'] = self.year
-
-        if (self._date is not None):
-            info_labels['date'] = self.date
-
-        if (self._aired is not None):
-            info_labels['aired'] = self.aired
-
-        if (self.playcount is not None):
-            info_labels['playcount'] = self.playcount
-
-        li.setInfo('video', info_labels)
+        if (self.IsPlayable and self.url is not None):
+            # Playable episode
+            li.setProperty('IsPlayable', 'true')
+            info_label['mediatype'] = 'episode'
+            li.setMimeType('application/x-mpegURL')
+            li.setContentLookup(False)
+            if (self.bandwidth > 0):
+                # Set Internet bandwidth limitation
+                xbmc.log('Setting network bandwidth restriction to {0}'.format(
+                    self.bandwidth))
+                li.setProperty('network.bandwidth', str(self.bandwidth))
 
         # Only add Stream Info if the the video_info property is not none
         if (self.video_info is not None):
             li.addStreamInfo('video', self.video_info)
 
+        # Set the info label
+        li.setInfo('video', info_label)
         self._kodi_list_item = li
-
+        xbmc.log('Created list item: {0}'.format(self.title))
         return self._kodi_list_item
 
     #
     # Methods
     #
+
+    def get_info_label(self):
+        """ Create the InfoLabel from the Episode Propeties
+
+        Returns:
+            dict -- Dictionary with the Info Label propeties
+        """
+
+        info_label = {}
+
+        if (self.plot_include_time_difference is True):
+            # Include time difference in plot
+            info_label['Plot'] = '{0}\n\n{1}'.format(
+                self.get_time_difference(), self.plot)
+        elif (self.plot_include_broadcast_detail):
+            # Include broadcast detail
+            info_label['Plot'] = kodiutils.get_string(30050).format(
+                self.plot, self.broadcast_end_date.strftime('%Y-%m-%d'))
+        else:
+            info_label['Plot'] = self.plot
+
+        info_label['Title'] = self.title
+
+        if (self.duration is not None):
+            info_label['Duration'] = self.duration
+
+        if (self.pgm_no is not None):
+            info_label['Episode'] = self.pgm_no
+
+        if (self.year is not None):
+            info_label['Year'] = self.year
+
+        if (self._date is not None):
+            info_label['date'] = self.date
+
+        if (self._aired is not None):
+            info_label['aired'] = self.aired
+
+        if (self.playcount is not None):
+            info_label['playcount'] = self.playcount
+
+        return (info_label)
 
     def get_time_difference(self, compare_date=datetime.now()):
         """Get the time difference between the
