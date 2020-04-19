@@ -18,5 +18,5 @@ rm -rf kodi.six-master
 # Install routing.py
 cd .. 
 export SITE_PACKAGES="$(pipenv --venv)/lib/python$PYTHON_VERSION/site-packages/"
-ECHO "Site Packages Direcorty: $SITE_PACKAGES"
+echo "Site Packages Direcorty: $SITE_PACKAGES"
 cp routing/routing.py $SITE_PACKAGES
