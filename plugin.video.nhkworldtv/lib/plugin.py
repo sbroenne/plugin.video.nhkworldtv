@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from builtins import range
+
 import random
 import re
-
-from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 import xml.etree.ElementTree as ET
-from . import kodiutils
-from . import nhk_api
-from . import cache_api
+from builtins import range
+
 import routing
-from . import utils
+from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
+
+from . import cache_api, kodiutils, nhk_api, utils
 from .episode import Episode
 
 # Initiate constants and plug-in
@@ -705,7 +704,7 @@ def add_playable_episode_directory_item(episode, enforce_cache=False):
     """ Add a Kodi directory item for a playable episode """
     # If the vod_id is in cache and cache is being used,
     # diretly add the URL otherwise dynmaically resolve it
-    # via show_epsisode()
+    # via play_vod_episode()
     #
     # Use the cache backend or not
     if (enforce_cache):
@@ -725,14 +724,14 @@ def add_playable_episode_directory_item(episode, enforce_cache=False):
             episode.width = cached_episode['Width']
             episode.height = cached_episode['Height']
             episode.onair = cached_episode['OnAir']
+
             returnValue = [episode.url, episode.kodi_list_item, False]
             return (returnValue)
 
     # Not in cache - need to be resolve dynmaically
-    returnValue = [
-        plugin.url_for(play_vod_episode, episode.vod_id),
-        episode.kodi_list_item, False
-    ]
+    play_url = plugin.url_for(play_vod_episode, episode.vod_id)
+    xbmc.log('Dynamic Play URL: {0}'.format(play_url))
+    returnValue = [play_url, episode.kodi_list_item, False]
     return (returnValue)
 
 
@@ -836,14 +835,16 @@ def vod_episode_list(api_method,
 @plugin.route('/vod/play_episode/<vod_id>/')
 def play_vod_episode(vod_id, disable_cache=False):
 
-    xbmc.log('VOD_ID: {0}'.format(vod_id))
-    xbmc.log('DISABLE CACHE: {0}'.format(disable_cache))
-
     if (disable_cache is True):
         # Overwrite use of backend
         use_backend = False
     else:
         use_backend = USE_CACHE
+
+    xbmc.log('VOD_ID: {0}'.format(vod_id))
+    xbmc.log('DISABLE CACHE: {0}'.format(disable_cache))
+    xbmc.log('USE BACKEND: {0}'.format(use_backend))
+    xbmc.log('PLUGIN HANDLE: {0}'.format(plugin.handle))
 
     episode = Episode()
     episode.vod_id = vod_id
@@ -870,6 +871,7 @@ def play_vod_episode(vod_id, disable_cache=False):
         m3u8_play_path = nhk_api.rest_url['episode-m3u_generator'].format(
             cached_episode['M3u8Path'])
         episode.url = m3u8_play_path
+        xbmc.log('Episode M3U8 URL:'.format(episode.url))
         episode.aspect = cached_episode['Aspect']
         episode.width = cached_episode['Width']
         episode.height = cached_episode['Height']
@@ -946,6 +948,7 @@ def play_vod_episode(vod_id, disable_cache=False):
         m3u8_play_path = nhk_api.rest_url['episode-m3u_generator'].format(
             m3u8_media)
         episode.url = m3u8_play_path
+        xbmc.log('Episode M3U8 URL: {0}'.format(episode.url))
         episode.aspect = reference_file_json['aspectRatio']
         episode.width = reference_file_json['videoWidth']
         episode.height = reference_file_json['videoHeight']

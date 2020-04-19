@@ -23,14 +23,6 @@ class Test_Test_Episode(unittest.TestCase):
         print(episode.thumb)
         self.assertEqual(test_url, episode.thumb)
 
-    def test_set_bandwidth(self):
-        episode = Episode()
-        mbit = 0.5
-        episode.title = 'Test'
-        episode.bandwidth = mbit * 1000 * 1000
-        listItem = episode.kodi_list_item
-        self.assertIsNotNone(listItem.getProperty('network.bandwidth'))
-
     def test_get_video_info_from_string(self):
         episode = Episode()
         episode.video_info = '123'

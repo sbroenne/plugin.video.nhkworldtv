@@ -207,17 +207,12 @@ class Episode(object):
         # Get info label
         info_label = self.get_info_label()
 
-        if (self.IsPlayable and self.url is not None):
+        if (self.IsPlayable):
             # Playable episode
             li.setProperty('IsPlayable', 'true')
             info_label['mediatype'] = 'episode'
             li.setMimeType('application/x-mpegURL')
             li.setContentLookup(False)
-            if (self.bandwidth > 0):
-                # Set Internet bandwidth limitation
-                xbmc.log('Setting network bandwidth restriction to {0}'.format(
-                    self.bandwidth))
-                li.setProperty('network.bandwidth', str(self.bandwidth))
 
         # Only add Stream Info if the the video_info property is not none
         if (self.video_info is not None):
