@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
-from kodi_six import xbmc, xbmcaddon, xbmcgui
+from kodi_six import xbmc, xbmcgui
 from .kodiutils import get_string
 
-ADDON = xbmcaddon.Addon()
 
-
-def show_wizard():
+def show_wizard(ADDON):
     """Shows the first run wizard
     """
+
+    if (not ADDON.getSettingBool('run_wizard')):
+        return (False)
+
     xbmc.log("Starting Set-up Wizard")
     dialog = xbmcgui.Dialog()
 
@@ -77,7 +79,7 @@ def show_wizard():
         'You can do this by changing the Kodi "Internet bandwidth limitations" system-setting'
     )
     lines.append(
-        'You find this setting by going to: "(Gears incons) - System - Settings - Internet access - Internet connection bandwidth limitation'
+        'You find this setting by going to: "(Gears icons) - System - Settings - Internet access - Internet connection bandwidth limitation'
     )
     lines.append(
         'Everything over "1536 kbps" will disable 1080P (1080P requires at least 10.000 kbps).'

@@ -1003,6 +1003,6 @@ def play_news_item(api_url, news_id, item_type, title):
 
 def run():
     if ADDON.getSettingBool('run_wizard'):
-        first_run_wizard.show_wizard()
+        first_run_wizard.show_wizard(ADDON)
 
     plugin.run()
