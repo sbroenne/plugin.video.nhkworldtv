@@ -34,13 +34,9 @@ Plug-in honors Kodi-"Internet bandwidth limitations"-setting and selects quality
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
         <news>
-Plug-in now honors Kodi "Internet bandwidth limitations"-settings and selects quality accordingly (LQ, SD, 720P, 1080P).
+Added a Set-up Wizard that runs, when the plugin starts the first time.
 
-You can set this in Kodi-settings: "(Gears incons) - System - Settings - Internet access - Internet connection bandwidth limitation"
-
-Everything over "1536 kbps" will disable 1080P (requires at least 11.264 kbps).
-
-Default setting is "off" (play 1080P where available). This is a Kodi-wide setting.
+This wizard also explains how to set-up Internet bandwidth limitation settings in Kodi if you prefer something else than 1080P.
         </news>
         <assets>
             <icon>resources/icon.png</icon>

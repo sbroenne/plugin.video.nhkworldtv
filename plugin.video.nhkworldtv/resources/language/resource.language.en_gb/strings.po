@@ -42,6 +42,9 @@ msgctxt "#30009"
 msgid "Maximum episodes to cache"
 msgstr ""
 
+msgctxt "#30016"
+msgid "Run Set-up Wizard when plugin starts"
+msgstr ""
 # plugin.py
 
 # Top Stories Menu Item

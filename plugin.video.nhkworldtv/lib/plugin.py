@@ -12,6 +12,7 @@ from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 
 from . import cache_api, kodiutils, nhk_api, utils
 from .episode import Episode
+from . import first_run_wizard
 
 # Initiate constants and plug-in
 # When <reuselanguageinvoker>true</reuselanguageinvoker> this only happens
@@ -1001,4 +1002,7 @@ def play_news_item(api_url, news_id, item_type, title):
 
 
 def run():
+    if ADDON.getSettingBool('run_wizard'):
+        first_run_wizard.show_wizard()
+
     plugin.run()
