@@ -8,25 +8,29 @@ This plug-in is a fan project and not related in any way to NHK! I built this pl
 
 NHK World TV is a plug-in that displays most of the content from [NHK World Japan](https://www3.nhk.or.jp/nhkworld/en/live/) in Kodi in the highest possible quality (1080p).
 
-The plugin is optimized for an Internet connection with at least 10 MBIT. NHK still uses H.264 so that requires a lot of bandwidth.
+Tested on Kodi 18.6 and 19 with the default Estuary skin.
 
-Tested on Kodi 18.6 with the default Estuary skin.
+### Video Quality
 
-Originally it started as a fork of **Misty's** [Best Of NHK plug-in](https://forum.kodi.tv/showthread.php?tid=196657) but shares almost zero code with it nowadays.  His plug-in also provides addtional content like NHK on Youtube - check it out - it is worth it!
+NHK provides streams in LQ, SD, 720P in medium and Full-HD (1080P) in very hiqh quality'
 
-**Thank you Misty, awesome work!**
+By default the plug-in will play 1080P. If you encounter buffering issues, you can select a lower quality by changing the **Kodi** _Internet bandwidth limitations_ **system-setting**.
+
+You find this setting by going to: _(Gears icons) - System - Settings - Internet access - **Internet connection bandwidth limitation**_
+
+Everything over **1536 kbps** will **disable** 1080P (1080P requires at least **10.000 kbps**).
+
+Default setting is **off** (play 1080P where available). This is a **Kodi-wide system setting**.
+
+### Design Goals
+
+#### Inclusion in the official Kodi Repo
 
 The design goal for the NHK World TV plug-in is to eventually be included in the official Kodi repo and to include **only** content from the NHK World web site with the focus on the video-on-demand section - in hest best possible quality.
 
 If you like to add the other content that can be found in Best Of NHK, please feel free to clone - I will **not** accept PRs for adding content sources outside of NHK World itself.
 
-## How-to Install
-
-You can install a beta version of the plugin by installing the [NHK World TV Development Repository](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne). The plug-in will auto-update itself regularly.
-
-The repo also contains an updated version of [requests-cache](https://github.com/sbroenne/script.module.requests-cache) because the one in the Kodi repo is outdated. I have submitted a PR to the inital author to update the upstream repo.
-
-## Performance
+#### Performance
 
 "Snappiness" was one of my design goals when developing this plug-in. For example, most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to two hours)
 
@@ -36,12 +40,17 @@ You can find the source code for the cloud service at [NHK World TV Azure Backen
 
 The cache runs on Azure implemented as Azure Functions backed by Cosmos DB. It gets updated with new episodes multiple times per day.
 
+## How-to Install
+
+You can install a beta version of the plugin by installing the [NHK World TV Development Repository](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne). The plug-in will auto-update itself regularly.
+
+The repo also contains an updated version of [requests-cache](https://github.com/sbroenne/script.module.requests-cache) because the one in the Kodi repo is outdated. I have submitted a PR to the inital author to update the upstream repo.
+
 ## Known Issues
 
 1. After the **initial** installation and after **each update**:
-    1. You might encounter an error when stating the plug-in. Simply start again - this will fix the issue. This is caused by a bug in a third party component (requests-cache)
 
-    2. The start of the plug-in can take a litte while - subsequent starts should be faster.
+    1. The start of the plug-in can take a litte while - subsequent starts should be faster.
 
 2. If you have a problem **after an update**, simply exit Kodi and start it again - or start a different plug-in. This will usually fix it. This is caused by Kodi when you re-use the Pyhton language invoker - which the plug-in does since it improves performance dramatically.
 
@@ -74,3 +83,9 @@ You will find scripts to build the plugin in locally in the [build](./build/) fo
 ## Bugs & Issues
 
 If you find a bug, or want to fix something directly, that would be awesome! Just use github and open an issue!
+
+## Origins
+
+Originally it started as a fork of **Misty's** [Best Of NHK plug-in](https://forum.kodi.tv/showthread.php?tid=196657) but shares almost zero code with it nowadays.  His plug-in also provides addtional content like NHK on Youtube - check it out - it is worth it!
+
+**Thank you Misty, awesome work!**
