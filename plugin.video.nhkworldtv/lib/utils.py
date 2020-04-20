@@ -11,6 +11,7 @@ from datetime import datetime
 import time
 import pytz
 from tzlocal import get_localzone
+import sqlite3
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
@@ -91,25 +92,36 @@ def get_url(url, cached=True):
     max_retries = 3
     current_try = 1
     while (current_try <= max_retries):
-        # Only add the API key for API Calls
+        ignore_sqlite_error = False
+        # Make an API Call
+        xbmc.log('Making API Call {0} ({1} of {2})'.format(
+            url, current_try, max_retries))
 
-        # Use cached or non-cached result
-        if (cached):
-            # Use session cache
-            if (request_params is not None):
-                r = s.get(url, params=request_params)
-            else:
-                r = s.get(url)
-        else:
-            with s.cache_disabled():
+        try:
+            # Use cached or non-cached result
+            if (cached):
+                # Use session cache
                 if (request_params is not None):
                     r = s.get(url, params=request_params)
                 else:
                     r = s.get(url)
-
-        # Make an API Call
-        xbmc.log('Making API Call {0} ({1} of {2})'.format(
-            r.url, current_try, max_retries))
+            else:
+                with s.cache_disabled():
+                    if (request_params is not None):
+                        r = s.get(url, params=request_params)
+                    else:
+                        r = s.get(url)
+        except (sqlite3.OperationalError):
+            # Catch transient requests-cache SQL Lite error
+            # This is a race condition I think, it takes time for
+            # requests-cache to create the response table
+            # but it doesn't wait for this internally
+            # so sometimes a call can be made
+            # before the the table has been created
+            # This will fix itself shortly (on the next call)
+            xbmc.log('Catching sqlite3.OperationlError: {0}'.format(
+                sqlite3.OperationalError.message))
+            ignore_sqlite_error = True
 
         if (r.status_code == 200):
             # Call was successfull
@@ -117,8 +129,8 @@ def get_url(url, cached=True):
                  - Retrieved from cache {2}'.format(r.url, r.status_code,
                                                     r.from_cache))
             return (r)
-        elif (r.status_code == 502):
-            # Bad Gateway
+        elif (r.status_code == 502 or ignore_sqlite_error):
+            # Bad Gateway or SQL Lite Operational exception
             if (current_try == max_retries):
                 # Max retries reached - still could not get url
                 # Failure - no way to handle - probably an issue
@@ -130,7 +142,7 @@ def get_url(url, cached=True):
                     xbmc.LOGFATAL)
                 r.raise_for_status()
             else:
-                # Wait for n seconds and then try again
+                # Try again - this usually fixes the error
                 xbmc.log(
                     'Failure fetching URL: {0} with Status {1})'.format(
                         r.url, r.status_code), xbmc.LOGWARNING)
