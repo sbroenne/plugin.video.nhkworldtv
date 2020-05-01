@@ -117,6 +117,7 @@ def top_stories_index():
     max_row_count = MAX_NEWS_DISPLAY_ITEMS
     result_row_count = len(api_result_json['data'])
     episodes = []
+    last_video_episode = None
     # Only display MAX ROWS
     if (result_row_count < max_row_count):
         max_row_count = result_row_count
@@ -149,11 +150,11 @@ def top_stories_index():
             episode.plot = row['description']
             episode.video_info = kodiutils.get_SD_video_info()
             episode.IsPlayable = True
-
             api_url = utils.get_NHK_website_url(video['config'])
             episodes.append(
                 (plugin.url_for(play_news_item, api_url, episode.vod_id,
                                 'news', title), episode.kodi_list_item, False))
+            last_video_episode = episode
 
         else:
             # No video attached to it
@@ -180,11 +181,8 @@ def top_stories_index():
                                               'videos')
 
     # Used for unit testing
-    # only successfull if we processed at least top story
-    if (row_count > 0):
-        return (row_count)
-    else:
-        return (0)
+    # Return last episode that has a video attached
+    return (last_video_episode)
 
 
 #
@@ -280,11 +278,8 @@ def ataglance_index():
                                               'videos')
 
     # Used for unit testing
-    # only successfull if we processed at least top story
-    if (row_count > 0):
-        return (row_count)
-    else:
-        return (0)
+    # Return last episode
+    return (episode)
 
 
 #
@@ -970,11 +965,12 @@ def play_news_item(api_url, news_id, item_type, title):
     xbmc.log('NEWS_ID: {0}'.format(news_id))
     xbmc.log('TITLE: {0}'.format(title))
 
-    video_xml = utils.get_url(api_url).text
     if (item_type == 'news'):
+        video_xml = utils.get_url(api_url).text
         play_path = nhk_api.rest_url['news_video_url'].format(
             utils.get_top_stories_play_path(video_xml))
     elif (item_type == 'ataglance'):
+        video_xml = utils.get_url(api_url).text
         play_path = nhk_api.rest_url['ataglance_video_url'].format(
             utils.get_ataglance_play_path(video_xml))
     else:

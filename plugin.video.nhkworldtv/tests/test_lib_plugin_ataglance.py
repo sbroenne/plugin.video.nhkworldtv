@@ -7,7 +7,7 @@ class Test_AtAGlance(unittest.TestCase):
         self.assertTrue(plugin.add_ataglance_menu_item())
 
     def test_get_AtAGlance_index(self):
-        self.assertIsNot(plugin.ataglance_index(), 0)
+        self.assertIsNotNone(plugin.ataglance_index())
 
 
 if __name__ == '__main__':

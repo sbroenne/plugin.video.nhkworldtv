@@ -7,7 +7,7 @@ class Test_Top_Stories(unittest.TestCase):
         self.assertTrue(plugin.add_top_stories_menu_item())
 
     def test_get_top_stories_index(self):
-        self.assertIsNot(plugin.top_stories_index(), 0)
+        self.assertIsNotNone(plugin.top_stories_index())
 
 
 if __name__ == '__main__':
