@@ -338,12 +338,16 @@ def news_programs_index():
             episode.vod_id = vod_id
 
             # Extract the Title
+            break_string = '<br />'
             description = root.find('description').text
-            episode.title = description.split('<br />', 1)[0]
-            # Extract the broadcast time and convert it to local time
-            episode.broadcast_start_date = utils.get_timestamp_from_datestring(
-                (description.split('<br />', 1)[1]).strip())
-            episode.plot_include_time_difference = True
+            if (break_string in description):
+                episode.title = description.split(break_string, 1)[0]
+                # Extract the broadcast time and convert it to local time
+                episode.broadcast_start_date = utils.get_timestamp_from_datestring(
+                    (description.split(break_string, 1)[1]).strip())
+                episode.plot_include_time_difference = True
+            else:
+                episode.title = description
             episode.plot = ''
             episode.fanart = news_program['image']
             episode.thumb = news_program['image']
