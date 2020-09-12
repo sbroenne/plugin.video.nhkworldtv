@@ -70,22 +70,13 @@ def show_wizard(ADDON):
 
     lines = []
     lines.append(
-        'NHK provides streams in LQ, SD, 720P in medium and Full-HD (1080P) in very hiqh quality'
+        'NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality.'
     )
     lines.append(
-        'By default the plug-in will play 1080P. If you encounter buffering issues, you can select a lower quality.'
+        'By default the plug-in will play 1080P.'
     )
     lines.append(
-        'You can do this by changing the Kodi "Internet bandwidth limitations" system-setting'
-    )
-    lines.append(
-        'You find this setting by going to: "(Gears icons) - System - Settings - Internet access - Internet connection bandwidth limitation'
-    )
-    lines.append(
-        'Everything over "1536 kbps" will disable 1080P (1080P requires at least 10.000 kbps).'
-    )
-    lines.append(
-        'Default setting is "off" (play 1080P where available). This is a Kodi-wide system setting.'
+        'If you encounter buffering issues, you can select a lower quality by changing the "Use 720P instead of 1080P" addon-setting.'
     )
     lines.append(
         'The wizard has finished and will close now. Enjoy NHK World TV!')

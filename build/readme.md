@@ -32,6 +32,10 @@ chmod u+x build_leia.sh
 
 The output can then be found in the respective [dist](./leia/dist/) folder.
 
-## Copy to local Kodi install
+## Copy to local MacOsX Kodi
 
 The [copy_local_macosx script](./copy_local_macosx.sh) will install the content of the [dist](./leia/dist/) folder to the local Kodi installation folder so you can update the plug-in easily while developing. This script works **only on MacOsX** but but should be easy to adapt to your environment.
+
+## Copy to local WSL 2 on Windows 10 Kodi
+
+The [copy_local_wsl script](./copy_local_wsl.sh) will install the content of the [dist](./leia/dist/) folder to the local Kodi installation folder so you can update the plug-in easily while developing. This script works **only on Windows 10 using WSL2 as the development environment** but but should be easy to adapt to your environment.

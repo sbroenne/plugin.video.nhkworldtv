@@ -53,7 +53,5 @@ rest_url = {
     'video_url':
     'https://movie-s.nhk.or.jp/ws/ws_program/api/67f5b750-b419-11e9-8a16-0e45e8988f42/apiv/5/mode/json?v={0}',
     'episode_url':
-    'https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/{0}/chunklist.m3u8',
-    'episode-m3u_generator':
-    'https://hls-abr-api-wse-nhkw.stream.co.jp/make.m3u8?app=mz-nhk10&plfm=kitdvod&bcp=mm/flvmedia/&media={0}'
+    'https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/{0}/chunklist.m3u8'
 }

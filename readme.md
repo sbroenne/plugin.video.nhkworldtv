@@ -12,15 +12,11 @@ Tested on Kodi 18.6 and 19 with the default Estuary skin.
 
 ### Video Quality
 
-NHK provides streams in LQ, SD, 720P in medium and Full-HD (1080P) in very hiqh quality.
+NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality.
 
-By default the plug-in will play 1080P. If you encounter buffering issues, you can select a lower quality by changing the **Kodi** _Internet bandwidth limitations_ **system-setting**.
+By default the plug-in will play 1080P. If you encounter buffering issues, you can select a lower quality by changing the Use 720P instead of 1080P addon-setting.
 
-You find this setting by going to: _(Gears icons) - System - Settings - Internet access - **Internet connection bandwidth limitation**_
-
-Everything over **1536 kbps** will **disable** 1080P (1080P requires at least **10.000 kbps**).
-
-Default setting is **off** (play 1080P where available). This is a **Kodi-wide system setting**.
+Default setting is **off** (play 1080P where available).
 
 ### Design Goals
 

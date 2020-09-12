@@ -48,23 +48,7 @@ class Test_VOD(unittest.TestCase):
         episode_url = plugin.play_vod_episode(episode.vod_id, True)
         print(episode_url)
         self.assertIsNotNone(episode_url)
-
-    def test_play_episode_vod_id_non_cache(self):
-        episode = plugin.vod_episode_list('get_most_watched_episodes', 'None',
-                                          0, xbmcplugin.SORT_METHOD_NONE, '')
-
-        episode_url = plugin.play_vod_episode(episode.vod_id, True)
-        print(episode_url)
-        self.assertIsNotNone(episode_url)
-
-    def test_play_episode_vod_id_cache(self):
-        episode = plugin.vod_episode_list('get_most_watched_episodes', 'None',
-                                          0, xbmcplugin.SORT_METHOD_NONE, '')
-
-        episode_url = plugin.play_vod_episode(episode.vod_id, False)
-        print(episode_url)
-        self.assertIsNotNone(episode_url)
-
+  
     def test_play_episode_cache(self):
 
         episode = plugin.vod_episode_list('get_most_watched_episodes', 'None',
