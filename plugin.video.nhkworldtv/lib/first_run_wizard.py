@@ -23,7 +23,7 @@ def show_wizard(ADDON):
         'For the best user experience I would suggest to set-up some settings now.'
     )
 
-    abort_wizard = dialog.yesno('1 of 4: Set-up Wizard - Welcome',
+    abort_wizard = dialog.yesno('1 of 3: Set-up Wizard - Welcome',
                                 delimiter.join(lines),
                                 nolabel='Yes, continue set-up',
                                 yeslabel='No, I am good')
@@ -31,21 +31,6 @@ def show_wizard(ADDON):
     if (abort_wizard):
         ADDON.setSettingBool('run_wizard', False)
         return (False)
-
-    lines = []
-    lines.append(
-        'This plug-in can use a Microsoft Azure hosted cache service to speed-up video play-back'
-    )
-    lines.append('This is enabled by default.')
-    lines.append('Do you want disable this setting?')
-    disable_azure_cache = dialog.yesno('2 of 4: Set-up Wizard - {0}'.format(
-        get_string(30002)),
-                                       delimiter.join(lines),
-                                       nolabel='No, leave it on',
-                                       yeslabel='Yes, disable it')
-
-    if (disable_azure_cache):
-        ADDON.setSettingBool('use_backend', False)
 
     lines = []
     lines.append(
@@ -60,7 +45,7 @@ def show_wizard(ADDON):
     lines.append('Do you want enable auto-setting of view modes?')
 
     enable_view_mode = dialog.yesno(
-        '3 of 4: Set-up Wizard - Auto Kodi view modes',
+        '2 of 3: Set-up Wizard - Auto Kodi view modes',
         delimiter.join(lines),
         nolabel='No',
         yeslabel='Yes, please auto-set')
@@ -81,7 +66,7 @@ def show_wizard(ADDON):
     lines.append(
         'The wizard has finished and will close now. Enjoy NHK World TV!')
 
-    complete = dialog.ok('4 of 4: Set-up Wizard - Buffering problems',
+    complete = dialog.ok('3 of 3: Set-up Wizard - 1080P',
                          delimiter.join(lines))
 
     if (complete):

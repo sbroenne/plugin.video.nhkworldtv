@@ -69,7 +69,6 @@ The plug-in is localized but translation only exists for English (GB). It is als
 Main open topics are:
 
 - code fixes to comply with the Kodi plugin guidelines
-- more unit tests for fringe cases
 - preparations to be able to submit the plugin to the official Kodi repo
 
 ## Local Development

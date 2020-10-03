@@ -7,6 +7,7 @@ import lib.utils as utils
 class Test_Play_News_Item(unittest.TestCase):
     def test_play_news_item_from_top_stories(self):
         episode = plugin.top_stories_index()
+        self.assertIsNotNone(episode)
         api_url_string = '/nhkworld/data/en/news/movie/{0}.xml'.format(
             episode.vod_id)
         api_url = utils.get_NHK_website_url(api_url_string)
@@ -16,6 +17,7 @@ class Test_Play_News_Item(unittest.TestCase):
 
     def test_play_news_item_from_ataglance(self):
         episode = plugin.ataglance_index()
+        self.assertIsNotNone(episode)
         api_url_string = '/nhkworld/en/news/ataglance/{0}/video-main.xml'.format(
             episode.vod_id)
         api_url = utils.get_NHK_website_url(api_url_string)
