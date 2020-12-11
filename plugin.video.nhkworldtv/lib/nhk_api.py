@@ -47,7 +47,7 @@ rest_url = {
     'news_programs_video_url':
     'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/programs/{0},l,h,q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',
     'live_stream_url':
-    'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp/index_4M.m3u8',
+    'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_4M.m3u8',
     'player_url':
     'https://movie-s.nhk.or.jp/v/refid/nhkworld/prefid/{0}?embed=js&targetId=videoplayer&de-responsive=true&de-callback-method=nwCustomCallback&de-appid={1}&de-subtitle-on=false',
     'video_url':
