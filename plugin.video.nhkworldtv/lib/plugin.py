@@ -6,6 +6,7 @@ import random
 import re
 import xml.etree.ElementTree as ET
 from builtins import range
+from requests.models import HTTPError
 
 import routing
 from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
@@ -144,7 +145,7 @@ def top_stories_index():
             episode.thumb = thumbnails['small']
             episode.fanart = thumbnails['middle']
         episode.broadcast_start_date = row['updated_at']
-       
+
         if row['videos'] is not None:
             video = row['videos']
             # Top stories that have a video attached to them
@@ -180,10 +181,9 @@ def top_stories_index():
 
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
-        kodiutils.set_video_directory_information(plugin.handle,
-                                                  kodiutils.VIEW_MODE_INFOWALL,
-                                                  xbmcplugin.SORT_METHOD_UNSORTED,
-                                                  'videos')
+        kodiutils.set_video_directory_information(
+            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
+            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
 
     # Used for unit testing
     # Return latest episode that has a video attached to it - can be none!
@@ -223,7 +223,8 @@ def add_ataglance_menu_item():
     # Create the directory itemn
     episode.video_info = kodiutils.get_SD_video_info()
     if (episode is not None):
-        xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(ataglance_index),
+        xbmcplugin.addDirectoryItem(plugin.handle,
+                                    plugin.url_for(ataglance_index),
                                     episode.kodi_list_item, True)
     return episode
 
@@ -282,13 +283,13 @@ def ataglance_index():
 
     if (row_count) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
-        kodiutils.set_video_directory_information(plugin.handle,
-                                                  kodiutils.VIEW_MODE_INFOWALL,
-                                                  xbmcplugin.SORT_METHOD_UNSORTED,
-                                                  'videos')
+        kodiutils.set_video_directory_information(
+            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
+            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
 
     # Used for unit testing
     return episode
+
 
 #
 # News Programs
@@ -328,17 +329,32 @@ def news_programs_index():
     episodes = []
     episode = None
     root = None
+
     for news_program in news_programs:
+        success = True
         row_count = row_count + 1
+        news_program_xml = None
         news_program_id = news_program['id']
         api_url = nhk_api.rest_url['news_program_xml'].format(news_program_id)
-        news_program_xml = utils.get_url(api_url, False).text
+
+        # Get the News Program URL from NHK - sometimes it doesn't exist
+        # https://github.com/sbroenne/plugin.video.nhkworldtv/issues/9
         try:
-            root = ET.fromstring(news_program_xml)
-            success = True
-        except ET.ParseError:
-            xbmc.log('Couldnt load Program XML {0}'.format(news_program_id))
+            news_program_xml = utils.get_url(api_url, False).text
+        except HTTPError:
+            xbmc.log('Couldnt load Program XML {0} from NHK Website'.format(
+                news_program_id))
             success = False
+
+        if (success):
+            # Sometimes the XML is invalid, add error handling
+            try:
+                root = ET.fromstring(news_program_xml)
+                success = True
+            except ET.ParseError:
+                xbmc.log(
+                    'Couldnt parse Program XML {0}'.format(news_program_id))
+                success = False
 
         if (success):
             play_path = nhk_api.rest_url['news_programs_video_url'].format(
@@ -368,10 +384,9 @@ def news_programs_index():
 
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
-        kodiutils.set_video_directory_information(plugin.handle,
-                                                  kodiutils.VIEW_MODE_INFOWALL,
-                                                  xbmcplugin.SORT_METHOD_UNSORTED,
-                                                  'videos')
+        kodiutils.set_video_directory_information(
+            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
+            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
 
     # Used for unit testing
     return episode
@@ -531,8 +546,9 @@ def live_schedule_index():
 
     if (row_count) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
-        xbmcplugin.endOfDirectory(
-            plugin.handle, succeeded=True, cacheToDisc=False)
+        xbmcplugin.endOfDirectory(plugin.handle,
+                                  succeeded=True,
+                                  cacheToDisc=False)
 
     # Used for unit testing
     # Return row count
@@ -630,13 +646,13 @@ def vod_programs():
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(plugin.handle,
-                                                kodiutils.VIEW_MODE_INFOWALL,
-                                                xbmcplugin.SORT_METHOD_TITLE,
-                                                'videos')
-    
+                                                  kodiutils.VIEW_MODE_INFOWALL,
+                                                  xbmcplugin.SORT_METHOD_TITLE,
+                                                  'videos')
+
     # Return last program program Id - useful for unit testing
     return (program_id)
-    
+
 
 @plugin.route('/vod/categories/')
 def vod_categories():
@@ -669,12 +685,13 @@ def vod_categories():
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(plugin.handle,
-                                                kodiutils.VIEW_MODE_INFOWALL,
-                                                xbmcplugin.SORT_METHOD_TITLE,
-                                                'videos')
+                                                  kodiutils.VIEW_MODE_INFOWALL,
+                                                  xbmcplugin.SORT_METHOD_TITLE,
+                                                  'videos')
 
     # Return last valid category ID - useful useful for unit testing
     return category_id
+
 
 @plugin.route('/vod/playlists/')
 def vod_playlists():
@@ -703,10 +720,9 @@ def vod_playlists():
 
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
-        kodiutils.set_video_directory_information(plugin.handle,
-                                                kodiutils.VIEW_MODE_INFOWALL,
-                                                xbmcplugin.SORT_METHOD_UNSORTED,
-                                                'videos')
+        kodiutils.set_video_directory_information(
+            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
+            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
 
     # Return last valid playlist ID - useful for unit testing
     return playlist_id
@@ -837,12 +853,12 @@ def vod_episode_list(api_method,
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         sort_method = int(sort_method)
         kodiutils.set_video_directory_information(plugin.handle,
-                                                kodiutils.VIEW_MODE_INFOWALL,
-                                                sort_method, 'videos')
+                                                  kodiutils.VIEW_MODE_INFOWALL,
+                                                  sort_method, 'videos')
 
     # Used for unit testing
     return episode
-    
+
 
 # Video On Demand - Play Episode
 @plugin.route('/vod/play_episode/<vod_id>/')
@@ -921,7 +937,8 @@ def play_vod_episode(vod_id, disable_cache=False):
 
         # Only add the reference URL if exists (sometimes it doesn't!!)
         reference_url = nhk_api.rest_url['episode_url'].format(play_path)
-        if ((utils.check_url_exists(reference_url) is True) and USE_720P == False):
+        if ((utils.check_url_exists(reference_url) is True)
+                and USE_720P == False):
             episode.url = nhk_api.rest_url['episode_url'].format(play_path)
             episode.aspect = reference_file_json['aspectRatio']
             episode.width = reference_file_json['videoWidth']
