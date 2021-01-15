@@ -52,6 +52,6 @@ jobs:
           pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=200 --statistics
         working-directory: plugin.video.nhkworldtv
 
-      - name: Run Unit Tests with pytest
-        run:  pipenv run pytest
-        working-directory: plugin.video.nhkworldtv
+      #- name: Run Unit Tests with pytest
+      #  run:  pipenv run pytest
+      #  working-directory: plugin.video.nhkworldtv
