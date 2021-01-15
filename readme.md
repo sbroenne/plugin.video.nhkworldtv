@@ -12,7 +12,7 @@ Tested on Kodi 18.6+ and 19 with the default Estuary skin.
 
 ## How-to Install
 
-# Kodi 18 / Leia (current Kodi version)
+### Kodi 18 / Leia (current Kodi version)
 
 You can install the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne/repository.sbroenne-0.0.12.zip). The plug-in will auto-update itself regularly from this repo.
 
