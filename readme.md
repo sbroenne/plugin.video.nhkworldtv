@@ -6,9 +6,15 @@ This plug-in is a fan project and not related in any way to NHK! I built this pl
 
 ## Overview
 
-NHK World TV is a plug-in that displays most of the content from [NHK World Japan](https://www3.nhk.or.jp/nhkworld/en/live/) in Kodi in the highest possible quality (1080p).
+NHK World TV is a plug-in that displays most of the content from [NHK World Japan](https://www3.nhk.or.jp/nhkworld/en/live/) in Kodi in the highest possible quality (1080p) where available.
 
-Tested on Kodi 18.6 and 19 with the default Estuary skin.
+Tested on Kodi 18.6+ and 19 with the default Estuary skin.
+
+## How-to Install
+
+# Kodi 18 / Leia (current Kodi version)
+
+You can install the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne/repository.sbroenne-0.0.12.zip). The plug-in will auto-update itself regularly from this repo.
 
 ### Video Quality
 
@@ -36,17 +42,11 @@ You can find the source code for the cloud service at [NHK World TV Azure Backen
 
 The cache runs on Azure implemented as Azure Functions backed by Cosmos DB. It gets updated with new episodes multiple times per day.
 
-## How-to Install
-
-You can install a beta version of the plugin by installing the [NHK World TV Development Repository](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne). The plug-in will auto-update itself regularly.
-
-The repo also contains an updated version of [requests-cache](https://github.com/sbroenne/script.module.requests-cache) because the one in the Kodi repo is outdated. I have submitted a PR to the inital author to update the upstream repo.
-
 ## Known Issues
 
 1. After the **initial** installation and after **each update**:
 
-    1. The start of the plug-in can take a litte while - subsequent starts should be faster.
+   1. The start of the plug-in can take a litte while - subsequent starts should be faster.
 
 2. If you have a problem **after an update**, simply exit Kodi and start it again - or start a different plug-in. This will usually fix it. This is caused by Kodi when you re-use the Pyhton language invoker - which the plug-in does since it improves performance dramatically.
 
@@ -81,6 +81,6 @@ If you find a bug, or want to fix something directly, that would be awesome! Jus
 
 ## Origins
 
-Originally it started as a fork of **Misty's** [Best Of NHK plug-in](https://forum.kodi.tv/showthread.php?tid=196657) but shares almost zero code with it nowadays.  His plug-in also provides addtional content like NHK on Youtube - check it out - it is worth it!
+Originally it started as a fork of **Misty's** [Best Of NHK plug-in](https://forum.kodi.tv/showthread.php?tid=196657) but shares almost zero code with it nowadays. His plug-in also provides addtional content like NHK on Youtube - check it out - it is worth it!
 
 **Thank you Misty, awesome work!**

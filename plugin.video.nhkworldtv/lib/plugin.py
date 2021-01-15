@@ -746,7 +746,7 @@ def add_playable_episode_directory_item(episode, enforce_cache=False):
             # In cache - display directly
 
             # If we should use 720P or there is no 1080P file, use the 720P file
-            if ((USE_720P == True) or (cached_episode['Path1080P'] is None)):
+            if ((USE_720P) or (cached_episode['Path1080P'] is None)):
                 episode.url = cached_episode['Path720P']
             else:
                 episode.url = cached_episode['Path1080P']
@@ -894,7 +894,7 @@ def play_vod_episode(vod_id, disable_cache=False):
             episode.duration = cached_episode['Duration']
 
         # If we should use 720P or there is no 1080P file, use the 720P file
-        if ((USE_720P == True) or (cached_episode['Path1080P'] is None)):
+        if ((USE_720P) or (cached_episode['Path1080P'] is None)):
             episode.url = cached_episode['Path720P']
         else:
             episode.url = cached_episode['Path1080P']
@@ -937,14 +937,14 @@ def play_vod_episode(vod_id, disable_cache=False):
 
         # Only add the reference URL if exists (sometimes it doesn't!!)
         reference_url = nhk_api.rest_url['episode_url'].format(play_path)
-        if ((utils.check_url_exists(reference_url) is True)
-                and USE_720P == False):
+        if ((utils.check_url_exists(reference_url) is True) and not USE_720P):
             episode.url = nhk_api.rest_url['episode_url'].format(play_path)
             episode.aspect = reference_file_json['aspectRatio']
             episode.width = reference_file_json['videoWidth']
             episode.height = reference_file_json['videoHeight']
         else:
-            # Prefer 720P or video doesn't have a reference file - use the 720P Version instead
+            # Prefer 720P or video doesn't have a reference file.
+            # Then use the 720P Version instead
             # Asset #0 is the 720P Version
             asset = assets_json['assetFiles'][0]
             play_path = asset['rtmp']['play_path'].split('?')[0]
