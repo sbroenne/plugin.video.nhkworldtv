@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="{PLUGIN_VERSION}" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="${PLUGIN_VERSION}" provider-name="sbroenne">
     <requires>
-        <import addon="xbmc.python" version="{XBMC_PYTHON_VERSION}"/>
-        <import addon="script.module.certifi" version="2019.9.11"/>
-        <import addon="script.module.requests" version="2.22.0"/>
-        <import addon="script.module.requests-cache" version="{REQUESTS_CACHE_VERSION}"/>
-        <import addon="script.module.routing" version="0.2.3"/>
-        <import addon="script.module.future" version="0.17.1"/>
-        <import addon="script.module.kodi-six" version="0.1.3"/>
-        <import addon="script.module.pytz" version="2014.2"/>
-        <import addon="script.module.tzlocal" version="2.0.0"/>
+        <import addon="xbmc.python" version="${XBMC_PYTHON_VERSION}"/>
+        <import addon="script.module.certifi" version="${CERTIFI_VERSION}"/>
+        <import addon="script.module.requests" version="${REQUESTS_VERSION}"/>
+        <import addon="script.module.requests-cache" version="${REQUESTS_CACHE_VERSION}"/>
+        <import addon="script.module.routing" version="${ROUTING_VERSION}"/>
+        <import addon="script.module.future" version="${FUTURE_VERSION}"/>
+        <import addon="script.module.kodi-six" version="${KODI_SIX_VERSION}"/>
+        <import addon="script.module.pytz" version="${PYTZ_VERSION}"/>
+        <import addon="script.module.tzlocal" version="${TZLOCAL_VERSION}"/>
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
@@ -21,7 +21,7 @@
         <description lang="en_GB">
 Watch NHK World Japan in HD (up-to 1080P) - includes live stream, news and on-demand programs.
 
-Tested on Kodi 18.6 and 19. I built this plugin because NHK does not support Android TV (yet).
+Tested on Kodi 18.6+ and 19. I built this plugin because NHK does not support Android TV (yet).
 
 NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality. By default the plug-in will play 1080P.
 
