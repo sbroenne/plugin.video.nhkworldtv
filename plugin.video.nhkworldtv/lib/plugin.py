@@ -569,6 +569,38 @@ def vod_index():
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_programs),
                                 li, True)
+    # Latest Episodes
+    li = xbmcgui.ListItem(kodiutils.get_string(30043))
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(
+        plugin.handle,
+        plugin.url_for(vod_episode_list, 'get_latest_episodes', 'None', 0,
+                       xbmcplugin.SORT_METHOD_UNSORTED), li, True)
+
+    # Most Watched
+    li = xbmcgui.ListItem(kodiutils.get_string(30044))
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(
+        plugin.handle,
+        plugin.url_for(vod_episode_list, 'get_most_watched_episodes', 'None',
+                       0, xbmcplugin.SORT_METHOD_UNSORTED), li, True)
+
+    # We, in the Time of Corona
+    li = xbmcgui.ListItem(kodiutils.get_string(30047))
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(
+        plugin.handle,
+        plugin.url_for(vod_episode_list, 'get_programs_episode_list',
+                       'inthetimeofcorona', 1,
+                       xbmcplugin.SORT_METHOD_UNSORTED), li, True)
+
+    # Documentaries
+    li = xbmcgui.ListItem(kodiutils.get_string(30046))
+    li.setArt(art)
+    xbmcplugin.addDirectoryItem(
+        plugin.handle,
+        plugin.url_for(vod_episode_list, 'get_categories_episode_list', 15, 0,
+                       xbmcplugin.SORT_METHOD_UNSORTED), li, True)
     # Categories
     li = xbmcgui.ListItem(kodiutils.get_string(30041))
     li.setArt(art)
@@ -579,20 +611,7 @@ def vod_index():
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_playlists),
                                 li, True)
-    # Latest Episodes
-    li = xbmcgui.ListItem(kodiutils.get_string(30043))
-    li.setArt(art)
-    xbmcplugin.addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(vod_episode_list, 'get_latest_episodes', 'None', 0,
-                       xbmcplugin.SORT_METHOD_UNSORTED), li, True)
-    # Most Watched
-    li = xbmcgui.ListItem(kodiutils.get_string(30044))
-    li.setArt(art)
-    xbmcplugin.addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(vod_episode_list, 'get_most_watched_episodes', 'None',
-                       0, xbmcplugin.SORT_METHOD_UNSORTED), li, True)
+
     # All
     li = xbmcgui.ListItem(kodiutils.get_string(30045))
     li.setArt(art)
@@ -744,7 +763,6 @@ def add_playable_episode_directory_item(episode, enforce_cache=False):
         if (episode.vod_id in PROGRAM_METADATA_CACHE):
             cached_episode = PROGRAM_METADATA_CACHE[episode.vod_id]
             # In cache - display directly
-
             # If we should use 720P or there is no 1080P file, use the 720P file
             if ((USE_720P) or (cached_episode['Path1080P'] is None)):
                 episode.url = cached_episode['Path720P']
