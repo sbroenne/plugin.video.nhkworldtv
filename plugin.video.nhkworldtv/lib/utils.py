@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import re
 import requests
+from requests.models import Response
 import requests_cache
 from kodi_six import xbmc, xbmcaddon
 from . import api_keys
@@ -88,6 +89,7 @@ def get_url(url, cached=True):
     else:
         request_params = None
 
+    r = Response()
     # maximum number of retries
     max_retries = 3
     current_try = 1
