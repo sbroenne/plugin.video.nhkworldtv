@@ -27,7 +27,7 @@ else:
     UNIT_TEST = True
 
 URL_CACHE_MINUTES = ADDON.getSettingInt('url_cache_minutes')
-# Enforce minimu 60 minutes caching
+# Enforce minimum 60 minutes caching
 if URL_CACHE_MINUTES < 60:
     URL_CACHE_MINUTES = 60
 
@@ -95,7 +95,7 @@ def get_url(url, cached=True):
     while (current_try <= max_retries):
         ignore_sqlite_error = False
         # Make an API Call
-        xbmc.log('Making API Call {0} ({1} of {2})'.format(
+        xbmc.log('Fetching URL:{0} ({1} of {2})'.format(
             url, current_try, max_retries))
 
         try:
@@ -126,7 +126,7 @@ def get_url(url, cached=True):
 
         if (r.status_code == 200):
             # Call was successfull
-            xbmc.log('Successfully fetched URL/API: {0} - Status {1} \
+            xbmc.log('Successfully fetched URL: {0} - Status {1} \
                  - Retrieved from cache {2}'.format(r.url, r.status_code,
                                                     r.from_cache))
             return (r)
@@ -138,21 +138,22 @@ def get_url(url, cached=True):
                 # with the NHK Website
                 # Raise exception
                 xbmc.log(
-                    'Could not get URL {0} - HTTP Status Code {1} \
-                    - Retries {2}'.format(r.url, r.status_code, current_try),
-                    xbmc.LOGFATAL)
-                r.raise_for_status()
+                    'FATAL: Could not get URL {0} after {2} retries'.format(
+                        r.url, current_try), xbmc.LOGFATAL)
+                # Only raise the status if it was 502
+                if (r.status_code == 502):
+                    r.raise_for_status()
             else:
-                # Try again - this usually fixes the error
+                # Try again - this usually fixes the error with the next request
                 xbmc.log(
-                    'Failure fetching URL: {0} with Status {1})'.format(
-                        r.url, r.status_code), xbmc.LOGWARNING)
+                    'Temporary failure fetching URL: {0} with Status {1})'.
+                    format(r.url, r.status_code), xbmc.LOGWARNING)
                 current_try = current_try + 1
         else:
-            # Other error
+            # Other HTTP error - do not retry
             xbmc.log(
-                'Could not get URL {0} - HTTP Status Code {1} - Retries {2}'.
-                format(r.url, r.status_code, current_try), xbmc.LOGFATAL)
+                'Could not get URL {0} - HTTP Status Code {1}'.format(
+                    r.url, r.status_code), xbmc.LOGFATAL)
             r.raise_for_status()
             exit
 

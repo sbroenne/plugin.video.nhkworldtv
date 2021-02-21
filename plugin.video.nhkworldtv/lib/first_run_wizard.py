@@ -2,7 +2,6 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from kodi_six import xbmc, xbmcgui
-from .kodiutils import get_string
 
 
 def show_wizard(ADDON):
@@ -57,9 +56,7 @@ def show_wizard(ADDON):
     lines.append(
         'NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality.'
     )
-    lines.append(
-        'By default the plug-in will play 1080P.'
-    )
+    lines.append('By default the plug-in will play 1080P.')
     lines.append(
         'If you encounter buffering issues, you can select a lower quality by changing the "Use 720P instead of 1080P" addon-setting.'
     )

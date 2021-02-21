@@ -917,7 +917,7 @@ def play_vod_episode(vod_id, disable_cache=False):
         else:
             episode.url = cached_episode['Path1080P']
 
-        xbmc.log('Episode URL:'.format(episode.url))
+        xbmc.log('Episode URL: {0}'.format(episode.url))
         episode.aspect = cached_episode['Aspect']
         episode.width = cached_episode['Width']
         episode.height = cached_episode['Height']

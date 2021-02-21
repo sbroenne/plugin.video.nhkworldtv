@@ -1,8 +1,6 @@
 from __future__ import division
 import datetime
 import unittest  # The test framework
-import requests
-
 import lib.nhk_api as nhk_api
 import lib.utils as utils
 
