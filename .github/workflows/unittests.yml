@@ -24,7 +24,7 @@ jobs:
 
       - name: Use correct Pipfile
         run: |
-          echo "Pipfile to be used: Pipfile ${{ matrix.python-version }}"
+          echo "Pipfile to be used: Pipfile${{ matrix.python-version }}"
           cp Pipfile${{ matrix.python-version }} Pipfile
 
       - name: Delete sqlite DB if it exists
@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies with pipenv
         run: |
-          pip install pipenv --user
+          pip install pipenv
           pipenv install --dev
 
       - name: Install pre-requisites (Kodi Six/Routing)
