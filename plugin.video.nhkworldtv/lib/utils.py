@@ -138,7 +138,7 @@ def get_url(url, cached=True):
                 # with the NHK Website
                 # Raise exception
                 xbmc.log(
-                    'FATAL: Could not get URL {0} after {2} retries'.format(
+                    'FATAL: Could not get URL {0} after {1} retries'.format(
                         r.url, current_try), xbmc.LOGFATAL)
                 # Only raise the status if it was 502
                 if (r.status_code == 502):
