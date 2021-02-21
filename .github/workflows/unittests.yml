@@ -1,11 +1,8 @@
-# .github/workflows/unittests.yml
-
-name: UnitTests
-
+name: Run Pytest unit tests for every Python file change
 on:
   push:
-    #paths:
-      #- "**.py"
+    paths:
+      - "**.py"
   schedule:
     # Run every Saturday at 01:00
     - cron: "0 1 * * 5"
@@ -52,6 +49,6 @@ jobs:
           pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=200 --statistics
         working-directory: plugin.video.nhkworldtv
 
-      #- name: Run Unit Tests with pytest
-      #  run:  pipenv run pytest
-      #  working-directory: plugin.video.nhkworldtv
+      - name: Run Unit Tests with pytest
+        run: pipenv run pytest
+        working-directory: plugin.video.nhkworldtv

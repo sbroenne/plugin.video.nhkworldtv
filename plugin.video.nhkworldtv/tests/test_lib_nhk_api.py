@@ -1,22 +1,15 @@
 import unittest  # The test framework
 import lib.nhk_api as nhk_api
+import lib.utils as utils
 
 
 class Test_Test_nhk_api(unittest.TestCase):
-    def test_nhk_api_episodes(self):
-        self.assertIsNotNone(nhk_api.rest_url['get_all_episodes'])
 
-    def test_nhk_api_live_stream_url(self):
-        self.assertIsNotNone(nhk_api.rest_url['live_stream_url'])
-
-    def test_nhk_api_player_url(self):
-        self.assertIsNotNone(nhk_api.rest_url['player_url'])
-
-    def test_nhk_api_video_url(self):
-        self.assertIsNotNone(nhk_api.rest_url['video_url'])
-
+    # Test dynamically parsed API URL
     def test_nhk_api_ondemand_url(self):
-        self.assertIsNotNone(nhk_api.rest_url['homepage_ondemand'])
+        self.assertTrue(
+            utils.get_url(nhk_api.rest_url['homepage_ondemand'],
+                          False).status_code == 200)
 
 
 if __name__ == '__main__':

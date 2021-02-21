@@ -41,9 +41,8 @@ requests_cache.remove_expired_responses()
 s = requests.Session()
 # Act like a browser
 headers = {
-    'agent':
-    'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 \
-    (KHTML, like Gecko) Chrome/82.0.4080.0 Mobile Safari/537.36'
+    'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74'
 }
 s.headers = headers
 

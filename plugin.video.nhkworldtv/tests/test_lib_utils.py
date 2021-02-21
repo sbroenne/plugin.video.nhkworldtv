@@ -9,9 +9,9 @@ import lib.utils as utils
 
 class Test_Test_utils(unittest.TestCase):
     def test_get_HTTPS(self):
-        self.assertIsInstance(
-            utils.get_url('https://www3.nhk.or.jp/nhkworld/'),
-            requests.Response)
+        self.assertTrue(
+            utils.get_url('https://www3.nhk.or.jp/nhkworld/',
+                          False).status_code == 200)
 
     def test_get_JSON_cached(self):
         self.assertIsInstance(
@@ -50,8 +50,7 @@ class Test_Test_utils(unittest.TestCase):
 
     def test_get_local_timestamp_from_news_datestring(self):
         datestring = '20200416130000'
-        local_datetime = utils.get_timestamp_from_datestring(
-            datestring)
+        local_datetime = utils.get_timestamp_from_datestring(datestring)
         self.assertIsNotNone(local_datetime)
 
 

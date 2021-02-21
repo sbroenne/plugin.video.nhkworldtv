@@ -1,10 +1,10 @@
+name: Create NHK World TV Release for Kodi Leia and Matrix
+
 on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
-
-name: Create NHK World TV Release for Kodi Leia and Matrix
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   build:
@@ -35,7 +35,7 @@ jobs:
           chmod u+x build.sh
           ./build.sh
           echo "::set-output name=plugin_zip::./build/$KODI_VERSION/dist/plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip"
-          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip"  
+          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip"
         working-directory: build
       - name: Create Release
         id: create_release
@@ -53,7 +53,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ${{ steps.build_zip_leia.outputs.plugin_zip }}
           asset_name: ${{ steps.build_zip_leia.outputs.plugin_name }}
           asset_content_type: application/zip
@@ -63,7 +63,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ${{ steps.build_zip_matrix.outputs.plugin_zip }}
           asset_name: ${{ steps.build_zip_matrix.outputs.plugin_name }}
           asset_content_type: application/zip
