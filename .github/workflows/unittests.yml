@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [2.7]
+        python-version: [2.7, 3.8]
 
     steps:
       - uses: actions/checkout@v2
@@ -22,22 +22,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Change Python version in the Pipfile
+      - name: Use correct Pipfile
         run: |
-          rm -f Pipfile.lock
-          echo "Pipfile Python version: ${{ matrix.python-version }}"
-          sed -i 's/2.7/${{ matrix.python-version }}/g' Pipfile
+          echo "Pipfile to be used: Pipfile ${{ matrix.python-version }}"
+          cp Pipfile${{ matrix.python-version }} Pipfile
+
+      - name: Delete sqlite DB if it exists
+        run: |
+          rm -f nhk_world_cache.sqlite
 
       - name: Install dependencies with pipenv
         run: |
-          pip install pipenv
-          pipenv install --deploy --dev
+          pip install pipenv --user
+          pipenv install --dev
 
       - name: Install pre-requisites (Kodi Six/Routing)
         env:
           PYTHON_VERSION: ${{ matrix.python-version }}
         run: |
-          chmod u+x install_packages.sh
           pipenv run ./install_packages.sh
         working-directory: build
 
@@ -50,5 +52,6 @@ jobs:
         working-directory: plugin.video.nhkworldtv
 
       - name: Run Unit Tests with pytest
-        run: pipenv run pytest
+        run: |
+          pipenv run pytest
         working-directory: plugin.video.nhkworldtv

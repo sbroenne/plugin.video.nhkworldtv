@@ -6,7 +6,7 @@ The plugin version is determined from the latest Git Tag (e.g. _v1.0.0_). You ca
 
 ## Prerequsites
 
-Pipenv is used to install the required [Python packages](../Pipfile) where possible.
+Pipenv is used to install the required [Python packages](../Pipfile) where possible. There is a Pipfile for Python version 2.7 and 3.8. You need to rename it to **Pipfile** before you can use Pipenv.
 
 ### GNU Sed
 
@@ -17,7 +17,6 @@ If you develop on a Mac, you need to use GNU sed insted of the default MacOsX se
 I use two packages (kodi-six and routing) that are not in PyPi. You need to manually install them once with the [install_packages script](./install_packages.sh) - this only needs to be done once.
 
 ```bash
-chmod u+x install_packages.sh
 pipenv run ./install_packages.sh
 ```
 
