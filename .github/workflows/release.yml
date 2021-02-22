@@ -33,7 +33,7 @@ jobs:
         id: build_zip_leia
         run: |
           echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
-          echo "::set-output name=plugin_name:plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
+          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
       - name: Set matrix release information
         id: build_zip_matrix
         run: |
