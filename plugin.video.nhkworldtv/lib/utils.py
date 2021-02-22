@@ -91,7 +91,7 @@ def get_url(url, cached=True):
 
     while (current_try <= max_retries):
         ignore_sqlite_error = False
-        status_code = 0
+        status_code = 999
         # Make an API Call
         xbmc.log('Fetching URL:{0} ({1} of {2})'.format(
             url, current_try, max_retries))
@@ -110,13 +110,6 @@ def get_url(url, cached=True):
                         r = s.get(url, params=request_params)
                     else:
                         r = s.get(url)
-            status_code = r.status_code
-            if (status_code == 200):
-                # Call was successfull
-                xbmc.log('Successfully fetched URL: {0} - Status {1} \
-                    - Retrieved from cache {2}'.format(url, status_code,
-                                                       r.from_cache))
-                break
         except (sqlite3.OperationalError):
             # Catch transient requests-cache SQL Lite error
             # This is a race condition I think, it takes time for
@@ -128,15 +121,22 @@ def get_url(url, cached=True):
             xbmc.log('Catching sqlite3.OperationlError: {0}'.format(
                 sqlite3.OperationalError.message))
             ignore_sqlite_error = True
-            status_code = 1
+        else:
+            status_code = r.status_code
 
-        if (status_code == 502 or ignore_sqlite_error):
-            # Bad Gateway or SQL Lite Operational exception
+        if (status_code == 200):
+            # Call was successfull
+            xbmc.log('Successfully fetched URL: {0} - Status {1} \
+                    - Retrieved from cache {2}'.format(url, status_code,
+                                                       r.from_cache))
+            break
+
+        elif (status_code == 502 or ignore_sqlite_error):
+            # Bad Gateway or SQL Lite Operational exception - can be retried
             if (current_try == max_retries):
                 # Max retries reached - still could not get url
                 # Failure - no way to handle - probably an issue
                 # with the NHK Website
-                # Raise exception
                 xbmc.log(
                     'FATAL: Could not get URL {0} after {1} retries'.format(
                         url, current_try), xbmc.LOGFATAL)
@@ -147,15 +147,17 @@ def get_url(url, cached=True):
                 xbmc.log(
                     'Temporary failure fetching URL: {0} with Status {1})'.
                     format(url, status_code), xbmc.LOGWARNING)
-                current_try = current_try + 1
-                # Wait for 500ms before the next call
-                time.sleep(.500)
+
+                # Wait for 1s before the next call
+                time.sleep(1)
         else:
             # Other HTTP error - FATAL, do not retry
             xbmc.log(
                 'FATAL: Could not get URL: {0} - HTTP Status Code {1}'.format(
                     url, status_code), xbmc.LOGFATAL)
             break
+
+        current_try = current_try + 1
 
     if (r is not None):
         return (r)

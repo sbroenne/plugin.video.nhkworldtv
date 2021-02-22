@@ -24,6 +24,9 @@ class Test_Test_utils(unittest.TestCase):
         self.assertIsInstance(
             utils.get_json(nhk_api.rest_url['get_livestream'], False), dict)
 
+    def test_get_JSON_invalid(self):
+        self.assertIsNone(utils.get_json('https://www3.nhk.or.jp/nhkworld/'))
+
     def test_get_NHK_website_url(self):
         self.assertEqual(utils.get_NHK_website_url('/nhkworld/'),
                          'https://www3.nhk.or.jp/nhkworld/')
