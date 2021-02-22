@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.139" provider-name="sbroenne">
+    <requires>
+        <import addon="xbmc.python" version="2.26.0"/>
+        <import addon="script.module.certifi" version="2019.9.11"/>
+        <import addon="script.module.requests" version="2.22.0"/>
+        <import addon="script.module.requests-cache" version="0.4.13"/>
+        <import addon="script.module.routing" version="0.2.3"/>
+        <import addon="script.module.future" version="0.17.1"/>
+        <import addon="script.module.kodi-six" version="0.1.3"/>
+        <import addon="script.module.pytz" version="2014.2"/>
+        <import addon="script.module.tzlocal" version="2.0.0"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="main.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Watch NHK World Japan in HD - live stream and on-demand programs</summary>
+        <description lang="en_GB">
+Watch NHK World Japan in HD - includes live stream, news and on-demand programs.
+
+Tested on Kodi 18.6+ and 19. I built this plugin because NHK does not support Android TV (yet).
+
+NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality. By default the plug-in will play 1080P. If you encounter buffering issues, you can select a lower quality by changing the 'Use 720P instead of 1080P' addon-setting.
+        </description>
+        <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
+        <platform>all</platform>
+        <license>GPL-3.0</license>
+        <forum></forum>
+        <language>en_GB</language>
+        <email>stefan_broenner@yahoo.com</email>
+        <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
+        <news>
+Added "We, in the Time of Corona" and "Documentaries" sections
+        </news>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+            <screenshot>resources/screenshot01.jpeg</screenshot>
+            <screenshot>resources/screenshot02.jpeg</screenshot>
+            <screenshot>resources/screenshot03.jpeg</screenshot>
+        </assets>
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+    </extension>
+</addon>

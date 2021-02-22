@@ -1,3 +1,8 @@
 * text=auto eol=lf
 *.{cmd,[cC][mM][dD]} text eol=crlf
 *.{bat,[bB][aA][tT]} text eol=crlf
+.gitignore export-ignore
+.gitattributes export-ignore
+.github export-ignore
+plugin.video.nhkworldtv/tests export-ignore
+plugin.video.nhkworldtv/addon_template.xml export-ignore
