@@ -2,7 +2,7 @@
 # Build NK World TV for Kodi Leia (18.5+)
 
 # Set the git tag
-export GIT_TAG=$(git describe --abbrev=0)
+export GIT_TAG=$(git describe --tags --abbrev=0)
 # Set plugin version
 export PLUGIN_VERSION=${GIT_TAG:1}
 
