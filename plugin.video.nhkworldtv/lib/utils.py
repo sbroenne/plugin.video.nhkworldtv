@@ -42,7 +42,7 @@ s = requests.Session()
 # Act like a browser
 headers = {
     'User-Agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.74'
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182'
 }
 s.headers = headers
 
@@ -88,12 +88,13 @@ def get_url(url, cached=True):
     else:
         request_params = None
 
-    r = Response()
     # maximum number of retries
     max_retries = 3
     current_try = 1
     while (current_try <= max_retries):
         ignore_sqlite_error = False
+        status_code = 0
+        r = Response()
         # Make an API Call
         xbmc.log('Fetching URL:{0} ({1} of {2})'.format(
             url, current_try, max_retries))
@@ -112,6 +113,13 @@ def get_url(url, cached=True):
                         r = s.get(url, params=request_params)
                     else:
                         r = s.get(url)
+            status_code = r.status_code
+            if (status_code == 200):
+                # Call was successfull
+                xbmc.log('Successfully fetched URL: {0} - Status {1} \
+                    - Retrieved from cache {2}'.format(url, status_code,
+                                                       r.from_cache))
+                return (r)
         except (sqlite3.OperationalError):
             # Catch transient requests-cache SQL Lite error
             # This is a race condition I think, it takes time for
@@ -124,13 +132,7 @@ def get_url(url, cached=True):
                 sqlite3.OperationalError.message))
             ignore_sqlite_error = True
 
-        if (r.status_code == 200):
-            # Call was successfull
-            xbmc.log('Successfully fetched URL: {0} - Status {1} \
-                 - Retrieved from cache {2}'.format(r.url, r.status_code,
-                                                    r.from_cache))
-            return (r)
-        elif (r.status_code == 502 or ignore_sqlite_error):
+        if (status_code == 502 or ignore_sqlite_error):
             # Bad Gateway or SQL Lite Operational exception
             if (current_try == max_retries):
                 # Max retries reached - still could not get url
@@ -139,23 +141,22 @@ def get_url(url, cached=True):
                 # Raise exception
                 xbmc.log(
                     'FATAL: Could not get URL {0} after {1} retries'.format(
-                        r.url, current_try), xbmc.LOGFATAL)
-                # Only raise the status if it was 502
-                if (r.status_code == 502):
-                    r.raise_for_status()
+                        url, current_try), xbmc.LOGFATAL)
+                # Return resuls of last request
+                return (r)
             else:
-                # Try again - this usually fixes the error with the next request
+                # Try again - this usually fixes the error with
+                # the next request
                 xbmc.log(
                     'Temporary failure fetching URL: {0} with Status {1})'.
-                    format(r.url, r.status_code), xbmc.LOGWARNING)
+                    format(url, status_code), xbmc.LOGWARNING)
                 current_try = current_try + 1
         else:
-            # Other HTTP error - do not retry
+            # Other HTTP error - FATAL, do not retry
             xbmc.log(
-                'Could not get URL {0} - HTTP Status Code {1}'.format(
-                    r.url, r.status_code), xbmc.LOGFATAL)
-            r.raise_for_status()
-            exit
+                'FATAL: Could not get URL: {0} - HTTP Status Code {1}'.format(
+                    url, status_code), xbmc.LOGFATAL)
+            return (r)
 
 
 def get_NHK_website_url(path):

@@ -6,10 +6,15 @@ import lib.utils as utils
 
 
 class Test_Test_utils(unittest.TestCase):
-    def test_get_HTTPS(self):
+    def test_get_url(self):
         self.assertTrue(
             utils.get_url('https://www3.nhk.or.jp/nhkworld/',
                           False).status_code == 200)
+
+    def test_get_url_notfound(self):
+        self.assertTrue(
+            utils.get_url('https://www3.nhk.or.jp/doesnotexist/',
+                          False).status_code == 404)
 
     def test_get_JSON_cached(self):
         self.assertIsInstance(

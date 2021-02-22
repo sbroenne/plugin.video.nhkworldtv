@@ -133,3 +133,5 @@ dmypy.json
 build/leia/*
 build/matrix/*
 
+Pipfile
+Pipfile.lock
