@@ -10,6 +10,9 @@ jobs:
   build:
     name: Create & Upload ZIP Archive
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -17,26 +20,24 @@ jobs:
         run: echo "GIT_TAG=${GITHUB_REF##*/}"  >> $GITHUB_ENV
       - name: Set Plugin version # GIT_TAG without the preceding v
         run: echo "PLUGIN_VERSION=${GIT_TAG:1}" >> $GITHUB_ENV
-      - name: Build NHK World TV for Kodi Leia # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
+      - name: Deploy pre-requisites
+        id: pre_req
+        run: |
+          pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
+      - name: Build plugin ZIPs for Leia and Matrix
+        id: build_plugin
+        run: |
+          submit-addon -z -m -s plugin.video.nhkworldtv
+      - name: Set Leia release information
         id: build_zip_leia
-        env:
-          KODI_VERSION: "leia"
         run: |
-          chmod u+x build.sh
-          ./build.sh
-          echo "::set-output name=plugin_zip::./build/$KODI_VERSION/dist/plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip"
-          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip"
-        working-directory: build
-      - name: Build NHK World TV for Kodi Matrix # Build Plug-n for Leia - also sets $PLUGIN_VERSION env variable
+          echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
+          echo "::set-output name=plugin_name:plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
+      - name: Set matrix release information
         id: build_zip_matrix
-        env:
-          KODI_VERSION: "matrix"
         run: |
-          chmod u+x build.sh
-          ./build.sh
-          echo "::set-output name=plugin_zip::./build/$KODI_VERSION/dist/plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip"
-          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip"
-        working-directory: build
+          echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
+          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
