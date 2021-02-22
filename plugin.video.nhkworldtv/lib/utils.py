@@ -128,6 +128,7 @@ def get_url(url, cached=True):
             xbmc.log('Catching sqlite3.OperationlError: {0}'.format(
                 sqlite3.OperationalError.message))
             ignore_sqlite_error = True
+            status_code = 1
 
         if (status_code == 502 or ignore_sqlite_error):
             # Bad Gateway or SQL Lite Operational exception
@@ -147,6 +148,8 @@ def get_url(url, cached=True):
                     'Temporary failure fetching URL: {0} with Status {1})'.
                     format(url, status_code), xbmc.LOGWARNING)
                 current_try = current_try + 1
+                # Wait for 500ms before the next call
+                time.sleep(.500)
         else:
             # Other HTTP error - FATAL, do not retry
             xbmc.log(
