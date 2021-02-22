@@ -3,7 +3,6 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import re
 import requests
-from requests.models import Response
 import requests_cache
 from kodi_six import xbmc, xbmcaddon
 from . import api_keys
@@ -66,14 +65,12 @@ def get_json(url, cached=True):
     r = get_url(url, cached)
     try:
         result = r.json()
-        xbmc.log(
-            'Successfully loaded JSON from API: {0} with Status {1}'.format(
-                r.url, r.status_code))
+        xbmc.log('Successfully loaded JSON from API: {0}'.format(r.url))
         return (result)
-    finally:
+    except (ValueError):
         # Failure - no way to handle - probably an issue with the NHK Website
-        # Raise exception
-        r.raise_for_status()
+        xbmc.log('Could not parse JSON from API: {0}'.format(r.url),
+                 xbmc.LOGFATAL)
 
 
 def get_url(url, cached=True):
@@ -91,10 +88,10 @@ def get_url(url, cached=True):
     # maximum number of retries
     max_retries = 3
     current_try = 1
+
     while (current_try <= max_retries):
         ignore_sqlite_error = False
         status_code = 0
-        r = Response()
         # Make an API Call
         xbmc.log('Fetching URL:{0} ({1} of {2})'.format(
             url, current_try, max_retries))
@@ -119,7 +116,7 @@ def get_url(url, cached=True):
                 xbmc.log('Successfully fetched URL: {0} - Status {1} \
                     - Retrieved from cache {2}'.format(url, status_code,
                                                        r.from_cache))
-                return (r)
+                break
         except (sqlite3.OperationalError):
             # Catch transient requests-cache SQL Lite error
             # This is a race condition I think, it takes time for
@@ -142,8 +139,7 @@ def get_url(url, cached=True):
                 xbmc.log(
                     'FATAL: Could not get URL {0} after {1} retries'.format(
                         url, current_try), xbmc.LOGFATAL)
-                # Return resuls of last request
-                return (r)
+                break
             else:
                 # Try again - this usually fixes the error with
                 # the next request
@@ -156,7 +152,10 @@ def get_url(url, cached=True):
             xbmc.log(
                 'FATAL: Could not get URL: {0} - HTTP Status Code {1}'.format(
                     url, status_code), xbmc.LOGFATAL)
-            return (r)
+            break
+
+    if (r is not None):
+        return (r)
 
 
 def get_NHK_website_url(path):

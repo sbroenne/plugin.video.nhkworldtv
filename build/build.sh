@@ -14,43 +14,54 @@ echo "Building NHK World TV version: $PLUGIN_VERSION"
 echo "Kodi version: $KODI_VERSION"
 
 echo "1. Pre-build clean-up"
-# Clean-up
+# Clean-up everything
 rm -rf $KODI_VERSION
-rm -rf $KODI_VERSION/dist
-# Cleanup DEV artifacts
+
+# Create Plugin directory
+export DEST_DIR=$KODI_VERSION/plugin.video.nhkworldtv
+export SOURCE_DIR='../plugin.video.nhkworldtv'
+echo "Plugin source: $SOURCE_DIR"
+echo "Plugin destination: $DEST_DIR"
+
+# Creating target
 mkdir $KODI_VERSION
-cp -r ../plugin.video.nhkworldtv $KODI_VERSION
-rm -rf $KODI_VERSION/plugin.video.nhkworldtv/tests
-rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/api_json.js
-rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/*.pyc
-rm -f $KODI_VERSION/plugin.video.nhkworldtv/lib/*.pyo
-rm -f $KODI_VERSION/plugin.video.nhkworldtv/tests
-rm -f $KODI_VERSION/plugin.video.nhkworldtv/nhk_world_cache.sqlite
-rm -rf $KODI_VERSION/plugin.video.nhkworldtv/.pytest*
-rm -rf $KODI_VERSION/plugin.video.nhkworldtv/.vscode
+mkdir $DEST_DIR
+mkdir $DEST_DIR/lib
+mkdir $DEST_DIR/resources
 
-echo "2. envsubst addon.xml"
+# Copying resources
+echo "2. Copying resources from $SOURCE_DIR to $DEST_DIR"
+cp $SOURCE_DIR/addon_template.xml $DEST_DIR
+cp $SOURCE_DIR/LICENSE $DEST_DIR
+cp $SOURCE_DIR/main.py $DEST_DIR
+cp $SOURCE_DIR/lib/*.py $DEST_DIR/lib
+cp -r $SOURCE_DIR/resources $DEST_DIR
+
+echo "3. envsubst addon.xml"
 # Substitute the env variable reference in addon.xml with the env variables 
-envsubst < $KODI_VERSION/plugin.video.nhkworldtv/addon_template.xml > $KODI_VERSION/plugin.video.nhkworldtv/addon.xml
-rm -f $KODI_VERSION/plugin.video.nhkworldtv/addon_template.xml
+envsubst < $DEST_DIR/addon_template.xml > $DEST_DIR/addon.xml
+rm -f $DEST_DIR/addon_template.xml
 
-echo "3. Packing the plugin"
+echo "4. Packing the plugin"
 # Create distribution folder
 mkdir $KODI_VERSION/dist
 cd $KODI_VERSION/dist
 
 # Pack plug-in with create_repository
-../../create_repository.py ../plugin.video.nhkworldtv
+python3 ../../create_repository.py $SOURCE_DIR
+
+# Only used by the Github release action
 cp ./plugin.video.nhkworldtv/plugin.video.nhkworldtv-$PLUGIN_VERSION.zip plugin.video.nhkworldtv-$PLUGIN_VERSION-$KODI_VERSION.zip
 
-echo "4. Copying addtional resources"
+echo "5. Copying addtional resources"
 # Copy resources so that the Install Plug-in dialog in Kodi can display them
-mkdir plugin.video.nhkworldtv/resources
-cp ../plugin.video.nhkworldtv/resources/*.jpeg plugin.video.nhkworldtv/resources
-cp ../plugin.video.nhkworldtv/resources/*.jpg plugin.video.nhkworldtv/resources
-cp ../plugin.video.nhkworldtv/resources/*.png plugin.video.nhkworldtv/resources
 
-echo "5. Post-build clean-up"
+mkdir plugin.video.nhkworldtv/resources
+cp $SOURCE_DIR/resources/*.jpeg plugin.video.nhkworldtv/resources
+cp $SOURCE_DIR/resources/*.jpg plugin.video.nhkworldtv/resources
+cp $SOURCE_DIR/resources/*.png plugin.video.nhkworldtv/resources
+
+echo "6. Post-build clean-up"
 # Clean addon.xml - created by create_repository but not needed here
 rm -f addons*
 cd ../..
