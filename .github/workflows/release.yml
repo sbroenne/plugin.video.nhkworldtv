@@ -23,8 +23,8 @@ jobs:
       - name: Deploy pre-requisites
         id: pre_req
         run: |
-          pip3 install setuptools
-          pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
+          sudo pip3 install setuptools
+          sudo pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
       - name: Build plugin ZIPs for Leia and Matrix
         id: build_plugin
         run: |
