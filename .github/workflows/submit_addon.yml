@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: Create & Upload ZIP Archive
+    name: Build and push to Kodi repo
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -13,8 +13,8 @@ jobs:
       - name: Deploy pre-requisites
         id: pre_req
         run: |
-          sudo pip3 install setuptools
-          sudo pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
+          sudo -H pip3 install setuptools
+          sudo -H pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
       - name: Push to Kodi repo and create PR
         id: kodi-push
         env:

@@ -21,9 +21,9 @@ jobs:
       - name: Deploy pre-requisites
         id: pre_req
         run: |
-          sudo pip3 install setuptools
-          sudo pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
-          sudo pip3 install kodi-addon-checker
+          sudo -H pip3 install setuptools
+          sudo -H pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
+          sudo -H pip3 install kodi-addon-checker
       - name: Run kodi-addon-checker
         id: kodi-addon-checker
         run: |
