@@ -5,14 +5,12 @@ on:
     # Sequence of patterns matched against refs/tags
     tags:
       - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
 
 jobs:
   build:
     name: Create & Upload ZIP Archive
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.8]
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -25,6 +23,11 @@ jobs:
         run: |
           sudo pip3 install setuptools
           sudo pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
+          sudo pip3 install kodi-addon-checker
+      - name: Run kodi-addon-checker
+        id: kodi-addon-checker
+        run: |
+          kodi-addon-checker --branch leia plugin.video.nhkworldtv
       - name: Build plugin ZIPs for Leia and Matrix
         id: build_plugin
         run: |
