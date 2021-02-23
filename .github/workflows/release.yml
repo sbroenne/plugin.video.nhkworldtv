@@ -42,6 +42,14 @@ jobs:
         run: |
           echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
           echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
+      - name: Push to Kodi repo and create PR
+        id: kodi-push
+        env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EMAIL: ${{secrets.EMAIL}}
+        run: |
+          submit-addon -r repo-plugins -b leia -s plugin.video.nhkworldtv
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
