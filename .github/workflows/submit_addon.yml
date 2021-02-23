@@ -1,0 +1,25 @@
+name: Submit addon to Kodi repo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Create & Upload ZIP Archive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy pre-requisites
+        id: pre_req
+        run: |
+          sudo pip3 install setuptools
+          sudo pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
+      - name: Push to Kodi repo and create PR
+        id: kodi-push
+        env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EMAIL: ${{secrets.EMAIL}}
+        run: |
+          submit-addon -r repo-plugins -b leia -m --push-branch -s plugin.video.nhkworldtv
