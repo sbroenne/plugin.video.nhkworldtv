@@ -4,6 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 
 import random
 import re
+
 import xml.etree.ElementTree as ET
 from builtins import range
 from requests.models import HTTPError
@@ -11,7 +12,7 @@ from requests.models import HTTPError
 import routing
 from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 
-from . import cache_api, kodiutils, nhk_api, utils
+from . import kodiutils, nhk_api, utils, cache_api
 from .episode import Episode
 from . import first_run_wizard
 
@@ -24,6 +25,8 @@ ADDON = xbmcaddon.Addon()
 NHK_ICON = ADDON.getAddonInfo('icon')
 NHK_FANART = ADDON.getAddonInfo('fanart')
 plugin = routing.Plugin()
+USE_CACHE = False
+USE_720P = False
 
 if (utils.UNIT_TEST):
     # Run under unit test - set some default data since we will not be able to
@@ -31,10 +34,10 @@ if (utils.UNIT_TEST):
     MAX_NEWS_DISPLAY_ITEMS = 20
     MAX_ATAGLANCE_DISPLAY_ITEMS = 800
     MAX_PROGRAM_METADATA_CACHE_ITEMS = 2000
+
+    # Always enable meta data cache for testing
     PROGRAM_METADATA_CACHE = utils.get_program_metdadata_cache(
         MAX_PROGRAM_METADATA_CACHE_ITEMS)
-    USE_CACHE = True
-    USE_720P = False
 else:
     xbmc.log('Retrieving plug-in setting')
     # Define how many items should be displayed in News
@@ -46,15 +49,19 @@ else:
         "max_program_metadate_cache_items")
     # Define if to ise 720P instead of 1080P
     USE_720P = ADDON.getSettingBool("use_720P")
+    xbmc.log('Using 720P instead of 1080p: {0}'.format(USE_720P))
 
     # Episode Cache
     if (ADDON.getSettingBool('use_backend')):
+        # Try to get the meta dara cache from Azure
         PROGRAM_METADATA_CACHE = utils.get_program_metdadata_cache(
             MAX_PROGRAM_METADATA_CACHE_ITEMS)
-        USE_CACHE = True
-    else:
-        PROGRAM_METADATA_CACHE = {'CACHE_DISABLED', 'CACHE DISABLED'}
-        USE_CACHE = False
+
+        # Only use it if we got valid json back
+        # Also means that the service is running
+        if (PROGRAM_METADATA_CACHE is not None):
+            USE_CACHE = True
+            xbmc.log('Using program metadata cache from Azure')
 
 
 # Start page of the plug-in
@@ -421,7 +428,8 @@ def add_on_demand_menu_item():
         episode.fanart = program_json['image_pc']
 
         # Create the directory itemn
-        episode.video_info = kodiutils.get_1080_HD_video_info()
+
+        episode.video_info = kodiutils.get_video_info(USE_720P)
         xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_index),
                                     episode.kodi_list_item, True)
         return True
@@ -430,7 +438,16 @@ def add_on_demand_menu_item():
 
 
 # Add live stream menu item
-def add_live_stream_menu_item():
+def add_live_stream_menu_item(use_720p=USE_720P):
+    """[summary]
+        Creates a menu item for the NHK live stream
+    Args:
+        use_720p ([boolean], optional): Use 720P or 1080p.
+        Defaults to USE_720P from add-on settings
+
+    Returns:
+        [Episode]: Episode with the live stream
+    """
     xbmc.log('Adding live stream menu item')
     program_json = utils.get_json(nhk_api.rest_url['get_livestream'],
                                   False)['channel']['item']
@@ -447,16 +464,20 @@ def add_live_stream_menu_item():
     episode.fanart = row['thumbnail']
     episode.IsPlayable = True
     episode.playcount = 0
-    episode.url = nhk_api.rest_url['live_stream_url']
 
     # Title and Description
     plot = '{0}\n\n{1}'.format(row['title'], row['description'])
     episode.plot = plot
 
-    episode.video_info = kodiutils.get_1080_HD_video_info()
+    if use_720p:
+        episode.url = nhk_api.rest_url['live_stream_url_720p']
+    else:
+        episode.url = nhk_api.rest_url['live_stream_url_1080p']
+
+    episode.video_info = kodiutils.get_video_info(use_720p)
     xbmcplugin.addDirectoryItem(plugin.handle, episode.url,
                                 episode.kodi_list_item, False)
-    return (True)
+    return (episode)
 
 
 #
@@ -490,7 +511,7 @@ def add_live_schedule_menu_item():
     episode.plot = '{0}\n\n{1}'.format(
         kodiutils.get_string(30022).format(title), row['description'])
 
-    episode.video_info = kodiutils.get_1080_HD_video_info()
+    episode.video_info = kodiutils.get_video_info(USE_720P)
     xbmcplugin.addDirectoryItem(plugin.handle,
                                 plugin.url_for(live_schedule_index),
                                 episode.kodi_list_item, True)
@@ -539,7 +560,7 @@ def live_schedule_index():
 
         if (episode.IsPlayable):
             # Display the playable episode
-            episodes.append((add_playable_episode_directory_item(episode)))
+            episodes.append((add_playable_episode(episode)))
         else:
             # Simply display text
             episodes.append((None, episode.kodi_list_item, False))
@@ -747,39 +768,46 @@ def vod_playlists():
     return playlist_id
 
 
-def add_playable_episode_directory_item(episode, enforce_cache=False):
-    """ Add a Kodi directory item for a playable episode """
+def add_playable_episode(episode, use_cache=USE_CACHE, use_720p=USE_720P):
+    """ Add a Kodi directory item for a playable episode
+
+    Args:
+        episode ([Episode]): The episode
+        use_720p ([boolean], optional): Use 720P or 1080p.
+        Defaults to USE_720P from add-on settings
+
+    Returns:
+        [type]: [description]
+    """
     # If the vod_id is in cache and cache is being used,
     # diretly add the URL otherwise dynmaically resolve it
     # via play_vod_episode()
     #
     # Use the cache backend or not
-    if (enforce_cache):
-        use_backend = True
-    else:
-        use_backend = USE_CACHE
-
-    if (use_backend):
+    if (use_cache):
         if (episode.vod_id in PROGRAM_METADATA_CACHE):
             cached_episode = PROGRAM_METADATA_CACHE[episode.vod_id]
             # In cache - display directly
             # If we should use 720P or there is no 1080P file, use the 720P file
-            if ((USE_720P) or (cached_episode['Path1080P'] is None)):
-                episode.url = cached_episode['Path720P']
+            if ((use_720p) or (cached_episode['P1080P'] is None)):
+                episode.url = cache_api.base_url + cached_episode['P720P']
+                episode.video_info = kodiutils.get_720_HD_video_info()
             else:
-                episode.url = cached_episode['Path1080P']
+                episode.url = cache_api.base_url + cached_episode['P1080P']
+                episode.video_info = kodiutils.get_1080_HD_video_info()
 
-            episode.aspect = cached_episode['Aspect']
-            episode.width = cached_episode['Width']
-            episode.height = cached_episode['Height']
             episode.onair = cached_episode['OnAir']
 
             returnValue = [episode.url, episode.kodi_list_item, False]
+            xbmc.log("PLAYABLE_EPISODE: Added episode {0} from cache".format(
+                episode.vod_id))
             return (returnValue)
 
     # Not in cache - need to be resolve dynmaically
-    play_url = plugin.url_for(play_vod_episode, episode.vod_id)
-    xbmc.log('Dynamic Play URL: {0}'.format(play_url))
+    xbmc.log("PLAYABLE_EPISODE: Need to resolve episode {0}".format(
+        episode.vod_id))
+    play_url = plugin.url_for(resolve_vod_episode, episode.vod_id)
+    xbmc.log('PLAYABLE_EPISODE: Resolved Play URL: {0}'.format(play_url))
     returnValue = [play_url, episode.kodi_list_item, False]
     return (returnValue)
 
@@ -790,15 +818,23 @@ def vod_episode_list(api_method,
                      id,
                      show_only_subtitle,
                      sort_method,
-                     enforceCache=False):
-    """[summary]
-        Video On Demand - Episode List
+                     unit_test=False):
+    """  Video On Demand - Episode List
 
         Creates a folded with list items based on the requested NHK API Method
         (e.g. Programs, Categories, etc.)
+
+    Args:
+        api_method ([str]): The NHK API method to use
+        id ([str]): ID to use (optional)
+        show_only_subtitle ([bool]): Only show subtitles
+        sort_method ([str]): Sort method to use
+        unit_test ([bool]): Don't add playable episodes while under unit_test
+
     Returns:
-        [Episode] -- [Last Episode that was added]
+        [Episode] -- Last Episode that was added
     """
+
     # Only format api_url when a non-0 valze for id was provided
     # some APIs do not need an id
     if (id != 'None'):
@@ -864,8 +900,10 @@ def vod_episode_list(api_method,
 
         episode.plot = description
 
-        # Add the current episode directory item
-        episodes.append((add_playable_episode_directory_item(episode)))
+        #  Don't add playable episodes while under unit_test
+        if (not unit_test):
+            # Add the current episode directory item
+            episodes.append((add_playable_episode(episode)))
 
     if (row_count) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
@@ -875,107 +913,70 @@ def vod_episode_list(api_method,
                                                   sort_method, 'videos')
 
     # Used for unit testing
-    return episode
+    return (episode)
 
 
-# Video On Demand - Play Episode
-@plugin.route('/vod/play_episode/<vod_id>/')
-def play_vod_episode(vod_id, disable_cache=False):
+# Video On Demand - Resolve episode
+@plugin.route('/vod/resolve_episode/<vod_id>/')
+def resolve_vod_episode(vod_id, use_720p=USE_720P):
+    """ Resolve a VOD episode directly from NHK
 
-    if (disable_cache is True):
-        # Overwrite use of backend
-        use_backend = False
-    else:
-        use_backend = USE_CACHE
+    Args:
+        vod_id ([str]): The VOD Id
+        use_720p ([boolean], optional): Use 720P or 1080p.
+        Defaults to USE_720P from add-on settings
 
-    xbmc.log('VOD_ID: {0}'.format(vod_id))
-    xbmc.log('DISABLE CACHE: {0}'.format(disable_cache))
-    xbmc.log('USE BACKEND: {0}'.format(use_backend))
-    xbmc.log('PLUGIN HANDLE: {0}'.format(plugin.handle))
+    Returns:
+        [Episode]: The resolved Episode - only used for unit testing
+    """
 
     episode = Episode()
     episode.vod_id = vod_id
     episode.IsPlayable = True
+    # Get result from NHK - slower
+    episode.from_cache = False
+    xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
+    r = utils.get_url(nhk_api.rest_url['player_url'].format(vod_id, vod_id))
+    playerJS = r.text
+    # Parse the output of the Player JS file for the UUID of the episode
+    uuid_match = re.compile("'data-de-program-uuid','(.+?)'").findall(playerJS)
+    program_Uuid = uuid_match[0]
 
-    if (use_backend):
-        # Use NHK World TV Cloud Service to speed-up start of episode playback
-        # The service runs on Azure in West Europe but should still
-        # speed up the lookup process dramatically
-        # since it uses a pre-loaded cache
-        xbmc.log('Using Cloud Service to retrieve vod_id: {0}'.format(vod_id))
-        cached_episode = utils.get_json(
-            cache_api.rest_url['cache_get_program'].format(vod_id))
-        episode.title = cached_episode['Title']
-        episode.plot = cached_episode['Plot']
-        episode.pgm_no = cached_episode['PgmNo']
-        if (cached_episode['Duration'] is not None):
-            episode.duration = cached_episode['Duration']
+    # Get episode detail
+    episode_detail = utils.get_json(
+        nhk_api.rest_url['get_episode_detail'].format(
+            vod_id))['data']['episodes'][0]
+    episode.title = episode_detail['title_clean']
+    episode.broadcast_start_date = episode_detail['onair']
+    episode.plot = episode_detail['description_clean']
+    episode.pgm_no = episode_detail['pgm_no']
+    episode.duration = episode_detail['movie_duration']
 
-        # If we should use 720P or there is no 1080P file, use the 720P file
-        if ((USE_720P) or (cached_episode['Path1080P'] is None)):
-            episode.url = cached_episode['Path720P']
-        else:
-            episode.url = cached_episode['Path1080P']
+    # Get episode URL and video information
+    player_url = nhk_api.rest_url['video_url'].format(program_Uuid)
+    assets_json = utils.get_json(
+        player_url)['response']['WsProgramResponse']['program']['asset']
 
-        xbmc.log('Episode URL: {0}'.format(episode.url))
-        episode.aspect = cached_episode['Aspect']
-        episode.width = cached_episode['Width']
-        episode.height = cached_episode['Height']
-        if (cached_episode['OnAir'] is not None):
-            episode.broadcast_start_date = cached_episode['OnAir']
+    # Get the reference file (HD)
+    reference_file_json = assets_json['referenceFile']
+    play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
+
+    # Only add the reference URL if exists (sometimes it doesn't!!)
+    reference_url = nhk_api.rest_url['episode_url'].format(play_path)
+    if ((utils.check_url_exists(reference_url) is True) and not use_720p):
+        episode.url = nhk_api.rest_url['episode_url'].format(play_path)
+        episode.video_info = kodiutils.get_1080_HD_video_info()
     else:
-        # Get result from NHK - slower
-        xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
-        r = utils.get_url(nhk_api.rest_url['player_url'].format(
-            vod_id, vod_id))
-        playerJS = r.text
-        # Parse the output of the Player JS file for the UUID of the episode
-        uuid_match = re.compile("'data-de-program-uuid','(.+?)'").findall(
-            playerJS)
-        program_Uuid = uuid_match[0]
-
-        # Get episode detail
-        episode_detail = utils.get_json(
-            nhk_api.rest_url['get_episode_detail'].format(
-                vod_id))['data']['episodes'][0]
-        episode.title = episode_detail['title_clean']
-        episode.broadcast_start_date = episode_detail['onair']
-        episode.plot = episode_detail['description_clean']
-        episode.pgm_no = episode_detail['pgm_no']
-        episode.duration = episode_detail['movie_duration']
-
-        # Get episode URL and video information
-        player_url = nhk_api.rest_url['video_url'].format(program_Uuid)
-        assets_json = utils.get_json(
-            player_url)['response']['WsProgramResponse']['program']['asset']
-
-        # Get the reference file (HD)
-        reference_file_json = assets_json['referenceFile']
-        play_path = reference_file_json['rtmp']['play_path'].split('?')[0]
-
-        # Only add the reference URL if exists (sometimes it doesn't!!)
-        reference_url = nhk_api.rest_url['episode_url'].format(play_path)
-        if ((utils.check_url_exists(reference_url) is True) and not USE_720P):
-            episode.url = nhk_api.rest_url['episode_url'].format(play_path)
-            episode.aspect = reference_file_json['aspectRatio']
-            episode.width = reference_file_json['videoWidth']
-            episode.height = reference_file_json['videoHeight']
-        else:
-            # Prefer 720P or video doesn't have a reference file.
-            # Then use the 720P Version instead
-            # Asset #0 is the 720P Version
-            asset = assets_json['assetFiles'][0]
-            play_path = asset['rtmp']['play_path'].split('?')[0]
-            episode.url = nhk_api.rest_url['episode_url'].format(play_path)
-            episode.aspect = asset['aspectRatio']
-            episode.width = asset['videoWidth']
-            episode.height = asset['videoHeight']
-
-        # Log the Episode URL
-        xbmc.log('Episode URL: {0}'.format(episode.url))
+        # Prefer 720P or video doesn't have a reference file.
+        # Then use the 720P Version instead
+        # Asset #0 is the 720P Version
+        asset = assets_json['assetFiles'][0]
+        play_path = asset['rtmp']['play_path'].split('?')[0]
+        episode.url = nhk_api.rest_url['episode_url'].format(play_path)
+        episode.video_info = kodiutils.get_720_HD_video_info()
 
     xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
-    return (episode.url)
+    return (episode)
 
 
 #  Play News or At A Glance Item

@@ -16,6 +16,9 @@ class Test_Test_utils(unittest.TestCase):
             utils.get_url('https://www3.nhk.or.jp/doesnotexist/',
                           False).status_code == 404)
 
+    def test_get_url_notexists(self):
+        self.assertIsNone(utils.get_url('http://doesnotexist'))
+
     def test_get_JSON_cached(self):
         self.assertIsInstance(
             utils.get_json(nhk_api.rest_url['get_livestream']), dict)
@@ -26,6 +29,9 @@ class Test_Test_utils(unittest.TestCase):
 
     def test_get_JSON_invalid(self):
         self.assertIsNone(utils.get_json('https://www3.nhk.or.jp/nhkworld/'))
+
+    def test_get_JSON_notexists(self):
+        self.assertIsNone(utils.get_json('http://doesnotexist'))
 
     def test_get_NHK_website_url(self):
         self.assertEqual(utils.get_NHK_website_url('/nhkworld/'),
@@ -51,7 +57,7 @@ class Test_Test_utils(unittest.TestCase):
                          '1001_20200413171930_')
 
     def test_get_metadata_cache(self):
-        cache = utils.get_program_metdadata_cache(100)
+        cache = utils.get_program_metdadata_cache(2000)
         self.assertIsNotNone(cache)
 
     def test_get_local_timestamp_from_news_datestring(self):
