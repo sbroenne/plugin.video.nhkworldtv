@@ -44,6 +44,7 @@ class Episode(object):
         self._cast = None
         self._kodi_list_item = xbmcgui.ListItem
         self.absolute_image_url = False
+        self.from_cache = False
 
     #
     # Properties

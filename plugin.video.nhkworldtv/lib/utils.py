@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import re
 import requests
+from requests.sessions import Request
 import requests_cache
 from kodi_six import xbmc, xbmcaddon
 from . import api_keys
@@ -61,21 +62,40 @@ def check_url_exists(url):
 
 
 def get_json(url, cached=True):
-    """ Get JSON object from a URL with improved error handling """
+    """ Get JSON object from a URL with improved error handling
+
+    Args:
+        url ([str]): URL to retrieve
+        cached (bool, optional): Use request_cache. Defaults to True.
+
+    Returns:
+        [dict]: JSON dictionary
+    """
     r = get_url(url, cached)
-    try:
-        result = r.json()
-        xbmc.log('Successfully loaded JSON from API: {0}'.format(r.url))
-        return (result)
-    except (ValueError):
-        # Failure - no way to handle - probably an issue with the NHK Website
-        xbmc.log('Could not parse JSON from API: {0}'.format(r.url),
-                 xbmc.LOGFATAL)
+    if (r is not None):
+        try:
+            result = r.json()
+            xbmc.log('Successfully loaded JSON from API: {0}'.format(url))
+            return (result)
+        except (ValueError):
+            # Failure - no way to handle - probably an issue with the NHK API
+            xbmc.log('Could not parse JSON from API: {0}'.format(url))
+    else:
+        # Failure - could not connect to site
+        xbmc.log('Could not connect to API: {0}'.format(url))
 
 
 def get_url(url, cached=True):
-    """ Get a URL with automatic retries
-        NHK sometimes have intermittent problems with 502 Bad Gateway """
+    """Get a URL with automatic retries
+        NHK sometimes have intermittent problems with 502 Bad Gateway
+
+    Args:
+        url ([str]): URL to retrieve
+        cached (bool, optional): Use request_cache. Defaults to True.
+
+    Returns:
+        [response]: Response object
+    """
 
     # Populate request_params if needed
     if (api_keys.NHK_API_BASE_URL in url):
@@ -110,6 +130,9 @@ def get_url(url, cached=True):
                         r = s.get(url, params=request_params)
                     else:
                         r = s.get(url)
+        except (requests.ConnectionError):
+            # Could not establish connection at all
+            return (None)
         except (sqlite3.OperationalError):
             # Catch transient requests-cache SQL Lite error
             # This is a race condition I think, it takes time for
@@ -139,14 +162,14 @@ def get_url(url, cached=True):
                 # with the NHK Website
                 xbmc.log(
                     'FATAL: Could not get URL {0} after {1} retries'.format(
-                        url, current_try), xbmc.LOGFATAL)
+                        url, current_try), xbmc.LOGDEBUG)
                 break
             else:
                 # Try again - this usually fixes the error with
                 # the next request
                 xbmc.log(
                     'Temporary failure fetching URL: {0} with Status {1})'.
-                    format(url, status_code), xbmc.LOGWARNING)
+                    format(url, status_code), xbmc.LOGDEBUG)
 
                 # Wait for 1s before the next call
                 time.sleep(1)
@@ -154,7 +177,7 @@ def get_url(url, cached=True):
             # Other HTTP error - FATAL, do not retry
             xbmc.log(
                 'FATAL: Could not get URL: {0} - HTTP Status Code {1}'.format(
-                    url, status_code), xbmc.LOGFATAL)
+                    url, status_code), xbmc.LOGDEBUG)
             break
 
         current_try = current_try + 1
@@ -231,7 +254,6 @@ def get_program_metdadata_cache(max_items):
     Returns:
         {dict} -- A JSON dict with the cache items
     """
-    xbmc.log('Getting vod_id/program metadata cache from Azure')
     cache = get_json(
         cache_api.rest_url['cache_get_program_list'].format(max_items))
     return (cache)

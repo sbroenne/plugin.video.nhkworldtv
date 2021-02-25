@@ -4,6 +4,8 @@ from . import api_keys
 # Cache backend (Azure Functions) API
 
 rest_url = {
-    'cache_get_program': api_keys.CACHE_API_BASE_URL + '/Program/{0}',
-    'cache_get_program_list': api_keys.CACHE_API_BASE_URL + '/Program/List/{0}'
+    'cache_get_program_list':
+    api_keys.CACHE_API_BASE_URL + '/Program/v2/List/{0}',
 }
+
+base_url = "https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/mp4:mm/flvmedia/5905"

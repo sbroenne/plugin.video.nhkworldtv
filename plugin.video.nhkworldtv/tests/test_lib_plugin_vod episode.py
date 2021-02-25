@@ -1,0 +1,76 @@
+from __future__ import print_function
+import lib.plugin as plugin
+import xbmcplugin
+import pytest
+
+
+@pytest.fixture
+def test_episode():
+    episode = plugin.vod_episode_list('get_latest_episodes',
+                                      'None',
+                                      0,
+                                      xbmcplugin.SORT_METHOD_DATE,
+                                      unit_test=True)
+    return episode
+
+
+# Directly playable episode
+
+
+def test_add_playable_episode_cached_720p(test_episode):
+
+    episode = test_episode
+    assert (episode is not None)
+    return_value = plugin.add_playable_episode(episode,
+                                               use_720p=True,
+                                               use_cache=True)
+    path = return_value[0]
+    assert ("https://" in path)
+
+
+def test_add_playable_episode_cached_1080p(test_episode):
+
+    episode = test_episode
+    assert (episode is not None)
+    return_value = plugin.add_playable_episode(episode,
+                                               use_720p=False,
+                                               use_cache=True)
+    path = return_value[0]
+    assert ("https://" in path)
+
+
+# Episode that needs to be resolved from NHK
+def test_add_playable_episode_needs_to_be_resolved(test_episode):
+
+    episode = test_episode
+    assert (episode is not None)
+    return_value = plugin.add_playable_episode(episode,
+                                               use_720p=False,
+                                               use_cache=False)
+    path = return_value[0]
+    assert ("plugin:///" in path)
+
+
+# Resolve URLs from NHK
+
+
+def test_resolve_episode_from_NHK_720p(test_episode):
+
+    episode = test_episode
+    assert (episode is not None)
+
+    resolved_episode = plugin.resolve_vod_episode(episode.vod_id,
+                                                  use_720p=True)
+    assert (resolved_episode.url is not None)
+    assert (resolved_episode.video_info["height"] == "720")
+
+
+def test_resolve_episode_from_NHK_1080p(test_episode):
+
+    episode = test_episode
+    assert (episode is not None)
+
+    resolved_episode = plugin.resolve_vod_episode(episode.vod_id,
+                                                  use_720p=False)
+    assert (resolved_episode.url is not None)
+    assert (resolved_episode.video_info["height"] == "1080")
