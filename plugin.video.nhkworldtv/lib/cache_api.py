@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 from __future__ import (absolute_import, unicode_literals)
-from . import api_keys
+from . import api_keys, url
 # Cache backend (Azure Functions) API
 
 rest_url = {
@@ -9,3 +8,18 @@ rest_url = {
 }
 
 base_url = "https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/mp4:mm/flvmedia/5905"
+
+
+def get_program_metdadata_cache(max_items):
+    """Use NHK World TV Cloud Service to speed-up episode URLlookup.
+    The service runs on Azure in West Europe but should still speed up
+    the lookup process dramatically since it uses a pre-loaded cache
+
+    Arguments:
+        max_items {int} -- Amount of items to retrievve
+
+    Returns:
+        {dict} -- A JSON dict with the cache items
+    """
+    cache = url.get_json(rest_url['cache_get_program_list'].format(max_items))
+    return (cache)

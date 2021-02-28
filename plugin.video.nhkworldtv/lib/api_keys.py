@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import (unicode_literals)
 # NHK
 NHK_API_KEY = 'EJfK8jdS57GqlupFgAfAAwr573q01y6k'

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 from __future__ import (absolute_import, unicode_literals)
 from builtins import str
-from . import utils
+from . import url
 from . import api_keys
 
 API_BASE_URL = api_keys.NHK_API_BASE_URL
@@ -15,7 +14,7 @@ def create_command(prefix, resource):
 
 
 def get_API_from_NHK():
-    raw_API_json = utils.get_json(
+    raw_API_json = url.get_json(
         'https://www3.nhk.or.jp/nhkworld/assets/api_sdk/api.json')
     nhk_api = {}
     for row in raw_API_json['api']:

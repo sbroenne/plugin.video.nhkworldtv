@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from lib import plugin
 
 # Keep this file to a minimum, as Kodi

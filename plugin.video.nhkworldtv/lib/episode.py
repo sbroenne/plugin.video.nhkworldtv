@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 from builtins import object
 from kodi_six import xbmcgui, xbmc
-from . import utils
+from . import utils, url
 from . import kodiutils
 from datetime import datetime
 
@@ -110,7 +109,7 @@ class Episode(object):
     def thumb(self, value):
         """ Sets thumbnail URL """
         if ('/nhkworld/' in value and not self.absolute_image_url):
-            self._thumb = utils.get_NHK_website_url(value)
+            self._thumb = url.get_NHK_website_url(value)
         else:
             self._thumb = value
 
@@ -123,7 +122,7 @@ class Episode(object):
     def fanart(self, value):
         """ Sets thumbnail URL """
         if ('/nhkworld/' in value and not self.absolute_image_url):
-            self._fanart = utils.get_NHK_website_url(value)
+            self._fanart = url.get_NHK_website_url(value)
         else:
             self._fanart = value
 
