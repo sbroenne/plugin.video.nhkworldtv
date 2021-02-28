@@ -18,9 +18,9 @@ You can install the plugin by installing the [NHK World TV Development Repositor
 
 ### Video Quality
 
-NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality.
+NHK provides streams via Akamai in 720p and 1080p - the plug-in defaults to 1080p where available.
 
-By default the plug-in will play 1080P. If you encounter buffering issues, you can select a lower quality by changing the Use 720P instead of 1080P addon-setting.
+If you encounter buffering issues, you can fall-back to 720p by changing the 'Use 720p instead of 1080p' addon-setting.
 
 Default setting is **off** (play 1080P where available).
 
@@ -28,7 +28,7 @@ Default setting is **off** (play 1080P where available).
 
 #### Inclusion in the official Kodi Repo
 
-The design goal for the NHK World TV plug-in is to eventually be included in the official Kodi repo and to include **only** content from the NHK World web site with the focus on the video-on-demand section - in hest best possible quality.
+The design goal for the NHK World TV plug-in is to be included in the official Kodi repo and to include **only** content from the NHK World web site with the focus on the video-on-demand section - in hest best possible quality.
 
 If you like to add the other content that can be found in Best Of NHK, please feel free to clone - I will **not** accept PRs for adding content sources outside of NHK World itself.
 
@@ -36,11 +36,12 @@ If you like to add the other content that can be found in Best Of NHK, please fe
 
 "Snappiness" was one of my design goals when developing this plug-in. For example, most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to two hours)
 
-The plug-in also uses companion cloud service to speed up video play-back because these NHK APIs are very slow. You can disabe this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer and that you will loose a bit of UI functionality (e.g. Kodi will not store how much of a program you have already watched)
+The plug-in also uses companion cloud service to speed up video play-back because these NHK APIs are very slow. 
+You can disabe this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer and that you will loose a bit of UI functionality (e.g. Kodi will not store how much of a program you have already watched)
 
 You can find the source code for the cloud service at [NHK World TV Azure Backend](https://github.com/sbroenne/nhkworldtv-backend).
 
-The cache runs on Azure implemented as Azure Functions backed by Cosmos DB. It gets updated with new episodes multiple times per day.
+The cache runs on Azure and is implemented as Azure Functions backed by Cosmos DB. It gets updated with new episodes multiple times per day.
 
 ## Known Issues
 
@@ -52,7 +53,7 @@ The cache runs on Azure implemented as Azure Functions backed by Cosmos DB. It g
 
 ## Current Development Status
 
-The plug-in is largely feature complete. You are able to:
+The plug-in is feature complete. You are able to:
 
 - watch the live stream in HD
 - access the full on-demand programs in HD, including programs, categories, playlists, etc.
@@ -60,7 +61,7 @@ The plug-in is largely feature complete. You are able to:
 - access a "mini EPG"/live schedule with the upcoming shows - if the program is available on-demand, you can watch-ondemand it as well.
 - watch the NHK News Programs like NEWSLINE or NEWSLINE IN DEPTH
 
-Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site.
+Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site. I also run scheduled unit tests on Github to alert me on breaking changes.
 
 The plug-in is localized but translation only exists for English (GB). It is also Python3-compatible (by using python-future and kodi-six).
 
@@ -68,8 +69,7 @@ The plug-in is localized but translation only exists for English (GB). It is als
 
 Main open topics are:
 
-- code fixes to comply with the Kodi plugin guidelines
-- preparations to be able to submit the plugin to the official Kodi repo
+- None
 
 ## Local Development
 
@@ -77,10 +77,9 @@ You will find scripts to build the plugin in locally in the [build](./build/) fo
 
 ## Bugs & Issues
 
-If you find a bug, or want to fix something directly, that would be awesome! Just use github and open an issue!
+If you find a bug, or want to fix something directly, that would be awesome! Just use Github and open an issue! Thank you!
 
 ## Origins
 
-Originally it started as a fork of **Misty's** [Best Of NHK plug-in](https://forum.kodi.tv/showthread.php?tid=196657) but shares almost zero code with it nowadays. His plug-in also provides addtional content like NHK on Youtube - check it out - it is worth it!
-
+Originally it started as a fork of **Misty's** [Best Of NHK plug-in](https://forum.kodi.tv/showthread.php?tid=196657) but shares zero code with it nowadays. His plug-in also provides addtional content like NHK on Youtube - check it out - it is worth it!
 **Thank you Misty, awesome work!**
