@@ -19,7 +19,7 @@ jobs:
         id: kodi-push
         env:
           GH_USERNAME: ${{ github.actor }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
           EMAIL: ${{secrets.EMAIL}}
         run: |
           submit-addon -r repo-plugins -b leia --push-branch -s -m plugin.video.nhkworldtv
