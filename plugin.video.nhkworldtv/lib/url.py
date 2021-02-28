@@ -26,7 +26,6 @@ if URL_CACHE_MINUTES < 60:
     URL_CACHE_MINUTES = 60
 
 # Install the cache for requests
-print
 requests_cache.install_cache(db_name,
                              backend='sqlite',
                              expire_after=URL_CACHE_MINUTES * 60)
