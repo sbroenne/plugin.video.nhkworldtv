@@ -16,14 +16,12 @@
         <provides>video</provides>
     </extension>
 
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Watch NHK World Japan in HD - live stream and on-demand programs</summary>
+   <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">Watch NHK World Japan in Full HD - live stream, on-demand and news programs</summary>
         <description lang="en_GB">
-Watch NHK World Japan in HD - includes live stream, news and on-demand programs.
-
-Tested on Kodi 18.6+ and 19. I built this plugin because NHK does not support Android TV (yet).
-
-NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality. By default the plug-in will play 1080P. If you encounter buffering issues, you can select a lower quality by changing the 'Use 720P instead of 1080P' addon-setting.
+NHK provides streams via Akamai in 720p and 1080p - the plug-in will use 1080p where available.[CR]
+If you encounter buffering issues, you can fall-back to 720p by changing the 'Use 720p instead of 1080p' addon-setting.[CR]
+Tested on Kodi 18.6+ and 19.[CR]
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -34,7 +32,7 @@ NHK provides streams in 720P in medium and Full-HD (1080P) in very hiqh quality.
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
         <news>
-Added "We, in the Time of Corona" and "Documentaries" sections
+First non-beta release, no functionality changes.
         </news>
         <assets>
             <icon>resources/icon.png</icon>

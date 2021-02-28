@@ -47,7 +47,7 @@ msgid "Run Set-up Wizard when plugin starts"
 msgstr ""
 
 msgctxt "#30017"
-msgid "Use 720P instead of 1080P (in case you are running into buffering issues)"
+msgid "Use 720p instead of 1080p (in case you are running into buffering issues)"
 msgstr ""
 # plugin.py
 
