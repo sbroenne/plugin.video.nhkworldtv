@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: Build and push to Kodi repo
+    name: Push to Kodi repo
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
