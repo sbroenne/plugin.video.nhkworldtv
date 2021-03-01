@@ -20,32 +20,27 @@ NHK_FANART = ADDON.getAddonInfo('fanart')
 # Default value - can be overwritten by settings
 MAX_NEWS_DISPLAY_ITEMS = 0
 MAX_ATAGLANCE_DISPLAY_ITEMS = 0
-USE_CACHE = False
+USE_CACHE = True
 USE_720P = False
 
+# Initialize the plugin with default vailes and the cache
+xbmc.log('Initializing plug-in')
+xbmc.log('initialize: Retrieving plug-in setting')
+# Getting the add-on settings - these will be 0 under unit test
+# Define how many items should be displayed in News
+MAX_NEWS_DISPLAY_ITEMS = ADDON.getSettingInt("max_news_items")
+# Define how many items should be displayed in At A Glance
+MAX_ATAGLANCE_DISPLAY_ITEMS = ADDON.getSettingInt("max_ataglance_items")
+# Define if to ise 720P instead of 1080P
+USE_720P = ADDON.getSettingBool("use_720P")
+xbmc.log('initialize: Using 720P instead of 1080p: {0}'.format(USE_720P))
+USE_CACHE = ADDON.getSettingBool('use_backend')
+xbmc.log('initialize: Use Azure cache: {0}'.format(USE_CACHE))
 
-def initialize():
-    """ Initialize the plugin with default vailes and the cache
-    """
-
-    xbmc.log('Initializing plug-in')
-    global MAX_NEWS_DISPLAY_ITEMS
-    global MAX_ATAGLANCE_DISPLAY_ITEMS
-    xbmc.log('Retrieving plug-in setting')
-    # Getting the add-on settings - these will be 0 under unit test
-    # Define how many items should be displayed in News
-    MAX_NEWS_DISPLAY_ITEMS = ADDON.getSettingInt("max_news_items")
-    # Define how many items should be displayed in At A Glance
-    MAX_ATAGLANCE_DISPLAY_ITEMS = ADDON.getSettingInt("max_ataglance_items")
-    # Define if to ise 720P instead of 1080P
-    USE_720P = ADDON.getSettingBool("use_720P")
-    xbmc.log('Using 720P instead of 1080p: {0}'.format(USE_720P))
-
-    if (utils.UNIT_TEST):
-        MAX_NEWS_DISPLAY_ITEMS = 20
-        MAX_ATAGLANCE_DISPLAY_ITEMS = 800
-    return (True)
-
+if (utils.UNIT_TEST):
+    MAX_NEWS_DISPLAY_ITEMS = 20
+    MAX_ATAGLANCE_DISPLAY_ITEMS = 800
+    USE_CACHE = True
 
 #
 # Enty point - this is called from main.py
@@ -58,8 +53,6 @@ def run():
     """
     if ADDON.getSettingBool('run_wizard'):
         first_run_wizard.show_wizard(ADDON)
-
-    initialize()
     plugin.run()
 
 
@@ -602,18 +595,18 @@ def add_playable_episode(episode, use_cache, use_720p):
     # via play_vod_episode()
 
     # Get episode from cache if cache is enabled
+    xbmc.log("add_playable_episode: Add {0}, use cache: {1}".format(
+        episode.vod_id, use_cache))
     if (use_cache):
         returnValue = vod.get_episode_from_cache(episode, use_720p)
         if (returnValue is not None):
-            xbmc.log("PLAYABLE_EPISODE: Added episode {0} from cache".format(
+            xbmc.log("add_playable_episode: Added {0} from cache".format(
                 episode.vod_id))
             return (returnValue)
 
     # Don't use cache or episode not in cache - need to be resolve dynmaically
-    xbmc.log("PLAYABLE_EPISODE: Need to resolve episode {0}".format(
-        episode.vod_id))
     play_url = plugin.url_for(resolve_vod_episode, episode.vod_id)
-    xbmc.log('PLAYABLE_EPISODE: Resolved Play URL: {0}'.format(play_url))
+    xbmc.log('add_playable_episode: Resolved Play URL: {0}'.format(play_url))
     returnValue = [play_url, episode.kodi_list_item, False]
     return (returnValue)
 
@@ -647,6 +640,9 @@ def vod_episode_list(api_method,
     if (len(episodes) > 0):
         playable_episodes = []
         if (not unit_test):
+            xbmc.log(
+                'vod_episode_list: {0} episodes, use_cache: {1}, use_720p: {2}'
+                .format(len(episodes), USE_CACHE, USE_720P))
             for episode in episodes:
                 # Add the current episode directory item
                 playable_episodes.append(

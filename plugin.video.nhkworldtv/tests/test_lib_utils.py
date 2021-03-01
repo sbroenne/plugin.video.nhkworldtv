@@ -4,6 +4,14 @@ import datetime
 import lib.utils as utils
 
 
+def test_get_episode_name():
+    title = "title"
+    subtitle = "subtitle"
+    assert (utils.get_episode_name(title,
+                                   subtitle) == title + " - " + subtitle)
+    assert (utils.get_episode_name(title, "") == title)
+
+
 def test_to_local_time():
     converted_time = utils.to_local_time(1581266400000 // 1000)
     assert (isinstance(converted_time, datetime.datetime))

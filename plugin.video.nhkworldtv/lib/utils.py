@@ -7,13 +7,12 @@ import time
 import pytz
 from tzlocal import get_localzone
 
+UNIT_TEST = False
+
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
 plugin_path = ADDON.getAddonInfo('path')
-if (len(plugin_path) > 0):
-    # Running as Kodi plug-in
-    UNIT_TEST = False
-else:
+if (len(plugin_path) == 0):
     # Running under unit test
     UNIT_TEST = True
 

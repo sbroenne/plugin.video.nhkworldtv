@@ -11,13 +11,12 @@ import sqlite3
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
 plugin_path = ADDON.getAddonInfo('path')
-if (len(plugin_path) > 0):
-    # Running within Kodi - use that path
-    # Get Plug-In information
-    db_name = '{0}/nhk_world_cache'.format(plugin_path)
-    URL_CACHE_MINUTES = ADDON.getSettingInt('url_cache_minutes')
-else:
-    # Running under unit test
+# Running within Kodi - use that path
+# Get Plug-In information
+db_name = '{0}/nhk_world_cache'.format(plugin_path)
+URL_CACHE_MINUTES = ADDON.getSettingInt('url_cache_minutes')
+if (len(plugin_path) == 0):
+    # Running under unit test - overwrite location of DB
     db_name = 'nhk_world_cache'
     URL_CACHE_MINUTES = 60
 

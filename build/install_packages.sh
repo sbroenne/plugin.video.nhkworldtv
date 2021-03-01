@@ -5,7 +5,7 @@
 # $ PYTHON version is set by the Github Action - only need to set it for local development
 if [ -z $PYTHON_VERSION ]
 then
-    export PYTHON_VERSION=2.7
+    export PYTHON_VERSION=3.8
 fi
 
 echo "PYTHON VERSION: $PYTHON_VERSION"

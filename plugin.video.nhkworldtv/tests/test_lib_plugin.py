@@ -1,10 +1,6 @@
 import lib.plugin as plugin
 
 
-def test_initialize():
-    assert (plugin.initialize() is True)
-
-
 def test_main_menu():
     assert (plugin.index() is True)
 

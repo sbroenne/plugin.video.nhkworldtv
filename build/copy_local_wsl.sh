@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copies the Plugin from the dist folder to the local Kodi directory - used for local development on Windows 10 WSL2 (Ubuntu)
 # Build the Plugin
-. ./build_leia.sh
+. ./build_matrix.sh
 # Set the local path (you need to adjust this)
 local_kodi=/mnt/c/Users/stefa/AppData/Roaming/Kodi
 # Change the <reuselanguageinvoker> to false

@@ -1,7 +1,7 @@
 from __future__ import (absolute_import, unicode_literals)
 from builtins import str
-from . import url
-from . import api_keys
+from kodi_six import xbmc
+from . import api_keys, url
 
 API_BASE_URL = api_keys.NHK_API_BASE_URL
 NHK_BASE_URL = api_keys.NHK_BASE_URL
@@ -14,6 +14,7 @@ def create_command(prefix, resource):
 
 
 def get_API_from_NHK():
+    xbmc.log("nhk_api_parser.py: Getting API from NHK")
     raw_API_json = url.get_json(
         'https://www3.nhk.or.jp/nhkworld/assets/api_sdk/api.json')
     nhk_api = {}

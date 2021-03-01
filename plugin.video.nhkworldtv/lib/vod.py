@@ -10,7 +10,7 @@ episode_cache = None
 ADDON = xbmcaddon.Addon()
 
 if (ADDON.getSettingBool('use_backend')):
-    xbmc.log('Loading episode cache from Azure')
+    xbmc.log('vod.py: Loading episode cache from Azure')
     # Define how many program should be retrieved from meta data cache
     cache_items = ADDON.getSettingInt("max_program_metadate_cache_items")
     # Try to get the meta dara cache from Azure
@@ -22,7 +22,7 @@ if (ADDON.getSettingBool('use_backend')):
     # Also means that the service is running and we can use it
     if (isinstance(episode_cache, dict)):
         USE_CACHE = True
-        xbmc.log('Using program metadata cache from Azure')
+        xbmc.log('vod.py: Using program metadata cache from Azure')
 
 if (utils.UNIT_TEST):
     # Run under unit test - set some default data since we will not
@@ -143,8 +143,9 @@ def get_episode_from_cache(episode=Episode(), use_720p=False):
         episode.onair = cached_episode['OnAir']
 
         returnValue = [episode.url, episode.kodi_list_item, False]
-        xbmc.log("PLAYABLE_EPISODE: Added episode {0} from cache".format(
-            episode.vod_id))
+        xbmc.log(
+            "vod.get_episode_from_cache: Added episode {0} from cache".format(
+                episode.vod_id))
     return (returnValue)
 
 
@@ -161,7 +162,9 @@ def resolve_vod_episode(vod_id, use_720p):
     """
 
     episode = None
-    xbmc.log('Using Player.js to retrieve vod_id: {0}'.format(vod_id))
+    xbmc.log(
+        'vod.resolve_vod_episode: Using Player.js to retrieve vod_id: {0}'.
+        format(vod_id))
     r = url.get_url(nhk_api.rest_url['player_url'].format(vod_id, vod_id))
     if (r.status_code == 200):
         # Player content retrieved
@@ -173,6 +176,8 @@ def resolve_vod_episode(vod_id, use_720p):
         # Only continue if we could retrieve the uuid
         if (len(uuid_match) > 0):
             program_Uuid = uuid_match[0]
+            xbmc.log('vod.resolve_vod_episode: Parsed UUID: {0}'.format(
+                program_Uuid))
             # Get episode detail
             episode_detail = url.get_json(
                 nhk_api.rest_url['get_episode_detail'].format(
@@ -189,6 +194,9 @@ def resolve_vod_episode(vod_id, use_720p):
 
                 # Get episode URL and video information
                 player_url = nhk_api.rest_url['video_url'].format(program_Uuid)
+                xbmc.log('vod.resolve_vod_episode: Player Url: {0}'.format(
+                    player_url))
+
                 assets_json = url.get_json(player_url)['response'][
                     'WsProgramResponse']['program']['asset']
 

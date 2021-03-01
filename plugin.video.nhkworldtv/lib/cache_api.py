@@ -1,4 +1,5 @@
 from __future__ import (absolute_import, unicode_literals)
+from kodi_six import xbmc
 from . import api_keys, url
 # Cache backend (Azure Functions) API
 
@@ -22,4 +23,7 @@ def get_program_metdadata_cache(max_items):
         {dict} -- A JSON dict with the cache items
     """
     cache = url.get_json(rest_url['cache_get_program_list'].format(max_items))
+    xbmc.log(
+        "cache_api.get_program_metdadata_cache: Got {0} episodes from Azure".
+        format(len(cache)))
     return (cache)
