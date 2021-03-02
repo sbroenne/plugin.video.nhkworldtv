@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="0.0.150" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.0" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.certifi" version="2019.9.11"/>
@@ -19,6 +19,7 @@
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Watch NHK World Japan in Full HD - live stream, on-demand and news programs</summary>
         <description lang="en_GB">
+Watch NHK World Japan in Full HD[CR]
 NHK provides streams via Akamai in 720p and 1080p - the plug-in defaults to 1080p where available.[CR]
 If you encounter buffering issues, you can fall-back to 720p by changing the 'Use 720p instead of 1080p' addon-setting.[CR]
 Tested on Kodi 18.6+ and 19.[CR]
