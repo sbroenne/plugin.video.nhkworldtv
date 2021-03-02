@@ -34,7 +34,7 @@ Tested on Kodi 18.6+ and 19.
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news lang="en_GB">
+        <news>
 First non-beta release, no functionality changes.
         </news>
         <assets>
