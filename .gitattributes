@@ -6,3 +6,4 @@
 .github export-ignore
 plugin.video.nhkworldtv/tests export-ignore
 plugin.video.nhkworldtv/addon_template.xml export-ignore
+plugin.video.nhkworldtv/lib/api.json export-ignore
