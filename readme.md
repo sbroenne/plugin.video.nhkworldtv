@@ -12,9 +12,11 @@ Tested on Kodi 18.6+ and 19 with the default Estuary skin.
 
 ## How-to Install
 
-### Kodi 18 / Leia (current Kodi version)
+### Kodi 19 / Matrix (current Kodi version)
 
-You can install the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne/repository.sbroenne-0.0.12.zip). The plug-in will auto-update itself regularly from this repo.
+You can install the current Matrix version of the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne/repository.sbroenne-0.0.13.zip). The plug-in will auto-update itself regularly from this repo.
+
+You can also download the Leia version from a [releases](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.0/plugin.video.nhkworldtv-1.0.0.zip) but you need to install this as ZIP file and it will not auto-update.
 
 ### Video Quality
 
