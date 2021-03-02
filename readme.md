@@ -18,7 +18,7 @@ You can install the current Matrix version of the plugin by installing the [NHK 
 
 You can also download the Leia version from a [releases](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.0/plugin.video.nhkworldtv-1.0.0.zip) but you need to install this as ZIP file and it will not auto-update.
 
-### Video Quality
+## Video Quality
 
 NHK provides streams via Akamai in 720p and 1080p - the plug-in defaults to 1080p where available.
 
@@ -26,15 +26,15 @@ If you encounter buffering issues, you can fall-back to 720p by changing the 'Us
 
 Default setting is **off** (play 1080P where available).
 
-### Design Goals
+## Design Goals
 
-#### Inclusion in the official Kodi Repo
+### Inclusion in the official Kodi Repo
 
 The design goal for the NHK World TV plug-in is to be included in the official Kodi repo and to include **only** content from the NHK World web site with the focus on the video-on-demand section - in hest best possible quality.
 
 If you like to add the other content that can be found in Best Of NHK, please feel free to clone - I will **not** accept PRs for adding content sources outside of NHK World itself.
 
-#### Performance
+### Performance
 
 "Snappiness" was one of my design goals when developing this plug-in. For example, most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to two hours)
 
