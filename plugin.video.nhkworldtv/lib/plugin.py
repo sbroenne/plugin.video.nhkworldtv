@@ -23,7 +23,7 @@ MAX_ATAGLANCE_DISPLAY_ITEMS = 0
 USE_CACHE = True
 USE_720P = False
 
-# Initialize the plugin with default vailes and the cache
+# Initialize the plugin with default values and the cache
 xbmc.log('Initializing plug-in')
 xbmc.log('initialize: Retrieving plug-in setting')
 # Getting the add-on settings - these will be 0 under unit test
@@ -43,7 +43,7 @@ if (utils.UNIT_TEST):
     USE_CACHE = True
 
 #
-# Enty point - this is called from main.py
+# Entry point - this is called from main.py
 # This function cannot be unit tested
 #
 
@@ -52,7 +52,7 @@ def run():
     """ Run the plugin
     """
     if ADDON.getSettingBool('run_wizard'):
-        first_run_wizard.show_wizard(ADDON)
+        first_run_wizard.show_wizard()
     plugin.run()
 
 
@@ -85,7 +85,7 @@ def add_topstories_menu_item():
     xbmc.log('Adding top stories menu item')
     success = False
     menu_item = topstories.get_menu_item()
-    # Create the directory itemn
+    # Create the directory item
     if (menu_item is not None):
         xbmcplugin.addDirectoryItem(plugin.handle,
                                     plugin.url_for(topstories_index),
@@ -130,22 +130,22 @@ def topstories_index():
 #  Menu item
 def add_ataglance_menu_item():
     xbmc.log('Adding at a glance menu item')
-    succes = False
+    success = False
     menu_item = ataglance.get_menu_item()
 
     if (menu_item is not None):
         xbmcplugin.addDirectoryItem(plugin.handle,
                                     plugin.url_for(ataglance_index),
                                     menu_item.kodi_list_item, True)
-        succes = True
-    return (succes)
+        success = True
+    return success
 
 
 # Episode list
 @plugin.route('/ataglance/index')
 def ataglance_index():
     xbmc.log('Displaying At a Glance Index')
-    succes = False
+    success = False
     ataglance_episodes = ataglance.get_episodes(MAX_ATAGLANCE_DISPLAY_ITEMS)
     episodes = []
 
@@ -160,8 +160,8 @@ def ataglance_index():
         kodiutils.set_video_directory_information(
             plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
             xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
-        succes = True
-    return (succes)
+        success = True
+    return success
 
 
 #
@@ -179,7 +179,7 @@ def add_news_programs_menu_item():
         'https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/' +
         'newsline_2020.jpg'
     }
-    li = xbmcgui.ListItem(kodiutils.get_string(30080))
+    li = xbmcgui.ListItem(kodiutils.get_string(30080), offscreen=True)
     info_labels = {}
     info_labels['mediatype'] = 'episode'
     info_labels['Plot'] = kodiutils.get_string(30081)
@@ -195,7 +195,7 @@ def add_news_programs_menu_item():
 @plugin.route('/news/programs/index')
 def news_programs_index():
     xbmc.log('Displaying At News Index')
-    succes = False
+    success = False
     programs = news_programs.get_programs()
 
     if (len(programs)) > 0:
@@ -203,8 +203,8 @@ def news_programs_index():
         kodiutils.set_video_directory_information(
             plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
             xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
-        succes = True
-    return (succes)
+        success = True
+    return success
 
 
 # Add on-demand menu item
@@ -221,8 +221,8 @@ def add_on_demand_menu_item():
     while (pgm_title is None):
         try_count = try_count + 1
         xbmc.log(
-            'Determening if random episode has a valid title. Try count:{0}'.
-            format(try_count))
+            'Check if random episode has a valid title. Try count:{0}'.format(
+                try_count))
         featured_episode = random.randint(0, no_of_epsisodes - 1)
         program_json = featured_episodes[featured_episode]
         pgm_title = program_json['pgm_title_clean']
@@ -235,7 +235,7 @@ def add_on_demand_menu_item():
         episode.thumb = program_json['image_sp']
         episode.fanart = program_json['image_pc']
 
-        # Create the directory itemn
+        # Create the directory item
 
         episode.video_info = kodiutils.get_video_info(USE_720P)
         xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_index),
@@ -360,7 +360,7 @@ def live_schedule_index():
             # Can play on-demand -> Add "Play:" before the title
             # and make it playable
             episode.IsPlayable = True
-            episode.title = kodiutils.get_string(30070).format(title)
+            episode.title = kodiutils.get_string(30063).format(title)
         else:
             episode.title = title
 
@@ -387,7 +387,7 @@ def live_schedule_index():
 
 
 #
-# Video On Demand Mennu
+# Video On Demand menu
 #
 
 
@@ -396,12 +396,12 @@ def vod_index():
     xbmc.log('Creating Video On Demand Menu')
     art = {'thumb': NHK_ICON, 'fanart': NHK_FANART}
     # Programs
-    li = xbmcgui.ListItem(kodiutils.get_string(30040))
+    li = xbmcgui.ListItem(kodiutils.get_string(30040), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_programs),
                                 li, True)
     # Latest Episodes
-    li = xbmcgui.ListItem(kodiutils.get_string(30043))
+    li = xbmcgui.ListItem(kodiutils.get_string(30043), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
@@ -409,7 +409,7 @@ def vod_index():
                        xbmcplugin.SORT_METHOD_UNSORTED), li, True)
 
     # Most Watched
-    li = xbmcgui.ListItem(kodiutils.get_string(30044))
+    li = xbmcgui.ListItem(kodiutils.get_string(30044), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
@@ -417,7 +417,7 @@ def vod_index():
                        0, xbmcplugin.SORT_METHOD_UNSORTED), li, True)
 
     # We, in the Time of Corona
-    li = xbmcgui.ListItem(kodiutils.get_string(30047))
+    li = xbmcgui.ListItem(kodiutils.get_string(30047), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
@@ -426,25 +426,25 @@ def vod_index():
                        xbmcplugin.SORT_METHOD_UNSORTED), li, True)
 
     # Documentaries
-    li = xbmcgui.ListItem(kodiutils.get_string(30046))
+    li = xbmcgui.ListItem(kodiutils.get_string(30046), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(vod_episode_list, 'get_categories_episode_list', 15, 0,
                        xbmcplugin.SORT_METHOD_UNSORTED), li, True)
     # Categories
-    li = xbmcgui.ListItem(kodiutils.get_string(30041))
+    li = xbmcgui.ListItem(kodiutils.get_string(30041), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_categories),
                                 li, True)
     # Playlists
-    li = xbmcgui.ListItem(kodiutils.get_string(30042))
+    li = xbmcgui.ListItem(kodiutils.get_string(30042), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_playlists),
                                 li, True)
 
     # All
-    li = xbmcgui.ListItem(kodiutils.get_string(30045))
+    li = xbmcgui.ListItem(kodiutils.get_string(30045), offscreen=True)
     li.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
@@ -591,7 +591,7 @@ def add_playable_episode(episode, use_cache, use_720p):
         [list]: List
     """
     # If the vod_id is in cache and cache is being used,
-    # diretly add the URL otherwise dynmaically resolve it
+    # directly add the URL otherwise dynamically resolve it
     # via play_vod_episode()
 
     # Get episode from cache if cache is enabled
@@ -604,7 +604,7 @@ def add_playable_episode(episode, use_cache, use_720p):
                 episode.vod_id))
             return (returnValue)
 
-    # Don't use cache or episode not in cache - need to be resolve dynmaically
+    # Don't use cache or episode not in cache - need to be resolve dynamically
     play_url = plugin.url_for(resolve_vod_episode, episode.vod_id)
     xbmc.log('add_playable_episode: Resolved Play URL: {0}'.format(play_url))
     returnValue = [play_url, episode.kodi_list_item, False]
@@ -719,5 +719,5 @@ def play_news_item(api_url, news_id, item_type, title):
         return (True)
     else:
         # Couldn't find video
-        xbmc.log('Couldnt find video {0}'.format(api_url))
+        xbmc.log('Could not find video {0}'.format(api_url))
         return (False)

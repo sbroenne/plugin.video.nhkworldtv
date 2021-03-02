@@ -17,7 +17,7 @@ def get_program_metdadata_cache(max_items):
     the lookup process dramatically since it uses a pre-loaded cache
 
     Arguments:
-        max_items {int} -- Amount of items to retrievve
+        max_items {int} -- Amount of items to retrieve
 
     Returns:
         {dict} -- A JSON dict with the cache items

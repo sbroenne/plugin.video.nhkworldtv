@@ -46,7 +46,7 @@ def get_episode_list(api_method, id, show_only_subtitle):
         [list] -- List of episodes
     """
 
-    # Only format api_url when a non-0 valze for id was provided
+    # Only format api_url when a non-0 value for id was provided
     # some APIs do not need an id
     if (id != 'None'):
         api_url = nhk_api.rest_url[api_method].format(id)
@@ -124,7 +124,7 @@ def get_episode_from_cache(episode=Episode(), use_720p=False):
         [type]: [description]
     """
     # If the vod_id is in cache and cache is being used,
-    # diretly add the URL otherwise dynmaically resolve it
+    # directly add the URL otherwise dynamically resolve it
     # via play_vod_episode()
     #
     # Use the cache backend or not

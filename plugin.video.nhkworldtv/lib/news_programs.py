@@ -13,7 +13,7 @@ def get_programs():
 
 
     Returns:
-        [list]: List of news pograms
+        [list]: List of news programs
     """
     xbmc.log('Getting news programs from NHK')
     api_result_json = url.get_json(nhk_api.rest_url['news_program_config'],
@@ -36,7 +36,7 @@ def get_programs():
         try:
             news_program_xml = url.get_url(api_url, False).text
         except HTTPError:
-            xbmc.log('Couldnt load Program XML {0} from NHK Website'.format(
+            xbmc.log('Could not load Program XML {0} from NHK Website'.format(
                 news_program_id))
         else:
             # Sometimes the XML is invalid, add error handling
@@ -44,7 +44,7 @@ def get_programs():
                 root = ET.fromstring(news_program_xml)
             except ET.ParseError:
                 xbmc.log(
-                    'Couldnt parse Program XML {0}'.format(news_program_id))
+                    'Could not parse Program XML {0}'.format(news_program_id))
             else:
                 # Add program
                 play_path = nhk_api.rest_url['news_programs_video_url'].format(

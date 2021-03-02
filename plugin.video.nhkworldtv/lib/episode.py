@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 class Episode(object):
-    """ NHK Episode that contains all the necessary informaton
+    """ NHK Episode that contains all the necessary information
     to convert itself into a Kodi ListItem"""
     def __init__(self):
         """ Creates an Episode instance """
@@ -195,11 +195,11 @@ class Episode(object):
 
         if (self.url is not None):
             # Path was provided - created the ListItem with path
-            li = xbmcgui.ListItem(path=self.url)
+            li = xbmcgui.ListItem(path=self.url, offscreen=True)
             li.setLabel(self.title)
         else:
             # Create ListItem with title
-            li = xbmcgui.ListItem(self.title)
+            li = xbmcgui.ListItem(self.title, offscreen=True)
 
         li.setArt({'thumb': self.thumb, 'fanart': self.fanart})
         li.setLabel(self.title)
@@ -229,10 +229,10 @@ class Episode(object):
     #
 
     def get_info_label(self):
-        """ Create the InfoLabel from the Episode Propeties
+        """ Create the InfoLabel from the Episode properties
 
         Returns:
-            dict -- Dictionary with the Info Label propeties
+            dict -- Dictionary with the Info Label properties
         """
 
         info_label = {}
@@ -274,7 +274,7 @@ class Episode(object):
         """Get the time difference between the
         Start date and the compare_date
 
-        Mirrors the hebaviour from the NHK Website
+        Mirrors the behaviour from the NHK Website
 
         Arguments:
             compare_date {datetime} -- Date to compare with

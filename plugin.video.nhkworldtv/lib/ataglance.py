@@ -27,7 +27,7 @@ def get_menu_item():
     menu_item.plot = kodiutils.get_string(30012).format(
         featured_news['title'], featured_news['description'])
 
-    # Create the directory itemn
+    # Create the directory item
 
     menu_item.video_info = kodiutils.get_SD_video_info()
     return menu_item

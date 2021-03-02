@@ -30,7 +30,7 @@ def get_menu_item():
     menu_item.plot = kodiutils.get_string(30012).format(
         featured_news['title'], featured_news['description'])
 
-    # Create the directory itemn
+    # Create the directory item
     menu_item.video_info = kodiutils.get_SD_video_info()
 
     return menu_item
@@ -75,7 +75,7 @@ def get_episodes(max_items, icon, fanart):
         if row['videos'] is not None:
             video = row['videos']
             # Top stories that have a video attached to them
-            episode.title = kodiutils.get_string(30070).format(title)
+            episode.title = kodiutils.get_string(30063).format(title)
             episode.vod_id = news_id
             episode.duration = video['duration']
             episode.plot_include_time_difference = True

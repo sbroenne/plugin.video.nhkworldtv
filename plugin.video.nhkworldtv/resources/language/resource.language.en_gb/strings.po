@@ -144,8 +144,54 @@ msgid "{0} min ago"
 msgstr ""
 
 # Live Schedule
-msgctxt "#30070"
+msgctxt "#30063"
 msgid "PLAY: {0}"
+msgstr ""
+
+# First run Wizard
+
+# Step 1
+msgctxt "#30070"
+msgid "1 of 3: Set-up Wizard - Welcome"
+msgstr ""
+
+msgctxt "#30071"
+msgid "NHK World TV comes with a set of configurable options.[CR]You can always change them in the addon-settings later.[CR]For the best user experience I would suggest to set-up some settings now."
+msgstr ""
+
+msgctxt "#30072"
+msgid "Yes, continue set-up"
+msgstr ""
+
+msgctxt "#30073"
+msgid "No, I am good"
+msgstr ""
+
+# Step 2
+msgctxt "#30074"
+msgid "2 of 3: Set-up Wizard - Auto Kodi view modes"
+msgstr ""
+
+msgctxt "#30075"
+msgid "The plug-in can automatically set view modes (e.g. InfoWall) that best match the type of NHK content.[CR]This is disabled by default because it is a Kodi recommendation not to auto-set this.[CR]If you use the default Kodi skin (Estuary), I would recommend to auto-set view modes - this will give you the best user experience.[CR]Do you want to enable this?"
+msgstr ""
+
+msgctxt "#30076"
+msgid "No"
+msgstr ""
+
+msgctxt "#30077"
+msgid "Yes, please auto-set"
+msgstr ""
+
+# Step 3
+
+msgctxt "#30078"
+msgid "3 of 3: Information about 1080p"
+msgstr ""
+
+msgctxt "#30079"
+msgid "NHK provides streams via Akamai in 720p and 1080p - the plug-in defaults to 1080p where available.[CR]If you encounter buffering issues, you can fall-back to 720p in addon-settings.[CR][CR]The wizard has finished and will close now. Enjoy NHK World TV!"
 msgstr ""
 
 # News Programs
@@ -154,7 +200,7 @@ msgid "News Programs >"
 msgstr ""
 
 msgctxt "#30081"
-msgid "Watch NHK News Programs like NEWSLINE, NEWKSLINE IN DEPTH & NEWSROOM TOKYO on-demand.\n\nOnly currently broadcasted programs will be shown."
+msgid "Watch NHK News Programs like NEWSLINE, NEWSLINE IN DEPTH & NEWSROOM TOKYO on-demand.[CR]Only currently broadcasted programs will be shown."
 msgstr ""
 
 # kodiutils.py
