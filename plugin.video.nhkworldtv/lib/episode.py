@@ -176,20 +176,6 @@ class Episode(object):
         self._video_info = value
 
     @property
-    def cast(self):
-        """ Gets a cast info label
-        If it has not been set before, a default one will
-        be created from other fields
-        """
-        if (self._cast is not None):
-            return self._cast
-
-    @cast.setter
-    def cast(self, value):
-        """ Sets the cast info label """
-        self._cast = value
-
-    @property
     def kodi_list_item(self):
         """ Gets the current Kodi List Item """
 

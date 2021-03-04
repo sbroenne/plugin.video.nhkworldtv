@@ -69,9 +69,8 @@ def index():
     add_news_programs_menu_item()
     # Set-up view
     kodiutils.set_video_directory_information(plugin.handle,
-                                              kodiutils.VIEW_MODE_INFOWALL,
                                               xbmcplugin.SORT_METHOD_UNSORTED,
-                                              'videos')
+                                              'tvshows')
     return (True)
 
 
@@ -116,8 +115,7 @@ def topstories_index():
     if (len(episodes) > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(
-            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
-            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
+            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'episodes')
         success = True
     return (success)
 
@@ -158,8 +156,7 @@ def ataglance_index():
     if (len(episodes)) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(
-            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
-            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
+            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'episodes')
         success = True
     return success
 
@@ -201,8 +198,7 @@ def news_programs_index():
     if (len(programs)) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, programs, len(programs))
         kodiutils.set_video_directory_information(
-            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
-            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
+            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'tvshows')
         success = True
     return success
 
@@ -318,6 +314,10 @@ def add_live_schedule_menu_item():
                                      episode.broadcast_end_date, row['title'])
     episode.plot = '{0}\n\n{1}'.format(
         kodiutils.get_string(30022).format(title), row['description'])
+
+    # Do not show duration
+    episode.broadcast_start_date = 0
+    episode.broadcast_end_date = 0
 
     episode.video_info = kodiutils.get_video_info(USE_720P)
     xbmcplugin.addDirectoryItem(plugin.handle,
@@ -452,7 +452,6 @@ def vod_index():
                        xbmcplugin.SORT_METHOD_TITLE), li, True)
 
     kodiutils.set_video_directory_information(plugin.handle,
-                                              kodiutils.VIEW_MODE_WIDELIST,
                                               xbmcplugin.SORT_METHOD_NONE,
                                               'videos')
 
@@ -484,7 +483,7 @@ def vod_programs():
             episode.plot = row['description_clean']
             episode.thumb = row['image']
             episode.fanart = row['image_l']
-            episode.video_info = kodiutils.get_1080_HD_video_info()
+            episode.video_info = kodiutils.get_video_info(USE_720P)
 
             # Create the directory item
             episodes.append(
@@ -496,9 +495,8 @@ def vod_programs():
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(plugin.handle,
-                                                  kodiutils.VIEW_MODE_INFOWALL,
                                                   xbmcplugin.SORT_METHOD_TITLE,
-                                                  'videos')
+                                                  'episodes')
 
     # Return last program program Id - useful for unit testing
     return (program_id)
@@ -523,7 +521,7 @@ def vod_categories():
         episode.absolute_image_url = True
         episode.thumb = row['icon_l']
         episode.fanart = row['icon_l']
-        episode.video_info = kodiutils.get_1080_HD_video_info()
+        episode.video_info = kodiutils.get_video_info(USE_720P)
 
         # Create the directory item
         category_id = row['category_id']
@@ -535,7 +533,6 @@ def vod_categories():
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(plugin.handle,
-                                                  kodiutils.VIEW_MODE_INFOWALL,
                                                   xbmcplugin.SORT_METHOD_TITLE,
                                                   'videos')
 
@@ -571,8 +568,7 @@ def vod_playlists():
     if (row_count > 0):
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(
-            plugin.handle, kodiutils.VIEW_MODE_INFOWALL,
-            xbmcplugin.SORT_METHOD_UNSORTED, 'videos')
+            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'episodes')
 
     # Return last valid playlist ID - useful for unit testing
     return playlist_id
@@ -653,9 +649,8 @@ def vod_episode_list(api_method,
             xbmcplugin.addDirectoryItems(plugin.handle, playable_episodes,
                                          len(playable_episodes))
             sort_method = int(sort_method)
-            kodiutils.set_video_directory_information(
-                plugin.handle, kodiutils.VIEW_MODE_INFOWALL, sort_method,
-                'videos')
+            kodiutils.set_video_directory_information(plugin.handle,
+                                                      sort_method, 'episodes')
         success = True
 
     # Used for unit testing

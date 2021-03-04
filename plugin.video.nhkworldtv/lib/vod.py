@@ -135,11 +135,10 @@ def get_episode_from_cache(episode=Episode(), use_720p=False):
         # If we should use 720P or there is no 1080P file, use 720P
         if ((use_720p) or (cached_episode['P1080P'] is None)):
             episode.url = cache_api.base_url + cached_episode['P720P']
-            episode.video_info = kodiutils.get_720_HD_video_info()
+            episode.video_info = kodiutils.get_video_info(use_720p=True)
         else:
             episode.url = cache_api.base_url + cached_episode['P1080P']
-            episode.video_info = kodiutils.get_1080_HD_video_info()
-
+            episode.video_info = kodiutils.get_video_info(use_720p=False)
         episode.onair = cached_episode['OnAir']
 
         returnValue = [episode.url, episode.kodi_list_item, False]
@@ -214,7 +213,8 @@ def resolve_vod_episode(vod_id, use_720p):
                             and not use_720p):
                         episode.url = nhk_api.rest_url['episode_url'].format(
                             play_path)
-                        episode.video_info = kodiutils.get_1080_HD_video_info()
+                        episode.video_info = kodiutils.get_video_info(
+                            use_720p=False)
                         episode.IsPlayable = True
                     else:
                         # Prefer 720P or video doesn't have a reference file.
@@ -224,7 +224,8 @@ def resolve_vod_episode(vod_id, use_720p):
                         play_path = asset['rtmp']['play_path'].split('?')[0]
                         episode.url = nhk_api.rest_url['episode_url'].format(
                             play_path)
-                        episode.video_info = kodiutils.get_720_HD_video_info()
+                        episode.video_info = kodiutils.get_video_info(
+                            use_720p=True)
                         episode.IsPlayable = True
 
     return (episode)
