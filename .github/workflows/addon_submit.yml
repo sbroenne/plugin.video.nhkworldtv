@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    name: Push to Kodi repo
+    name: Push to Kodi plugin repo and create PR
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

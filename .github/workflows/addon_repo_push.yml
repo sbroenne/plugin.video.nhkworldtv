@@ -1,0 +1,25 @@
+name: Push addon to plugin repo branches
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Push addon to plugin repo branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy pre-requisites
+        id: pre_req
+        run: |
+          sudo -H pip3 install setuptools
+          sudo -H pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
+      - name: Push to Kodi repo and create PR
+        id: kodi-push
+        env:
+          GH_USERNAME: ${{ github.actor }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          EMAIL: ${{secrets.EMAIL}}
+        run: |
+          submit-addon -r repo-plugins -b leia --push-branch -s -m plugin.video.nhkworldtv
