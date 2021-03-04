@@ -138,8 +138,7 @@ def request_url(url, cached=True):
         # so sometimes a call can be made
         # before the the table has been created
         # This will fix itself shortly (on the next call)
-        xbmc.log('Catching sqlite3.OperationalError: {0}'.format(
-            sqlite3.OperationalError.message))
+        xbmc.log('url.request_url: Swallowing sqlite3.OperationalError')
         r.status_code = 10002
     return (r)
 

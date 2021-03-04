@@ -4,18 +4,6 @@ from kodi_six import xbmc, xbmcaddon, xbmcplugin
 # read settings
 ADDON = xbmcaddon.Addon()
 
-# View Modes from the default Estuary skin
-VIEW_MODE_INFOWALL = 54
-VIEW_MODE_WALL = 500
-VIEW_MODE_WIDELIST = 55
-
-# Reverse values to handle feedback from Kodi GUI
-VIEW_MODES_REVERSE = {
-    VIEW_MODE_INFOWALL: 'InfoWall',
-    VIEW_MODE_WIDELIST: 'WideList',
-    VIEW_MODE_WALL: 'Wall'
-}
-
 
 def get_string(string_id):
     localized_string = ADDON.getLocalizedString(string_id)
@@ -37,19 +25,19 @@ def get_video_info(use_720p):
         [dict]: A video_info dict
     """
     if (use_720p):
-        return (get_720_HD_video_info())
+        return (__get_720_HD_video_info())
     else:
-        return (get_1080_HD_video_info())
+        return (__get_1080_HD_video_info())
 
 
 # Returns a Full-HD (1080p) video info array
-def get_1080_HD_video_info():
+def __get_1080_HD_video_info():
     video_info = {'aspect': '1.78', 'width': '1920', 'height': '1080'}
     return (video_info)
 
 
 # Returns a HD (720p) video info array
-def get_720_HD_video_info():
+def __get_720_HD_video_info():
     video_info = {'aspect': '1.78', 'width': '1280', 'height': '720'}
     return (video_info)
 
@@ -61,47 +49,26 @@ def get_SD_video_info():
 
 
 def set_video_directory_information(plugin_handle,
-                                    view_mode,
                                     sort_method,
                                     content_type='videos'):
-    """Sets the metadate like VIEW_MODE and SORT_METHOD on the
+    """Sets the metadate like SORT_METHOD on the
     current Kodi directory
 
     Arguments:
         plugin_handle {int} -- Plugin handle
-        view_mode {int} -- e.g kodiutils.VIEW_MODE_INFOWALL
         sort_method {int} -- xbmcplugin.SORT_METHOD_TITLE
-        content_type {unicode} -- videos, episodes, tvshows, etc.
+        content_type {str} -- videos, episodes, tvshows, etc.
     """
     # Debug logging
-    current_viewmode = xbmc.getInfoLabel('Container.ViewMode')
     current_sort_method = xbmc.getInfoLabel('Container.SortMethod')
-    xbmc.log('Current view mode/sort method: {0}/{1}'.format(
-        current_viewmode, current_sort_method))
-    xbmc.log('Requested view mode/sort method: {0}/{1}'.format(
-        VIEW_MODES_REVERSE[view_mode], sort_method))
+    xbmc.log('Current sort method: {0}'.format(current_sort_method))
+    xbmc.log('Requested sort method: {0}'.format(sort_method))
 
     # Set sort method
     xbmcplugin.addSortMethod(plugin_handle, sort_method)
-
-    # Setting view mode - needs to be enabled in settings
-    if (ADDON.getSettingBool('set_view_mode')):
-        # Change view mode
-        xbmc.log('Switching to View Mode: {0}'.format(
-            VIEW_MODES_REVERSE[view_mode]))
-        # Set the content
-        if (view_mode != VIEW_MODE_WIDELIST):
-            # Do not set the content typ for WideList
-            xbmcplugin.setContent(plugin_handle, content_type)
-        xbmc.executebuiltin('Container.SetViewMode({0})'.format(view_mode))
-    else:
-        # Setting was disabled - do not change view mode
-        xbmc.log('SETTING NOT ENABLED: View Mode mot changed\
-                 - requested view mode: {0}'.format(
-            VIEW_MODES_REVERSE[view_mode]))
-        if (content_type != 'videos'):
-            # Set the content to a more specific content type than videos
-            xbmcplugin.setContent(plugin_handle, content_type)
+    if (content_type != 'videos'):
+        # Set the content to a more specific content type than videos
+        xbmcplugin.setContent(plugin_handle, content_type)
 
     # End of Directory
     xbmcplugin.endOfDirectory(plugin_handle, succeeded=True, cacheToDisc=False)
