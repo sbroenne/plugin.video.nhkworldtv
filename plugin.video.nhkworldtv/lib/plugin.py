@@ -316,8 +316,8 @@ def add_live_schedule_menu_item():
         kodiutils.get_string(30022).format(title), row['description'])
 
     # Do not show duration
-    episode.broadcast_start_date = 0
-    episode.broadcast_end_date = 0
+    episode.broadcast_start_date = None
+    episode.broadcast_end_date = None
 
     episode.video_info = kodiutils.get_video_info(USE_720P)
     xbmcplugin.addDirectoryItem(plugin.handle,

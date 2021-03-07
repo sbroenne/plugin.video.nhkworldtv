@@ -20,11 +20,17 @@
         <description lang="en_GB">
 Watch NHK World Japan in Full HD
 
-NHK provides streams via Akamai in 720p and 1080p - the plug-in defaults to 1080p where available.
+- Live Stream 
+- On demand programs - By program, latest and most watched, categories and playlist. You can also browse and search through all programs.
+- Live schedule
+- Top Stories and At a Glance
+- News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
 
-If you encounter buffering issues, you can fall-back to 720p by changing the 'Use 720p instead of 1080p' addon-setting.
+Content is retrieved and played directly from the NHK World web site.
 
-Tested on Kodi 18.6+ and 19.
+Plugin supports fallback to HD if you should encounter buffering issues.
+
+Tested on Kodi 18.6+ Leia and 19 Matrix.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -34,7 +40,7 @@ Tested on Kodi 18.6+ and 19.
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
         <news>
-First non-beta release, no functionality changes.
+- Removed optional setting of View States so that plugin can be submitted to official repo
         </news>
         <assets>
             <icon>resources/icon.png</icon>

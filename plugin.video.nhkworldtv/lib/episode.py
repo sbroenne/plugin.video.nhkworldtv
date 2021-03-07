@@ -82,11 +82,16 @@ class Episode(object):
     @broadcast_start_date.setter
     def broadcast_start_date(self, value):
         """ Sets the current broadcast start date from the timestamp value """
-        timestamp = int(value) // 1000
-        local_date = utils.to_local_time(timestamp)
-        self._broadcast_start_date = local_date
-        self._date = local_date
-        self._aired = local_date
+        if (value is None):
+            self._broadcast_start_date = None
+            self._date = None
+            self._aired = None
+        else:
+            timestamp = int(value) // 1000
+            local_date = utils.to_local_time(timestamp)
+            self._broadcast_start_date = local_date
+            self._date = local_date
+            self._aired = local_date
 
     @property
     def broadcast_end_date(self):
@@ -96,9 +101,12 @@ class Episode(object):
     @broadcast_end_date.setter
     def broadcast_end_date(self, value):
         """ Sets the current broadcast end date from the timestamp value """
-        timestamp = int(value) // 1000
-        local_date = utils.to_local_time(timestamp)
-        self._broadcast_end_date = local_date
+        if (value is None):
+            self._broadcast_end_date = None
+        else:
+            timestamp = int(value) // 1000
+            local_date = utils.to_local_time(timestamp)
+            self._broadcast_end_date = local_date
 
     @property
     def thumb(self):

@@ -26,8 +26,10 @@ def to_local_time(timestamp):
 def get_episode_name(title, subtitle):
     """ Construct an episode name from the title and the subtitle"""
     if len(subtitle) == 0:
+        subtitle = subtitle.replace("<p></p>", "")
         episode_name = '{0}'.format(title)
     else:
+        title = title.replace("<p></p>", "")
         episode_name = '{0} - {1}'.format(title, subtitle)
     return (episode_name)
 
