@@ -29,7 +29,7 @@ def get_menu_item():
 
     # Create the directory item
 
-    menu_item.video_info = kodiutils.get_SD_video_info()
+    menu_item.video_info = kodiutils.get_sd_video_info()
     return menu_item
 
 
@@ -71,15 +71,11 @@ def get_episodes(max_items):
         vod_id = row['id']
         episode.vod_id = vod_id
         episode.duration = row['video']['duration']
-        if (episode.duration is not None):
-            episode.plot_include_time_difference = True
-            episode.plot = row['description']
-        else:
-            episode.plot_include_time_difference = True
-            episode.plot = row['description']
+        episode.plot_include_time_difference = True
+        episode.plot = row['description']
 
-        episode.video_info = kodiutils.get_SD_video_info()
-        episode.IsPlayable = True
-        episode.url = url.get_NHK_website_url(row['video']['config'])
+        episode.video_info = kodiutils.get_sd_video_info()
+        episode.is_playable = True
+        episode.url = url.get_nhk_website_url(row['video']['config'])
         episodes.append(episode)
     return (episodes)

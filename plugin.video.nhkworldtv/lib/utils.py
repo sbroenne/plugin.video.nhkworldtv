@@ -109,3 +109,16 @@ def get_timestamp_from_datestring(datestring):
     # episode.broadcast_start_date etc.
     timestamp = int(time.mktime(local_dt.timetuple()) * 1000)
     return (timestamp)
+
+
+def format_plot(line1, line2):
+    """Format the plot field
+
+    Args:
+        line1 (str): First line
+        line2 (str): Second line
+
+    Returns:
+        str: Formatted plot field
+    """
+    return ('{0}\n\n{1}'.format(line1, line2))

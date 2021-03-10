@@ -29,11 +29,11 @@ def test_vod_menu():
 # At a glance
 
 
-def test_add_AtAGlance_menu_item():
+def test_add_ataglance_menu_item():
     assert (plugin.add_ataglance_menu_item() is True)
 
 
-def test_get_AtAGlance_index():
+def test_get_ataglance_index():
     assert (plugin.ataglance_index() is True)
 
 

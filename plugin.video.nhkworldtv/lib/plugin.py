@@ -103,7 +103,7 @@ def topstories_index():
     episodes = []
 
     for episode in topstories_episodes:
-        if (episode.IsPlayable):
+        if (episode.is_playable):
             episodes.append(
                 (plugin.url_for(play_news_item, episode.url, episode.vod_id,
                                 'news',
@@ -181,7 +181,7 @@ def add_news_programs_menu_item():
     info_labels['mediatype'] = 'episode'
     info_labels['Plot'] = kodiutils.get_string(30081)
     li.setInfo('video', info_labels)
-    li.addStreamInfo('video', kodiutils.get_SD_video_info())
+    li.addStreamInfo('video', kodiutils.get_sd_video_info())
     li.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle,
                                 plugin.url_for(news_programs_index), li, True)
@@ -266,7 +266,7 @@ def add_live_stream_menu_item(use_720p=USE_720P):
     # Schedule Information
     episode.thumb = row['thumbnail_s']
     episode.fanart = row['thumbnail']
-    episode.IsPlayable = True
+    episode.is_playable = True
     episode.playcount = 0
 
     # Title and Description
@@ -312,7 +312,7 @@ def add_live_schedule_menu_item():
 
     title = utils.get_schedule_title(episode.broadcast_start_date,
                                      episode.broadcast_end_date, row['title'])
-    episode.plot = '{0}\n\n{1}'.format(
+    episode.plot = utils.format_plot(
         kodiutils.get_string(30022).format(title), row['description'])
 
     # Do not show duration
@@ -359,14 +359,14 @@ def live_schedule_index():
         if (len(vod_id) > 0):
             # Can play on-demand -> Add "Play:" before the title
             # and make it playable
-            episode.IsPlayable = True
+            episode.is_playable = True
             episode.title = kodiutils.get_string(30063).format(title)
         else:
             episode.title = title
 
-        episode.plot = '{0}\n\n{1}'.format(episode_name, row['description'])
+        episode.plot = utils.format_plot(episode_name, row['description'])
 
-        if (episode.IsPlayable):
+        if (episode.is_playable):
             # Display the playable episode
             episodes.append((add_playable_episode(episode,
                                                   use_cache=USE_CACHE,
@@ -594,17 +594,17 @@ def add_playable_episode(episode, use_cache, use_720p):
     xbmc.log("add_playable_episode: Add {0}, use cache: {1}".format(
         episode.vod_id, use_cache))
     if (use_cache):
-        returnValue = vod.get_episode_from_cache(episode, use_720p)
-        if (returnValue is not None):
+        return_value = vod.get_episode_from_cache(episode, use_720p)
+        if (return_value is not None):
             xbmc.log("add_playable_episode: Added {0} from cache".format(
                 episode.vod_id))
-            return (returnValue)
+            return return_value
 
     # Don't use cache or episode not in cache - need to be resolve dynamically
     play_url = plugin.url_for(resolve_vod_episode, episode.vod_id)
     xbmc.log('add_playable_episode: Resolved Play URL: {0}'.format(play_url))
-    returnValue = [play_url, episode.kodi_list_item, False]
-    return (returnValue)
+    return_value = [play_url, episode.kodi_list_item, False]
+    return return_value
 
 
 @plugin.route('/vod/episode_list/<api_method>/<id>/<show_only_subtitle>/' +
@@ -672,11 +672,9 @@ def resolve_vod_episode(vod_id, use_720p=USE_720P):
     """
 
     episode = vod.resolve_vod_episode(vod_id, use_720p)
-    if (episode is not None):
-        if (episode.IsPlayable):
-            xbmcplugin.setResolvedUrl(plugin.handle, True,
-                                      episode.kodi_list_item)
-            return (episode)
+    if (episode is not None and episode.is_playable):
+        xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
+        return (episode)
 
 
 #  Play News or At A Glance Item
@@ -708,8 +706,8 @@ def play_news_item(api_url, news_id, item_type, title):
         episode.vod_id = news_id
         episode.title = title
         episode.url = play_path
-        episode.video_info = kodiutils.get_SD_video_info()
-        episode.IsPlayable = True
+        episode.video_info = kodiutils.get_sd_video_info()
+        episode.is_playable = True
         xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
         return (True)
     else:

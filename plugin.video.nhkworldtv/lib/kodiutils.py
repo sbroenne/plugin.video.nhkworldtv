@@ -11,8 +11,8 @@ def get_string(string_id):
         return localized_string
     else:
         # Running under unit test - return a unit test string
-        returnString = 'UNIT TEST LOCALIZED STRING {0}'.format(string_id)
-        return returnString
+        return_string = 'UNIT TEST LOCALIZED STRING {0}'.format(string_id)
+        return return_string
 
 
 def get_video_info(use_720p):
@@ -25,25 +25,25 @@ def get_video_info(use_720p):
         [dict]: A video_info dict
     """
     if (use_720p):
-        return (__get_720_HD_video_info())
+        return (__get_720_video_info())
     else:
-        return (__get_1080_HD_video_info())
+        return (__get_1080_video_info())
 
 
 # Returns a Full-HD (1080p) video info array
-def __get_1080_HD_video_info():
+def __get_1080_video_info():
     video_info = {'aspect': '1.78', 'width': '1920', 'height': '1080'}
     return (video_info)
 
 
 # Returns a HD (720p) video info array
-def __get_720_HD_video_info():
+def __get_720_video_info():
     video_info = {'aspect': '1.78', 'width': '1280', 'height': '720'}
     return (video_info)
 
 
 # Returns a SD video info array
-def get_SD_video_info():
+def get_sd_video_info():
     video_info = {'aspect': '1.82', 'width': '640', 'height': '368'}
     return (video_info)
 

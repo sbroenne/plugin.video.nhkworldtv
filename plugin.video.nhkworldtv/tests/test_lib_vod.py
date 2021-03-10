@@ -43,13 +43,13 @@ def test_resolve_episode_720p(test_episode):
 
     assert (isinstance(
         vod.resolve_vod_episode(test_episode.vod_id, use_720p=True), Episode))
-    assert (test_episode.IsPlayable is True)
+    assert (test_episode.is_playable is True)
 
 
 def test_resolve_episode_1080p(test_episode):
     assert (isinstance(
         vod.resolve_vod_episode(test_episode.vod_id, use_720p=False), Episode))
-    assert (test_episode.IsPlayable is True)
+    assert (test_episode.is_playable is True)
 
 
 def test_resolve_invalid_episode():

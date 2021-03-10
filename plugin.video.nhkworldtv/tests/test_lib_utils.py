@@ -37,3 +37,7 @@ def test_get_local_timestamp_from_news_datestring():
     datestring = '20200416130000'
     local_datetime = utils.get_timestamp_from_datestring(datestring)
     assert (local_datetime is not None)
+
+
+def test_format_plot():
+    assert (utils.format_plot('line1', 'line2') == 'line1\n\nline2')

@@ -72,8 +72,8 @@ def get_programs():
                 episode.fanart = news_program['image']
                 episode.thumb = news_program['image']
                 episode.duration = root.find('media.time').text
-                episode.video_info = kodiutils.get_SD_video_info()
-                episode.IsPlayable = True
+                episode.video_info = kodiutils.get_sd_video_info()
+                episode.is_playable = True
                 episodes.append((play_path, episode.kodi_list_item, False))
 
     return (episodes)

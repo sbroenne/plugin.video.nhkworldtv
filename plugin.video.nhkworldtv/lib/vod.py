@@ -69,7 +69,7 @@ def get_episode_list(api_method, id, show_only_subtitle):
     episode = None
     for row in program_json:
         episode = Episode()
-        episode.IsPlayable = True
+        episode.is_playable = True
         title = row['title_clean']
         subtitle = row['sub_title_clean']
 
@@ -112,7 +112,7 @@ def get_episode_list(api_method, id, show_only_subtitle):
     return (episodes)
 
 
-def get_episode_from_cache(episode=Episode(), use_720p=False):
+def get_episode_from_cache(episode, use_720p=False):
     """ Add a Kodi directory item for a playable episode
 
     Args:
@@ -128,7 +128,7 @@ def get_episode_from_cache(episode=Episode(), use_720p=False):
     # via play_vod_episode()
     #
     # Use the cache backend or not
-    returnValue = None
+    return_value = None
     if (episode.vod_id in episode_cache):
         cached_episode = episode_cache[episode.vod_id]
         # In cache - display directly
@@ -141,11 +141,11 @@ def get_episode_from_cache(episode=Episode(), use_720p=False):
             episode.video_info = kodiutils.get_video_info(use_720p=False)
         episode.onair = cached_episode['OnAir']
 
-        returnValue = [episode.url, episode.kodi_list_item, False]
+        return_value = [episode.url, episode.kodi_list_item, False]
         xbmc.log(
             "vod.get_episode_from_cache: Added episode {0} from cache".format(
                 episode.vod_id))
-    return (returnValue)
+    return return_value
 
 
 def resolve_vod_episode(vod_id, use_720p):
@@ -167,16 +167,16 @@ def resolve_vod_episode(vod_id, use_720p):
     r = url.get_url(nhk_api.rest_url['player_url'].format(vod_id, vod_id))
     if (r.status_code == 200):
         # Player content retrieved
-        playerJS = r.text
+        player_js = r.text
         # Parse the output of the Player JS file for the UUID of the episode
         uuid_match = re.compile("'data-de-program-uuid','(.+?)'").findall(
-            playerJS)
+            player_js)
 
         # Only continue if we could retrieve the uuid
         if (len(uuid_match) > 0):
-            program_Uuid = uuid_match[0]
+            program_uuid = uuid_match[0]
             xbmc.log('vod.resolve_vod_episode: Parsed UUID: {0}'.format(
-                program_Uuid))
+                program_uuid))
             # Get episode detail
             episode_detail = url.get_json(
                 nhk_api.rest_url['get_episode_detail'].format(
@@ -192,7 +192,7 @@ def resolve_vod_episode(vod_id, use_720p):
                 episode.duration = episode_detail['movie_duration']
 
                 # Get episode URL and video information
-                player_url = nhk_api.rest_url['video_url'].format(program_Uuid)
+                player_url = nhk_api.rest_url['video_url'].format(program_uuid)
                 xbmc.log('vod.resolve_vod_episode: Player Url: {0}'.format(
                     player_url))
 
@@ -215,7 +215,7 @@ def resolve_vod_episode(vod_id, use_720p):
                             play_path)
                         episode.video_info = kodiutils.get_video_info(
                             use_720p=False)
-                        episode.IsPlayable = True
+                        episode.is_playable = True
                     else:
                         # Prefer 720P or video doesn't have a reference file.
                         # Then use the 720P Version instead
@@ -226,6 +226,6 @@ def resolve_vod_episode(vod_id, use_720p):
                             play_path)
                         episode.video_info = kodiutils.get_video_info(
                             use_720p=True)
-                        episode.IsPlayable = True
+                        episode.is_playable = True
 
     return (episode)

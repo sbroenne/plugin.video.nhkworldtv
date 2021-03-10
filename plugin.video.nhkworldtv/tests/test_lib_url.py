@@ -9,7 +9,7 @@ def test_check_url_exists():
 
 
 def test_get_API_request_params():
-    assert (url.get_API_request_params(nhk_api.rest_url['get_livestream'])
+    assert (url.get_api_request_params(nhk_api.rest_url['get_livestream'])
             is not None)
 
 
@@ -61,5 +61,5 @@ def test_get_JSON_notexists():
 
 
 def test_get_NHK_website_url():
-    assert (url.get_NHK_website_url('/nhkworld/') ==
+    assert (url.get_nhk_website_url('/nhkworld/') ==
             'https://www3.nhk.or.jp/nhkworld/')

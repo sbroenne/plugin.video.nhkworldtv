@@ -27,7 +27,7 @@ class Episode(object):
         self.width = None
         self.height = None
         self.url = None
-        self.IsPlayable = False
+        self.is_playable = False
         self.playcount = None
         self._date = None
         self._aired = None
@@ -117,7 +117,7 @@ class Episode(object):
     def thumb(self, value):
         """ Sets thumbnail URL """
         if ('/nhkworld/' in value and not self.absolute_image_url):
-            self._thumb = url.get_NHK_website_url(value)
+            self._thumb = url.get_nhk_website_url(value)
         else:
             self._thumb = value
 
@@ -130,7 +130,7 @@ class Episode(object):
     def fanart(self, value):
         """ Sets thumbnail URL """
         if ('/nhkworld/' in value and not self.absolute_image_url):
-            self._fanart = url.get_NHK_website_url(value)
+            self._fanart = url.get_nhk_website_url(value)
         else:
             self._fanart = value
 
@@ -201,7 +201,7 @@ class Episode(object):
         # Get info label
         info_label = self.get_info_label()
 
-        if (self.IsPlayable):
+        if (self.is_playable):
             # Playable episode
             li.setProperty('IsPlayable', 'true')
             info_label['mediatype'] = 'episode'

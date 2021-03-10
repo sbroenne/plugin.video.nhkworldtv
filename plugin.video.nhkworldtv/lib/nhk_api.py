@@ -2,7 +2,7 @@ from __future__ import (absolute_import, unicode_literals)
 from . import nhk_api_parser
 
 # NHK World API - parsed from api.js
-# FIXME: Some URLs cannot be found in api.js and are therefor static
+# Note: Some URLs cannot be found in api.js and are therefor static
 rest_url = {
     'homepage_ondemand':
     nhk_api_parser.get_homepage_ondemand_url(),

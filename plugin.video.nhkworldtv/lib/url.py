@@ -78,7 +78,7 @@ def get_json(url, cached=True):
         xbmc.log('Could not connect to API: {0}'.format(url))
 
 
-def get_API_request_params(url):
+def get_api_request_params(url):
     """ Returns the API request paramaters for the NHK and the Cache API
 
     Args:
@@ -109,7 +109,7 @@ def request_url(url, cached=True):
         [response]: Response object - can be None
     """
 
-    request_params = get_API_request_params(url)
+    request_params = get_api_request_params(url)
     r = Response()
 
     try:
@@ -205,7 +205,7 @@ def get_url(url, cached=True):
     return (r)
 
 
-def get_NHK_website_url(path):
+def get_nhk_website_url(path):
     """ Return a full URL from the partial URLs in the JSON results """
     nhk_website = api_keys.NHK_BASE_URL
     return nhk_website + path

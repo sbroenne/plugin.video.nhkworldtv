@@ -31,7 +31,7 @@ def get_menu_item():
         featured_news['title'], featured_news['description'])
 
     # Create the directory item
-    menu_item.video_info = kodiutils.get_SD_video_info()
+    menu_item.video_info = kodiutils.get_sd_video_info()
 
     return menu_item
 
@@ -80,9 +80,9 @@ def get_episodes(max_items, icon, fanart):
             episode.duration = video['duration']
             episode.plot_include_time_difference = True
             episode.plot = row['description']
-            episode.video_info = kodiutils.get_SD_video_info()
-            episode.IsPlayable = True
-            episode.url = url.get_NHK_website_url(video['config'])
+            episode.video_info = kodiutils.get_sd_video_info()
+            episode.is_playable = True
+            episode.url = url.get_nhk_website_url(video['config'])
             episodes.append(episode)
         else:
             # No video attached to it
@@ -99,6 +99,6 @@ def get_episodes(max_items, icon, fanart):
             if (thumbnails is not None):
                 episode.thumb = thumbnails['small']
                 episode.fanart = thumbnails['middle']
-            episode.IsPlayable = False
+            episode.is_playable = False
             episodes.append((episode))
     return (episodes)
