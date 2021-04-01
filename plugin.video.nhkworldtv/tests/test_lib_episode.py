@@ -58,7 +58,7 @@ def test_get_calculated_duration():
     timestamp = time.mktime(start_date.timetuple()) * 1000
     episode.broadcast_start_date = timestamp
 
-    # Set the end date (60 seeconds later)
+    # Set the end date (60 seconds later)
     end_date = start_date + timedelta(seconds=60)
     timestamp = time.mktime(end_date.timetuple()) * 1000
     episode.broadcast_end_date = timestamp
@@ -72,7 +72,7 @@ def test_get_plot_duration_time_difference():
     timestamp = time.mktime(start_date.timetuple()) * 1000
     episode.broadcast_start_date = timestamp
 
-    # Set the end date (60 seeconds later)
+    # Set the end date (60 seconds later)
     end_date = start_date + timedelta(seconds=90)
     timestamp = time.mktime(end_date.timetuple()) * 1000
     episode.broadcast_end_date = timestamp
