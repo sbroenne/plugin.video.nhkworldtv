@@ -235,8 +235,9 @@ class Episode(object):
             # Include time difference in plot
             info_label['Plot'] = '{0}\n\n{1}'.format(
                 self.get_time_difference(), self.plot)
-        elif (self.plot_include_broadcast_detail):
-            # Include broadcast detail
+        elif (self.plot_include_broadcast_detail
+              and self.broadcast_end_date is not None):
+            # Include broadcast detail if there is an endDate
             info_label['Plot'] = kodiutils.get_string(30050).format(
                 self.plot, self.broadcast_end_date.strftime('%Y-%m-%d'))
         else:
