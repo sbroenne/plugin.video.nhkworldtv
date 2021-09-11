@@ -25,7 +25,7 @@ This plug-in is a fan project and not related in any way to NHK! I built this pl
 
 NHK World TV is a plug-in that displays most of the content from [NHK World Japan](https://www3.nhk.or.jp/nhkworld/en/live/) in Kodi in the highest possible quality (1080p) where available:
 
-- Live Stream 
+- Live Stream
 - On demand programs (by program, latest and most watched, categories and playlist) - you can also browse and search through all programs
 - Live schedule / "EPG"
 - Top Stories and At a Glance
@@ -39,7 +39,11 @@ Tested on Kodi 18.6+ (Leia) and 19 (Matrix).
 
 ## 1.3. How-to Install
 
-I have submitted the plug-in to be included in the official Kodi addon-repo so this should hopefully be a thing of the past in the nearer future.
+I submitted the plugin to the official Kodi repo but unfortunately this request was declined. The reason is that the they only accept one plugin per content provider.
+
+For NHK World that is the **NHK Live** plugin - looks like they have a first-come first-serve policy.
+
+For more details, have a look at the [pull request](https://github.com/xbmc/repo-plugins/pull/3426) that was created in March 2021.
 
 ### 1.3.1. Kodi 19 / Matrix (current Kodi version)
 
@@ -47,7 +51,7 @@ You can install the current Matrix version of the plugin by installing the [NHK 
 
 ### 1.3.2. Kodi 18 / Leia (previous Kodi version)
 
-You can also download the **Leia** version from a [Github release](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.1/plugin.video.nhkworldtv-1.0.1.zip) but you need to install this as ZIP file and it will **not auto-update**!
+You can also download the **Leia** version from a [Github release](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.2/plugin.video.nhkworldtv-1.0.2.zip) but you need to install this as ZIP file and it will **not auto-update**!
 
 ## 1.4. Video Quality
 
@@ -69,7 +73,7 @@ If you like to add the other content that can be found in Best Of NHK, please fe
 
 "Snappiness" was one of my design goals when developing this plug-in. For example, most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to two hours)
 
-The plug-in uses a companion cloud service to speed up video play-back because these specific  NHK APIs are very slow. 
+The plug-in uses a companion cloud service to speed up video play-back because these specific  NHK APIs are very slow.
 
 You can disable this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer and that you will loose a bit of UI functionality (e.g. Kodi will not store how much of a program you have already watched)
 
@@ -83,7 +87,7 @@ If you have a problem **after an update**, simply exit Kodi and start it again -
 
 ## 1.7. Current Development Status
 
-The plug-in is feature complete. 
+The plug-in is feature complete and stable.
 
 Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site. I also run scheduled unit tests on Github to alert me on breaking changes.
 
@@ -107,4 +111,4 @@ Originally it started as a fork of **Misty's** [Best Of NHK plug-in](https://for
 
 **Thank you Misty, awesome work!**
 
-It is not related in any way to the NHK Live plugin in the official addon-repo.
+It is not related in any way to the **NHK Live** plugin in the official addon repo.
