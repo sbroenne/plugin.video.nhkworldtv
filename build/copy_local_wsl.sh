@@ -1,10 +1,10 @@
 #!/bin/bash
 # Copies the Plugin from the dist folder to the local Kodi directory - used for local development on Windows 10 WSL2 (Ubuntu)
-# Build the Plugin
+# Build the Plugin for Matrix
 . ./build_matrix.sh
 # Set the local path (you need to adjust this)
 local_kodi=/mnt/c/Users/stefa/AppData/Roaming/Kodi
-# Change the <reuselanguageinvoker> to false
+# Change the <reuselanguageinvoker> to false - only needed for debugging
 sed -i "s/>true</>false</g" $KODI_VERSION/plugin.video.nhkworldtv/addon.xml
 # Delete existing add on folder
 rm -rf $local_kodi/addons/plugin.video.nhkworldtv

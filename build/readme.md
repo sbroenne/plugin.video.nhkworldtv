@@ -1,16 +1,12 @@
 # Local Build Instructions
 
-You can build this plug-in for both Kodi Leia and Matrix. There is a build file for each version. The plug-in has been tested on both versions. Since Matrix has been released, I have switched from Leia to Matirx in dev.
+You can build this plug-in for both Kodi Leia and Matrix. There is a build file for each version. The plug-in has been tested on both versions. Since Matrix has been released, I only release Matrix versions in my repo.
 
 The plugin version is determined from the latest Git Tag (e.g. _v1.0.0_). You can also hard-code it in the build file (can be useful for dev purposes)
 
-## Prerequsites
+## Prerequisites
 
 Pipenv is used to install the required [Python packages](../Pipfile) where possible. There is a Pipfile for Python version 2.7 and 3.8. You need to rename it to **Pipfile** before you can use Pipenv.
-
-### GNU Sed
-
-If you develop on a Mac, you need to use GNU sed insted of the default MacOsX sed - without it the build scripts will **not** work. I use Homebrew to install it and then change my $PATH to make it the default.
 
 ### Packages not in PyPi
 
@@ -26,16 +22,14 @@ This is how you would build for Kodi Matrix
 
 ```bash
 chmod u+x build_matrix.sh
-./build_leia.sh
+./build_matrix.sh
 ```
 
 The output can then be found in the respective [dist](./leia/matrix) folder.
 
-## Copy to local MacOsX Kodi
+## Copy to local WSL 2 on Windows 10/11 Kodi
 
-The [copy_local_macosx script](./copy_local_macosx.sh) will install the content of the [dist](./leia/matrix) folder to the local Kodi installation folder so you can update the plug-in easily while developing. This script works **only on MacOsX** but but should be easy to adapt to your environment.
-
-## Copy to local WSL 2 on Windows 10 Kodi
+I develop on Windows 11 with WSL v2.
 
 The [copy_local_wsl script](./copy_local_wsl.sh) will install the content of the [dist](./leia/matrix) folder to the local Kodi installation folder so you can update the plug-in easily while developing. This script works **only on Windows 10 using WSL2 as the development environment** but but should be easy to adapt to your environment.
 
