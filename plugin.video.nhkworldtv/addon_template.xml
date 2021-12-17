@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.nhkworldtv" name="NHK World TV" version="${PLUGIN_VERSION}" provider-name="sbroenne">
     <requires>
-        <import addon="xbmc.python" version="${XBMC_PYTHON_VERSION}"/>
-        <import addon="script.module.certifi" version="${CERTIFI_VERSION}"/>
-        <import addon="script.module.requests" version="${REQUESTS_VERSION}"/>
-        <import addon="script.module.requests-cache" version="${REQUESTS_CACHE_VERSION}"/>
-        <import addon="script.module.routing" version="${ROUTING_VERSION}"/>
-        <import addon="script.module.future" version="${FUTURE_VERSION}"/>
-        <import addon="script.module.kodi-six" version="${KODI_SIX_VERSION}"/>
-        <import addon="script.module.pytz" version="${PYTZ_VERSION}"/>
-        <import addon="script.module.tzlocal" version="${TZLOCAL_VERSION}"/>
+        <import addon="xbmc.python" version="${XBMC_PYTHON_VERSION}" />
+        <import addon="script.module.requests" version="${REQUESTS_VERSION}" />
+        <import addon="script.module.requests-cache" version="${REQUESTS_CACHE_VERSION}" />
+        <import addon="script.module.routing" version="${ROUTING_VERSION}" />
+        <import addon="script.module.future" version="${FUTURE_VERSION}" />
+        <import addon="script.module.kodi-six" version="${KODI_SIX_VERSION}" />
+        <import addon="script.module.tzlocal" version="${TZLOCAL_VERSION}" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
