@@ -117,10 +117,6 @@ msgctxt "#30046"
 msgid "Documentaries"
 msgstr ""
 
-msgctxt "#30047"
-msgid "We, in the Time of Corona"
-msgstr ""
-
 # Episode List
 msgctxt "#30050"
 msgid "{0}\n\nAvailable until: {1}"
