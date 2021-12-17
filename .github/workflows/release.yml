@@ -35,7 +35,7 @@ jobs:
         id: set_variables_leia
         run: |
           echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
-         - name: Set variables for Matrix
+      - name: Set variables for Matrix
         id: set_variables_matrix
         run: |
           echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
@@ -47,4 +47,3 @@ jobs:
           files: |
             ${{ steps.set_variables_matrix.outputs.plugin_zip }}
             ${{ steps.set_variables_leia.outputs.plugin_zip }}
-
