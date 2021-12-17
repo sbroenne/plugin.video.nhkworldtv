@@ -51,7 +51,7 @@ You can install the current Matrix version of the plugin by installing the [NHK 
 
 ### 1.3.2. Kodi 18 / Leia (previous Kodi version)
 
-You can also download the **Leia** version from a [Github release](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.2/plugin.video.nhkworldtv-1.0.2.zip) but you need to install this as ZIP file and it will **not auto-update**!
+You can also download the **Leia** version from a [Github release](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.3/plugin.video.nhkworldtv-1.0.3.zip) but you need to install this as ZIP file and it will **not auto-update**!
 
 ## 1.4. Video Quality
 
