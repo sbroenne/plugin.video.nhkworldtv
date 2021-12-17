@@ -4,7 +4,7 @@ on:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
-      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+      - "v*.*.*" # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   build:
@@ -35,39 +35,16 @@ jobs:
         id: set_variables_leia
         run: |
           echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
-          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
-      - name: Set variables for Leia
+         - name: Set variables for Matrix
         id: set_variables_matrix
         run: |
           echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
-          echo "::set-output name=plugin_name::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name:  NHK World TV Kodi Plugin - Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Release Kodi Leia plug-in
-        id: upload-release-asset_leia
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ${{ steps.set_variables_leia.outputs.plugin_zip }}
-          asset_name: ${{ steps.set_variables_leia.outputs.plugin_name }}
-          asset_content_type: application/zip
-      - name: Release Kodi Matrix plug-in
-        id: upload-release-asset_matrix
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.set_variables_matrix.outputs.plugin_zip }}
-          asset_name: ${{ steps.set_variables_matrix.outputs.plugin_name }}
-          asset_content_type: application/zip
+          name: "Release NHK World TV Kodi Plugin - ${{ github.ref }}"
+          files: |
+            ${{ steps.set_variables_matrix.outputs.plugin_zip }}
+            ${{ steps.set_variables_leia.outputs.plugin_zip }}
+
