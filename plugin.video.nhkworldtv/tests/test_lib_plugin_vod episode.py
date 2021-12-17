@@ -9,7 +9,7 @@ def test_episode():
     episodes = vod.get_episode_list('get_latest_episodes', 'None', 0)
     assert (isinstance(episodes, list))
     assert (len(episodes) > 0)
-    episode = episodes[0]
+    episode = episodes[1]
     return episode
 
 

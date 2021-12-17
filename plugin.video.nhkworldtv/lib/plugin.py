@@ -416,15 +416,6 @@ def vod_index():
         plugin.url_for(vod_episode_list, 'get_most_watched_episodes', 'None',
                        0, xbmcplugin.SORT_METHOD_UNSORTED), li, True)
 
-    # We, in the Time of Corona
-    li = xbmcgui.ListItem(kodiutils.get_string(30047), offscreen=True)
-    li.setArt(art)
-    xbmcplugin.addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(vod_episode_list, 'get_programs_episode_list',
-                       'inthetimeofcorona', 1,
-                       xbmcplugin.SORT_METHOD_UNSORTED), li, True)
-
     # Documentaries
     li = xbmcgui.ListItem(kodiutils.get_string(30046), offscreen=True)
     li.setArt(art)
