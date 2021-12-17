@@ -43,7 +43,6 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: "Release NHK World TV Kodi Plugin - ${{ github.ref }}"
           files: |
             ${{ steps.set_variables_matrix.outputs.plugin_zip }}
             ${{ steps.set_variables_leia.outputs.plugin_zip }}

@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.2" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.3" provider-name="sbroenne">
     <requires>
-        <import addon="xbmc.python" version="2.26.0"/>
-        <import addon="script.module.certifi" version="2019.9.11"/>
-        <import addon="script.module.requests" version="2.22.0"/>
-        <import addon="script.module.requests-cache" version="0.4.13"/>
-        <import addon="script.module.routing" version="0.2.3"/>
-        <import addon="script.module.future" version="0.17.1"/>
-        <import addon="script.module.kodi-six" version="0.1.3"/>
-        <import addon="script.module.pytz" version="2014.2"/>
-        <import addon="script.module.tzlocal" version="2.0.0"/>
+        <import addon="xbmc.python" version="2.26.0" />
+        <import addon="script.module.requests" />
+        <import addon="script.module.requests-cache" />
+        <import addon="script.module.routing" />
+        <import addon="script.module.future" />
+        <import addon="script.module.kodi-six" />
+        <import addon="script.module.tzlocal" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
