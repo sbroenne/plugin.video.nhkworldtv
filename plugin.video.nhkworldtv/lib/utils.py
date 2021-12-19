@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 import time
 import pytz
-from tzlocal import get_localzone
+# from tzlocal import get_localzone
 
 UNIT_TEST = False
 
@@ -102,12 +102,14 @@ def get_timestamp_from_datestring(datestring):
                         minute=int(datestring[10:12]),
                         second=int(datestring[12:14]),
                         tzinfo=tokyo)
+    # Work-around for https://github.com/sbroenne/plugin.video.nhkworldtv/issues/24
+    timestamp = int(time.mktime(tokyo_dt.timetuple()) * 1000)
     # Convert to local time zone
-    local_tz = get_localzone()
-    local_dt = tokyo_dt.astimezone(local_tz)
+    # local_tz = get_localzone()
+    # local_dt = tokyo_dt.astimezone(local_tz)
     # Convert to NHK timestamp that can be used to populate
     # episode.broadcast_start_date etc.
-    timestamp = int(time.mktime(local_dt.timetuple()) * 1000)
+    #timestamp = int(time.mktime(local_dt.timetuple()) * 1000)
     return (timestamp)
 
 

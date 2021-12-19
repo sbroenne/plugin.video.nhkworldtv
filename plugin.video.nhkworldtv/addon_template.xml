@@ -7,6 +7,7 @@
         <import addon="script.module.routing" />
         <import addon="script.module.future" />
         <import addon="script.module.kodi-six" />
+        <import addon="script.module.pytz" />
         <import addon="script.module.tzlocal" />
     </requires>
 
