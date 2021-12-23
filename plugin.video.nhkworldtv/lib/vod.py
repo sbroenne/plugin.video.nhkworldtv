@@ -1,8 +1,5 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import re
-from kodi_six import xbmc, xbmcaddon
+import xbmc, xbmcaddon
 from . import utils, cache_api, kodiutils, url, nhk_api
 from .episode import Episode
 

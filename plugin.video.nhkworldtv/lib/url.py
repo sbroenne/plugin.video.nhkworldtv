@@ -1,9 +1,7 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
 import requests
 from requests.models import Response
 import requests_cache
-from kodi_six import xbmc, xbmcaddon
+import xbmc, xbmcaddon
 from . import api_keys
 import time
 import sqlite3

@@ -1,4 +1,3 @@
-from __future__ import (unicode_literals)
 import lib.nhk_api_parser as parser
 
 

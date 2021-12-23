@@ -1,9 +1,6 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import random
 import routing
-from kodi_six import xbmc, xbmcaddon, xbmcgui, xbmcplugin
+import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 
 from . import kodiutils, nhk_api, utils, vod, url
 from . import ataglance, topstories, news_programs

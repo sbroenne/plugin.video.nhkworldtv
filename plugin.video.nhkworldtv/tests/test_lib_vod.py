@@ -1,4 +1,3 @@
-from __future__ import print_function
 from lib.episode import Episode
 import lib.vod as vod
 import pytest

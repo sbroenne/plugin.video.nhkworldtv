@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.4" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.5" provider-name="sbroenne">
     <requires>
-        <import addon="xbmc.python" version="2.26.0" />
-        <import addon="script.module.requests" />
-        <import addon="script.module.requests-cache" />
-        <import addon="script.module.routing" />
-        <import addon="script.module.future" />
-        <import addon="script.module.kodi-six" />
-        <import addon="script.module.pytz" />
-        <import addon="script.module.tzlocal" />
+        <import addon="xbmc.python" version="3.0.0" />
+        <import addon="script.module.requests" version="2.25.1+matrix.1" />
+        <import addon="script.module.requests-cache" version="0.5.2+matrix.2" />
+        <import addon="script.module.routing" version="0.2.3+matrix.1" />
+        <import addon="script.module.pytz" version="2019.3.0+matrix.2" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
@@ -30,7 +27,7 @@ Content is retrieved and played directly from the NHK World web site.
 
 Plugin supports fallback to HD if you should encounter buffering issues.
 
-Tested on Kodi 18.6+ Leia and 19 Matrix.
+Tested on Kodi Matrix.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -39,7 +36,8 @@ Tested on Kodi 18.6+ Leia and 19 Matrix.
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.0.3
+        <news>v1.0.5
+- Removed support for Kodi Leia
 - Removed "We in the time of Corona"-section
 - Removed optional setting of View States so that plugin can be submitted to official repo
         </news>

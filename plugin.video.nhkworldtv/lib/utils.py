@@ -1,6 +1,4 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-from kodi_six import xbmcaddon
+import xbmcaddon
 import re
 from datetime import datetime
 import time

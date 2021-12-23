@@ -1,6 +1,5 @@
-from __future__ import (absolute_import, unicode_literals)
 from builtins import str
-from kodi_six import xbmc
+import xbmc
 from . import api_keys, url
 
 API_BASE_URL = api_keys.NHK_API_BASE_URL

@@ -1,4 +1,3 @@
-from __future__ import (absolute_import, unicode_literals)
 from . import nhk_api_parser
 
 # NHK World API - parsed from api.js

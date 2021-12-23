@@ -1,4 +1,3 @@
-from __future__ import print_function
 from lib.episode import Episode
 from datetime import datetime, timedelta
 import time

@@ -1,4 +1,3 @@
-from __future__ import (unicode_literals)
 import lib.plugin as plugin
 import lib.url as url
 import lib.ataglance as ataglance

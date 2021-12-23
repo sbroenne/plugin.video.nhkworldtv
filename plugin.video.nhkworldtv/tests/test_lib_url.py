@@ -1,4 +1,3 @@
-from __future__ import division
 import lib.nhk_api as nhk_api
 import lib.url as url
 

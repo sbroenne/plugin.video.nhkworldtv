@@ -1,5 +1,4 @@
-from __future__ import (absolute_import, unicode_literals)
-from kodi_six import xbmc
+import xbmc
 from . import api_keys, url
 # Cache backend (Azure Functions) API
 

@@ -1,7 +1,4 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
-from kodi_six import xbmc
+import xbmc
 import xml.etree.ElementTree as ET
 from requests.models import HTTPError
 from . import kodiutils, nhk_api, url, utils

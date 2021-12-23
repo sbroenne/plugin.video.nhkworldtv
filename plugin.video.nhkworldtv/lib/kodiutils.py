@@ -1,5 +1,4 @@
-from __future__ import (absolute_import, unicode_literals)
-from kodi_six import xbmc, xbmcaddon, xbmcplugin
+import xbmc, xbmcaddon, xbmcplugin
 
 # read settings
 ADDON = xbmcaddon.Addon()

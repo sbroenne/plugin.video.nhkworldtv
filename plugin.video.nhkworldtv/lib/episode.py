@@ -1,7 +1,5 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
 from builtins import object
-from kodi_six import xbmcgui, xbmc
+import xbmcgui, xbmc
 from . import utils, url
 from . import kodiutils
 from datetime import datetime

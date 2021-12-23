@@ -1,7 +1,6 @@
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-from kodi_six import xbmc, xbmcgui, xbmcaddon
+import xbmc, xbmcgui, xbmcaddon
 from . import kodiutils
+
 ADDON = xbmcaddon.Addon()
 
 
