@@ -1,0 +1,25 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+rope = "*"
+pytest = "*"
+coverage = "*"
+pytest-cov = "*"
+setuptools = "*"
+addon-submitter = {git = "https://github.com/romanvm/kodi-addon-submitter.git"}
+kodi-addon-checker = "*"
+pylint = "*"
+
+[packages]
+requests = "*"
+kodistubs = "*"
+requests-cache = "*"
+pytz = "*"
+tzlocal = ""
+
+
+[requires]
+python_version = "3.8"

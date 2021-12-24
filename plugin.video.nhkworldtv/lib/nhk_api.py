@@ -1,3 +1,6 @@
+"""
+NHK API
+"""
 from . import nhk_api_parser
 
 # NHK World API - parsed from api.js
@@ -29,29 +32,29 @@ rest_url = {
     nhk_api_parser.get_all_episodes_url('all'),
     'get_episode_detail':
     nhk_api_parser.get_episode_detail_url(),
-    # Not in api.js
+    # Static - Not in api.js
     'news_detail':
-    'https://www3.nhk.or.jp/nhkworld/data/en/news/{0}.json',
+    "https://www3.nhk.or.jp/nhkworld/data/en/news/{0}.json",
     'get_news_ataglance':
-    'https://www3.nhk.or.jp/nhkworld/en/news/ataglance/index.json',
+    "https://www3.nhk.or.jp/nhkworld/en/news/ataglance/index.json",
     'news_video_url':
-    'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',
+    "https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5",
     'ataglance_video_url':
-    'https://nhkworld-vh.akamaihd.net/i/nhkworld/english/news/ataglance/{0}/master.m3u8?set-akamai-hls-revision=5',
+    "https://nhkworld-vh.akamaihd.net/i/nhkworld/english/news/ataglance/{0}/master.m3u8?set-akamai-hls-revision=5",
     'news_program_config':
-    'https://www3.nhk.or.jp/nhkworld/common/assets/news/config/en.json',
+    "https://www3.nhk.or.jp/nhkworld/common/assets/news/config/en.json",
     'news_program_xml':
-    'https://www3.nhk.or.jp/nhkworld/data/en/news/programs/{0}.xml',
+    "https://www3.nhk.or.jp/nhkworld/data/en/news/programs/{0}.xml",
     'news_programs_video_url':
-    'https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/programs/{0},l,h,q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5',
+    "https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/programs/{0},l,h,q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5",
     'live_stream_url_720p':
-    'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_1M.m3u8',
+    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_1M.m3u8",
     'live_stream_url_1080p':
-    'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_4M.m3u8',
+    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_4M.m3u8",
     'player_url':
-    'https://movie-s.nhk.or.jp/v/refid/nhkworld/prefid/{0}?embed=js&targetId=videoplayer&de-responsive=true&de-callback-method=nwCustomCallback&de-appid={1}&de-subtitle-on=false',
+    "https://movie-s.nhk.or.jp/v/refid/nhkworld/prefid/{0}?embed=js&targetId=videoplayer&de-responsive=true&de-callback-method=nwCustomCallback&de-appid={1}&de-subtitle-on=false",
     'video_url':
-    'https://movie-s.nhk.or.jp/ws/ws_program/api/67f5b750-b419-11e9-8a16-0e45e8988f42/apiv/5/mode/json?v={0}',
+    "https://movie-s.nhk.or.jp/ws/ws_program/api/67f5b750-b419-11e9-8a16-0e45e8988f42/apiv/5/mode/json?v={0}",
     'episode_url':
-    'https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/{0}/chunklist.m3u8'
+    "https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/{0}/chunklist.m3u8"
 }

@@ -1,7 +1,8 @@
+"""
+Top stories menu item and list
+"""
 from . import kodiutils, nhk_api, url
 from .episode import Episode
-
-# Top stories menu item and list
 
 
 def get_menu_item():
@@ -49,7 +50,7 @@ def get_episodes(max_items, icon, fanart):
     row_count = 0
     episodes = []
     # Only display MAX ROWS
-    if (result_row_count < max_row_count):
+    if result_row_count < max_row_count:
         max_row_count = result_row_count
 
     for row_count in range(0, max_row_count):
@@ -60,7 +61,7 @@ def get_episodes(max_items, icon, fanart):
         news_id = row['id']
 
         thumbnails = row['thumbnails']
-        if (thumbnails is None):
+        if thumbnails is None:
             # Featured news does not have a thumbnail
             episode.thumb = icon
             episode.fanart = fanart
@@ -80,7 +81,6 @@ def get_episodes(max_items, icon, fanart):
             episode.video_info = kodiutils.get_sd_video_info()
             episode.is_playable = True
             episode.url = url.get_nhk_website_url(video['config'])
-            episodes.append(episode)
         else:
             # No video attached to it
             episode.title = title
@@ -88,14 +88,14 @@ def get_episodes(max_items, icon, fanart):
             api_url = nhk_api.rest_url['news_detail'].format(news_id)
             news_detail_json = url.get_json(api_url)['data']
             detail = news_detail_json['detail']
-            detail = detail.replace('<br />', '\n')
-            detail = detail.replace('\n\n', '\n')
+            detail = detail.replace("<br />", "\n")
+            detail = detail.replace("\n\n", "\n")
             episode.plot_include_time_difference = True
             episode.plot = detail
             thumbnails = news_detail_json['thumbnails']
-            if (thumbnails is not None):
+            if thumbnails is not None:
                 episode.thumb = thumbnails['small']
                 episode.fanart = thumbnails['middle']
             episode.is_playable = False
-            episodes.append((episode))
-    return (episodes)
+        episodes.append(episode)
+    return episodes

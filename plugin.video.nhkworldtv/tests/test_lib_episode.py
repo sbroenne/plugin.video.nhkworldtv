@@ -11,7 +11,7 @@ def test_create_episode():
 def test_set_thumb_nhk():
     episode = Episode()
     episode.thumb = "/nhkworld/test.gif"
-    print(episode.thumb)
+    print((episode.thumb))
     assert ('https://' in episode.thumb)
 
 
@@ -19,7 +19,7 @@ def test_set_thumb_no_nhk():
     episode = Episode()
     test_url = 'https://test.gif'
     episode.thumb = test_url
-    print(episode.thumb)
+    print((episode.thumb))
     assert (test_url == episode.thumb)
 
 

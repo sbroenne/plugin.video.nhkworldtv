@@ -1,8 +1,13 @@
+"""
+Encapsulates all information of an individual NHK Episode
+"""
 from builtins import object
-import xbmcgui, xbmc
-from . import utils, url
-from . import kodiutils
 from datetime import datetime
+
+import xbmc
+import xbmcgui
+
+from . import kodiutils, url, utils
 
 
 class Episode(object):
@@ -50,7 +55,7 @@ class Episode(object):
     @property
     def duration(self):
         """ Gets the duration info label """
-        if (self._duration is not None):
+        if self._duration is not None:
             return self._duration
         elif ((self.broadcast_start_date is not None)
               and (self.broadcast_end_date is not None)):
@@ -80,7 +85,7 @@ class Episode(object):
     @broadcast_start_date.setter
     def broadcast_start_date(self, value):
         """ Sets the current broadcast start date from the timestamp value """
-        if (value is None):
+        if value is None:
             self._broadcast_start_date = None
             self._date = None
             self._aired = None
@@ -99,7 +104,7 @@ class Episode(object):
     @broadcast_end_date.setter
     def broadcast_end_date(self, value):
         """ Sets the current broadcast end date from the timestamp value """
-        if (value is None):
+        if value is None:
             self._broadcast_end_date = None
         else:
             timestamp = int(value) // 1000
@@ -137,7 +142,7 @@ class Episode(object):
         """ Get the sort date
         Date Format: 01.01.2009
         """
-        if (self._date is not None):
+        if self._date is not None:
             return self._date.strftime('%d.%m.%Y')
         else:
             return None
@@ -147,14 +152,16 @@ class Episode(object):
         """ Get the aired date
         Date Format: 2008-12-07
         """
-        if (self._aired is not None):
+        if self._aired is not None:
             return self._aired.strftime('%Y-%m-%d')
         else:
             return None
 
     @property
     def year(self):
-        if (self._date is not None):
+        """ Gets the year
+        """
+        if self._date is not None:
             self._year = self._date.strftime('%Y')
             return self._year
         else:
@@ -162,16 +169,19 @@ class Episode(object):
 
     @property
     def video_info(self):
-        if (self._video_info is not None):
+        """
+        Returns the video info struct
+        """
+        if self._video_info is not None:
             return self._video_info
-        elif (self.aspect is not None):
-            vi = {
+        elif self.aspect is not None:
+            video_info = {
                 'aspect': self.aspect,
                 'width': self.width,
                 'height': self.height
             }
-            self._video_info = vi
-            return vi
+            self._video_info = video_info
+            return video_info
 
         else:
             return None
@@ -185,35 +195,35 @@ class Episode(object):
     def kodi_list_item(self):
         """ Gets the current Kodi List Item """
 
-        if (self.url is not None):
+        if self.url is not None:
             # Path was provided - created the ListItem with path
-            li = xbmcgui.ListItem(path=self.url, offscreen=True)
-            li.setLabel(self.title)
+            list_item = xbmcgui.ListItem(path=self.url, offscreen=True)
+            list_item.setLabel(self.title)
         else:
             # Create ListItem with title
-            li = xbmcgui.ListItem(self.title, offscreen=True)
+            list_item = xbmcgui.ListItem(self.title, offscreen=True)
 
-        li.setArt({'thumb': self.thumb, 'fanart': self.fanart})
-        li.setLabel(self.title)
+        list_item.setArt({'thumb': self.thumb, 'fanart': self.fanart})
+        list_item.setLabel(self.title)
 
         # Get info label
         info_label = self.get_info_label()
 
-        if (self.is_playable):
+        if self.is_playable:
             # Playable episode
-            li.setProperty('IsPlayable', 'true')
+            list_item.setProperty('IsPlayable', 'true')
             info_label['mediatype'] = 'episode'
-            li.setMimeType('application/x-mpegURL')
-            li.setContentLookup(False)
+            list_item.setMimeType('application/x-mpegURL')
+            list_item.setContentLookup(False)
 
         # Only add Stream Info if the the video_info property is not none
-        if (self.video_info is not None):
-            li.addStreamInfo('video', self.video_info)
+        if self.video_info is not None:
+            list_item.addStreamInfo('video', self.video_info)
 
         # Set the info label
-        li.setInfo('video', info_label)
-        self._kodi_list_item = li
-        xbmc.log('Created list item: {0}'.format(self.title))
+        list_item.setInfo('video', info_label)
+        self._kodi_list_item = list_item
+        xbmc.log(f"Created list item: {self.title}")
         return self._kodi_list_item
 
     #
@@ -229,10 +239,9 @@ class Episode(object):
 
         info_label = {}
 
-        if (self.plot_include_time_difference is True):
+        if self.plot_include_time_difference is True:
             # Include time difference in plot
-            info_label['Plot'] = '{0}\n\n{1}'.format(
-                self.get_time_difference(), self.plot)
+            info_label['Plot'] = f"{self.get_time_difference()}\n\n{self.plot}"
         elif (self.plot_include_broadcast_detail
               and self.broadcast_end_date is not None):
             # Include broadcast detail if there is an endDate
@@ -243,25 +252,25 @@ class Episode(object):
 
         info_label['Title'] = self.title
 
-        if (self.duration is not None):
+        if self.duration is not None:
             info_label['Duration'] = self.duration
 
-        if (self.pgm_no is not None):
+        if self.pgm_no is not None:
             info_label['Episode'] = self.pgm_no
 
-        if (self.year is not None):
+        if self.year is not None:
             info_label['Year'] = self.year
 
-        if (self._date is not None):
+        if self._date is not None:
             info_label['date'] = self.date
 
-        if (self._aired is not None):
+        if self._aired is not None:
             info_label['aired'] = self.aired
 
-        if (self.playcount is not None):
+        if self.playcount is not None:
             info_label['playcount'] = self.playcount
 
-        return (info_label)
+        return info_label
 
     def get_time_difference(self, compare_date=datetime.now()):
         """Get the time difference between the
@@ -279,15 +288,15 @@ class Episode(object):
         date_delta = compare_date - self.broadcast_start_date
         date_delta_minutes = date_delta.seconds // 60
         date_delta_hours = date_delta_minutes // 60
-        if (date_delta.days > 0):
+        if date_delta.days > 0:
             # Show as absolute date
             time_difference = self.broadcast_start_date.strftime(
                 '%A, %b %d, %H:%M')
-        elif (date_delta_hours < 1):
+        elif date_delta_hours < 1:
             # Show in minutes
             time_difference = kodiutils.get_string(30062).format(
                 date_delta_minutes)
-        elif (date_delta_hours == 1):
+        elif date_delta_hours == 1:
             # Show as hour
             time_difference = kodiutils.get_string(30060).format(
                 date_delta_hours)
@@ -295,4 +304,4 @@ class Episode(object):
             # Show as hours (plural)
             time_difference = kodiutils.get_string(30061).format(
                 date_delta_hours)
-        return (time_difference)
+        return time_difference

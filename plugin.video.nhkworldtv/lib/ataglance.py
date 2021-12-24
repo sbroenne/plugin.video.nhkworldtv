@@ -1,3 +1,6 @@
+"""
+At-a-glance episodes
+"""
 from . import kodiutils, nhk_api, url
 from .episode import Episode
 
@@ -48,7 +51,7 @@ def get_episodes(max_items):
     episodes = []
 
     # Only display MAX ROWS
-    if (result_row_count < max_row_count):
+    if result_row_count < max_row_count:
         max_row_count = result_row_count
 
     for row_count in range(0, max_row_count):
@@ -57,7 +60,7 @@ def get_episodes(max_items):
         episode = Episode()
         title = row['title']
         thumbnails = row['image']
-        if (thumbnails['list_sp'] is not None):
+        if thumbnails['list_sp'] is not None:
             episode.thumb = thumbnails['list_sp']
         else:
             episode.thumb = thumbnails['list_pc']
@@ -75,4 +78,4 @@ def get_episodes(max_items):
         episode.is_playable = True
         episode.url = url.get_nhk_website_url(row['video']['config'])
         episodes.append(episode)
-    return (episodes)
+    return episodes

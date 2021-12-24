@@ -2,7 +2,7 @@ import lib.nhk_api_parser as parser
 
 
 def test_get_API_from_NHK():
-    assert (parser.get_API_from_NHK() is not None)
+    assert (parser.get_api_from_nhk() is not None)
 
 
 def test_replace_path_parameters_version_language():

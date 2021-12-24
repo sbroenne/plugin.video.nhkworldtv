@@ -1,3 +1,4 @@
+from lib.episode import Episode
 import lib.plugin as plugin
 import lib.vod as vod
 import pytest
@@ -6,9 +7,13 @@ import pytest
 @pytest.fixture
 def test_episode():
     episodes = vod.get_episode_list('get_latest_episodes', 'None', 0)
+
     assert (isinstance(episodes, list))
-    assert (len(episodes) > 0)
-    episode = episodes[1]
+    no_of_episodes = len(episodes)
+    assert (no_of_episodes > 0)
+    # Get the second oldest episode - ensures that this is in the Azure Cache
+    episode = episodes[no_of_episodes - 1]
+    assert (isinstance(episode, Episode))
     return episode
 
 

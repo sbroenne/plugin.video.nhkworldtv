@@ -12,8 +12,10 @@ def test_get_episode_from_episode_list():
     episodes = vod.get_episode_list('get_latest_episodes', 'None', 0)
 
     assert (isinstance(episodes, list))
-    assert (len(episodes) > 0)
-    episode = episodes[0]
+    no_of_episodes = len(episodes)
+    assert (no_of_episodes > 0)
+    # Get the second oldest episode - ensures that this is in the Azure Cache
+    episode = episodes[no_of_episodes - 1]
     assert (isinstance(episode, Episode))
     return episode
 

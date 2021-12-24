@@ -1,6 +1,11 @@
-import xbmc
+"""
+News programs
+"""
 import xml.etree.ElementTree as ET
+
+import xbmc
 from requests.models import HTTPError
+
 from . import kodiutils, nhk_api, url, utils
 from .episode import Episode
 
@@ -8,11 +13,10 @@ from .episode import Episode
 def get_programs():
     """ Get the list of news programs
 
-
     Returns:
         [list]: List of news programs
     """
-    xbmc.log('Getting news programs from NHK')
+    xbmc.log("Getting news programs from NHK")
     api_result_json = url.get_json(nhk_api.rest_url['news_program_config'],
                                    False)
     news_programs = api_result_json['config']['programs']
@@ -33,28 +37,28 @@ def get_programs():
         try:
             news_program_xml = url.get_url(api_url, False).text
         except HTTPError:
-            xbmc.log('Could not load Program XML {0} from NHK Website'.format(
-                news_program_id))
+            xbmc.log(
+                f"Could not load Program XML {news_program_id} from NHK Website"
+            )
         else:
             # Sometimes the XML is invalid, add error handling
             try:
                 root = ET.fromstring(news_program_xml)
             except ET.ParseError:
-                xbmc.log(
-                    'Could not parse Program XML {0}'.format(news_program_id))
+                xbmc.log(f"Could not parse Program XML {news_program_id}")
             else:
                 # Add program
                 play_path = nhk_api.rest_url['news_programs_video_url'].format(
                     utils.get_news_program_play_path(
-                        root.find('file.high').text))
+                        root.find("file.high").text))
                 episode = Episode()
-                vod_id = 'news_program_{0}'.format(news_program_id)
+                vod_id = f"news_program_{news_program_id}"
                 episode.vod_id = vod_id
 
                 # Extract the Title
                 break_string = '<br />'
                 description = root.find('description').text
-                if (break_string in description):
+                if break_string in description:
                     lines = description.split(break_string, 1)
                     episode.title = lines[0]
                     # Extract the broadcast time and convert it to local time
@@ -73,4 +77,4 @@ def get_programs():
                 episode.is_playable = True
                 episodes.append((play_path, episode.kodi_list_item, False))
 
-    return (episodes)
+    return episodes

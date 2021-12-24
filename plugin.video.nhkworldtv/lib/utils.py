@@ -1,16 +1,19 @@
-import xbmcaddon
+"""
+Commonly used utility functions
+"""
 import re
-from datetime import datetime
 import time
+from datetime import datetime
 import pytz
-# from tzlocal import get_localzone
+from tzlocal import get_localzone
+import xbmcaddon
 
 UNIT_TEST = False
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
-plugin_path = ADDON.getAddonInfo('path')
-if (len(plugin_path) == 0):
+PLUGIN_PATH = ADDON.getAddonInfo('path')
+if len(PLUGIN_PATH) == 0:
     # Running under unit test
     UNIT_TEST = True
 
@@ -18,18 +21,18 @@ if (len(plugin_path) == 0):
 def to_local_time(timestamp):
     """ Convert from a UNIX timestamp to a valid date time """
     local_time = datetime.fromtimestamp(timestamp)
-    return (local_time)
+    return local_time
 
 
 def get_episode_name(title, subtitle):
     """ Construct an episode name from the title and the subtitle"""
     if len(subtitle) == 0:
         subtitle = subtitle.replace("<p></p>", "")
-        episode_name = '{0}'.format(title)
+        episode_name = f"{title}"
     else:
         title = title.replace("<p></p>", "")
-        episode_name = '{0} - {1}'.format(title, subtitle)
-    return (episode_name)
+        episode_name = f"{title} - {subtitle}"
+    return episode_name
 
 
 def get_top_stories_play_path(xmltext):
@@ -78,8 +81,7 @@ def get_schedule_title(start_date, end_date, title):
      Returns:
         {unicode} -- 11:30-12:30: Journeys in Japan
     """
-    return ('{0}-{1}: {2}'.format(start_date.strftime('%H:%M'),
-                                  end_date.strftime('%H:%M'), title))
+    return f"{start_date.strftime('%H:%M')}-{end_date.strftime('%H:%M')}: {title}"
 
 
 def get_timestamp_from_datestring(datestring):
@@ -100,15 +102,14 @@ def get_timestamp_from_datestring(datestring):
                         minute=int(datestring[10:12]),
                         second=int(datestring[12:14]),
                         tzinfo=tokyo)
-    # Work-around for https://github.com/sbroenne/plugin.video.nhkworldtv/issues/24
-    timestamp = int(time.mktime(tokyo_dt.timetuple()) * 1000)
+    
     # Convert to local time zone
-    # local_tz = get_localzone()
-    # local_dt = tokyo_dt.astimezone(local_tz)
+    local_tz = get_localzone()
+    local_dt = tokyo_dt.astimezone(local_tz)
     # Convert to NHK timestamp that can be used to populate
     # episode.broadcast_start_date etc.
-    #timestamp = int(time.mktime(local_dt.timetuple()) * 1000)
-    return (timestamp)
+    timestamp = int(time.mktime(local_dt.timetuple()) * 1000)
+    return timestamp
 
 
 def format_plot(line1, line2):
@@ -121,4 +122,4 @@ def format_plot(line1, line2):
     Returns:
         str: Formatted plot field
     """
-    return ('{0}\n\n{1}'.format(line1, line2))
+    return f"{line1}\n\n{line2}"

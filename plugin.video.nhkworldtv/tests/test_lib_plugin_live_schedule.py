@@ -6,4 +6,4 @@ def test_add_live_schedule_menu_item():
 
 
 def test_get_live_schedule_index():
-    assert (plugin.live_schedule_index() != 0)
+    assert (plugin.live_schedule_index() is True)

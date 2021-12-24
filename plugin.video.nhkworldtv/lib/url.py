@@ -1,21 +1,27 @@
-import requests
-from requests.models import Response
-import requests_cache
-import xbmc, xbmcaddon
-from . import api_keys
-import time
+"""
+URL / Request handling
+"""
 import sqlite3
+import time
+
+import requests
+import requests_cache
+import xbmc
+import xbmcaddon
+from requests.models import Response
+
+from . import api_keys
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
-plugin_path = ADDON.getAddonInfo('path')
+PLUGIN_PATH = ADDON.getAddonInfo('path')
 # Running within Kodi - use that path
 # Get Plug-In information
-db_name = '{0}/nhk_world_cache'.format(plugin_path)
+DB_NAME = f"{PLUGIN_PATH}/nhk_world_cache"
 URL_CACHE_MINUTES = ADDON.getSettingInt('url_cache_minutes')
-if (len(plugin_path) == 0):
+if len(PLUGIN_PATH) == 0:
     # Running under unit test - overwrite location of DB
-    db_name = 'nhk_world_cache'
+    DB_NAME = "nhk_world_cache"
     URL_CACHE_MINUTES = 60
 
 # Enforce minimum 60 minutes caching
@@ -23,19 +29,19 @@ if URL_CACHE_MINUTES < 60:
     URL_CACHE_MINUTES = 60
 
 # Install the cache for requests
-requests_cache.install_cache(db_name,
-                             backend='sqlite',
+requests_cache.install_cache(DB_NAME,
+                             backend="sqlite",
                              expire_after=URL_CACHE_MINUTES * 60)
 requests_cache.remove_expired_responses()
 
 # Instantiate request session
-s = requests.Session()
+session = requests.Session()
 # Act like a browser
 headers = {
     'User-Agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182'
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182"
 }
-s.headers = headers
+session.headers = headers
 
 
 def check_url_exists(url):
@@ -44,12 +50,12 @@ def check_url_exists(url):
     Arguments:
         url {str} -- URL to check
     """
-    with s.cache_disabled():
-        r = s.get(url)
-        if (r.status_code == 404):
-            return (False)
+    with session.cache_disabled():
+        request = session.get(url)
+        if request.status_code == 404:
+            return False
         else:
-            return (True)
+            return True
 
 
 def get_json(url, cached=True):
@@ -62,18 +68,18 @@ def get_json(url, cached=True):
     Returns:
         [dict]: JSON dictionary
     """
-    r = get_url(url, cached)
-    if (r.status_code == 200):
+    request = get_url(url, cached)
+    if request.status_code == 200:
         try:
-            result = r.json()
-            xbmc.log('Successfully loaded JSON from API: {0}'.format(url))
-            return (result)
-        except (ValueError):
+            result = request.json()
+            xbmc.log(f"Successfully loaded JSON from API: {url}")
+            return result
+        except ValueError:
             # Failure - no way to handle - probably an issue with the NHK API
-            xbmc.log('Could not parse JSON from API: {0}'.format(url))
+            xbmc.log(f"Could not parse JSON from API: {url}")
     else:
         # Failure - could not connect to site
-        xbmc.log('Could not connect to API: {0}'.format(url))
+        xbmc.log(f"Could not connect to API: {url}")
 
 
 def get_api_request_params(url):
@@ -86,14 +92,14 @@ def get_api_request_params(url):
     """
 
     # Populate request_params if needed
-    if (api_keys.NHK_API_BASE_URL in url):
+    if api_keys.NHK_API_BASE_URL in url:
         request_params = {'apikey': api_keys.NHK_API_KEY}
-    elif (api_keys.CACHE_API_BASE_URL in url):
+    elif api_keys.CACHE_API_BASE_URL in url:
         request_params = {'code': api_keys.CACHE_API_KEY}
     else:
         request_params = None
 
-    return (request_params)
+    return request_params
 
 
 def request_url(url, cached=True):
@@ -108,27 +114,27 @@ def request_url(url, cached=True):
     """
 
     request_params = get_api_request_params(url)
-    r = Response()
+    request = Response()
 
     try:
         # Use cached or non-cached result
-        if (cached):
+        if cached:
             # Use session cache
-            if (request_params is not None):
-                r = s.get(url, params=request_params)
+            if request_params is not None:
+                request = session.get(url, params=request_params)
             else:
-                r = s.get(url)
+                request = session.get(url)
         else:
-            with s.cache_disabled():
-                if (request_params is not None):
-                    r = s.get(url, params=request_params)
+            with session.cache_disabled():
+                if request_params is not None:
+                    request = session.get(url, params=request_params)
                 else:
-                    r = s.get(url)
-        return (r)
-    except (requests.ConnectionError):
+                    request = session.get(url)
+        return request
+    except requests.ConnectionError:
         # Could not establish connection at all
-        r.status_code = 10001
-    except (sqlite3.OperationalError):
+        request.status_code = 10001
+    except sqlite3.OperationalError:
         # Catch transient requests-cache SQL Lite error
         # This is a race condition I think, it takes time for
         # requests-cache to create the response table
@@ -136,9 +142,9 @@ def request_url(url, cached=True):
         # so sometimes a call can be made
         # before the the table has been created
         # This will fix itself shortly (on the next call)
-        xbmc.log('url.request_url: Swallowing sqlite3.OperationalError')
-        r.status_code = 10002
-    return (r)
+        xbmc.log("url.request_url: Swallowing sqlite3.OperationalError")
+        request.status_code = 10002
+    return request
 
 
 def get_url(url, cached=True):
@@ -157,50 +163,48 @@ def get_url(url, cached=True):
     max_retries = 3
     current_try = 1
 
-    while (current_try <= max_retries):
+    while current_try <= max_retries:
         # Make an API Call
-        xbmc.log('Fetching URL:{0} ({1} of {2})'.format(
-            url, current_try, max_retries))
+        xbmc.log(f"Fetching URL:{url} ({current_try} of {max_retries})")
 
-        r = request_url(url, cached)
-        status_code = r.status_code
+        request = request_url(url, cached)
+        status_code = request.status_code
 
-        if (status_code == 200):
+        if status_code == 200:
             # Call was successfull
-            xbmc.log('Successfully fetched URL: {0} - Status {1} \
-                    - Retrieved from cache {2}'.format(url, status_code,
-                                                       r.from_cache))
+            xbmc.log(f"Successfully fetched URL: {url} - Status {status_code} \
+                    - Retrieved from cache {request.from_cache}")
             break
 
         elif (status_code == 502 or status_code == 10002):
             # Bad Gateway or SQL Lite Operational exception - can be retried
-            if (current_try == max_retries):
+            if current_try == max_retries:
                 # Max retries reached - still could not get url
                 # Failure - no way to handle - probably an issue
                 # with the NHK Website
                 xbmc.log(
-                    'FATAL: Could not get URL {0} after {1} retries'.format(
-                        url, current_try), xbmc.LOGDEBUG)
+                    f"FATAL: Could not get URL {url} after {current_try} retries",
+                    xbmc.LOGDEBUG)
                 break
             else:
                 # Try again - this usually fixes the error with
                 # the next request
                 xbmc.log(
-                    'Temporary failure fetching URL: {0} with Status {1})'.
-                    format(url, status_code), xbmc.LOGDEBUG)
+                    f"Temporary failure fetching URL: {url} with Status {status_code})",
+                    xbmc.LOGDEBUG)
 
                 # Wait for 1s before the next call
                 time.sleep(1)
         else:
             # Other HTTP error - FATAL, do not retry
             xbmc.log(
-                'FATAL: Could not get URL: {0} - HTTP Status Code {1}'.format(
-                    url, status_code), xbmc.LOGDEBUG)
+                f"FATAL: Could not get URL: {url} - HTTP Status Code {status_code}",
+                xbmc.LOGDEBUG)
             break
 
         current_try = current_try + 1
 
-    return (r)
+    return request
 
 
 def get_nhk_website_url(path):

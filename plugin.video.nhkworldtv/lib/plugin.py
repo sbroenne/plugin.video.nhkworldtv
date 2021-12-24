@@ -1,11 +1,17 @@
+"""
+Main plugin code
+"""
 import random
-import routing
-import xbmc, xbmcaddon, xbmcgui, xbmcplugin
 
-from . import kodiutils, nhk_api, utils, vod, url
-from . import ataglance, topstories, news_programs
+import routing
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+
+from . import (ataglance, first_run_wizard, kodiutils, news_programs, nhk_api,
+               topstories, url, utils, vod)
 from .episode import Episode
-from . import first_run_wizard
 
 plugin = routing.Plugin()
 
@@ -21,8 +27,8 @@ USE_CACHE = True
 USE_720P = False
 
 # Initialize the plugin with default values and the cache
-xbmc.log('Initializing plug-in')
-xbmc.log('initialize: Retrieving plug-in setting')
+xbmc.log("Initializing plug-in")
+xbmc.log("initialize: Retrieving plug-in setting")
 # Getting the add-on settings - these will be 0 under unit test
 # Define how many items should be displayed in News
 MAX_NEWS_DISPLAY_ITEMS = ADDON.getSettingInt("max_news_items")
@@ -30,11 +36,11 @@ MAX_NEWS_DISPLAY_ITEMS = ADDON.getSettingInt("max_news_items")
 MAX_ATAGLANCE_DISPLAY_ITEMS = ADDON.getSettingInt("max_ataglance_items")
 # Define if to ise 720P instead of 1080P
 USE_720P = ADDON.getSettingBool("use_720P")
-xbmc.log('initialize: Using 720P instead of 1080p: {0}'.format(USE_720P))
-USE_CACHE = ADDON.getSettingBool('use_backend')
-xbmc.log('initialize: Use Azure cache: {0}'.format(USE_CACHE))
+xbmc.log(f"initialize: Using 720P instead of 1080p: {USE_720P}")
+USE_CACHE = ADDON.getSettingBool("use_backend")
+xbmc.log(f"initialize: Use Azure cache: {USE_CACHE}")
 
-if (utils.UNIT_TEST):
+if utils.UNIT_TEST:
     MAX_NEWS_DISPLAY_ITEMS = 20
     MAX_ATAGLANCE_DISPLAY_ITEMS = 800
     USE_CACHE = True
@@ -48,15 +54,17 @@ if (utils.UNIT_TEST):
 def run():
     """ Run the plugin
     """
-    if ADDON.getSettingBool('run_wizard'):
+    if ADDON.getSettingBool("run_wizard"):
         first_run_wizard.show_wizard()
     plugin.run()
 
 
-# Start page of the plug-in
 @plugin.route('/')
 def index():
-    xbmc.log('Creating Main Menu')
+    """
+    Start page of the plug-in
+    """
+    xbmc.log("Creating Main Menu")
     # Add menus
     add_live_stream_menu_item()
     add_on_demand_menu_item()
@@ -67,8 +75,8 @@ def index():
     # Set-up view
     kodiutils.set_video_directory_information(plugin.handle,
                                               xbmcplugin.SORT_METHOD_UNSORTED,
-                                              'tvshows')
-    return (True)
+                                              "tvshows")
+    return True
 
 
 #
@@ -78,43 +86,49 @@ def index():
 
 #  Menu item
 def add_topstories_menu_item():
-    xbmc.log('Adding top stories menu item')
+    """
+    Top Stories - Menu item
+    """
+    xbmc.log("Adding top stories menu item")
     success = False
     menu_item = topstories.get_menu_item()
     # Create the directory item
-    if (menu_item is not None):
+    if menu_item is not None:
         xbmcplugin.addDirectoryItem(plugin.handle,
                                     plugin.url_for(topstories_index),
                                     menu_item.kodi_list_item, True)
         success = True
-    return (success)
+    return success
 
 
 # List
 @plugin.route('/topstories/index')
 def topstories_index():
-    xbmc.log('Displaying Top Stories Index')
+    """
+    Top Stories - Index
+    """
+    xbmc.log("Displaying Top Stories Index")
     success = False
     topstories_episodes = topstories.get_episodes(MAX_NEWS_DISPLAY_ITEMS,
                                                   NHK_ICON, NHK_FANART)
     episodes = []
 
     for episode in topstories_episodes:
-        if (episode.is_playable):
+        if episode.is_playable:
             episodes.append(
                 (plugin.url_for(play_news_item, episode.url, episode.vod_id,
-                                'news',
+                                "news",
                                 episode.title), episode.kodi_list_item, False))
         else:
             # No video attached to it
             episodes.append((None, episode.kodi_list_item, False))
 
-    if (len(episodes) > 0):
+    if len(episodes) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(
-            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'episodes')
+            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, "episodes")
         success = True
-    return (success)
+    return success
 
 
 #
@@ -124,11 +138,14 @@ def topstories_index():
 
 #  Menu item
 def add_ataglance_menu_item():
-    xbmc.log('Adding at a glance menu item')
+    """
+    At a glance - Menu item
+    """
+    xbmc.log("Adding At a glance menu item")
     success = False
     menu_item = ataglance.get_menu_item()
 
-    if (menu_item is not None):
+    if menu_item is not None:
         xbmcplugin.addDirectoryItem(plugin.handle,
                                     plugin.url_for(ataglance_index),
                                     menu_item.kodi_list_item, True)
@@ -139,21 +156,25 @@ def add_ataglance_menu_item():
 # Episode list
 @plugin.route('/ataglance/index')
 def ataglance_index():
-    xbmc.log('Displaying At a Glance Index')
+    """
+    At a glance - Index
+    """
+    xbmc.log("Displaying At a Glance Index")
     success = False
     ataglance_episodes = ataglance.get_episodes(MAX_ATAGLANCE_DISPLAY_ITEMS)
     episodes = []
 
     for episode in ataglance_episodes:
+
         episodes.append(
             (plugin.url_for(play_news_item, episode.url, episode.vod_id,
                             'ataglance',
                             episode.title), episode.kodi_list_item, False))
 
-    if (len(episodes)) > 0:
+    if len(episodes) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(
-            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'episodes')
+            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, "episodes")
         success = True
     return success
 
@@ -165,34 +186,40 @@ def ataglance_index():
 
 # Menu item
 def add_news_programs_menu_item():
+    """
+    News Programs - Menu item
+    """
+    xbmc.log("Displaying News Programs menu item")
     art = {
         'thumb':
-        'https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/' +
-        'news/programs/1001_2.jpg',
+        "https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/news/programs/1001_2.jpg",
         'fanart':
-        'https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/' +
-        'newsline_2020.jpg'
+        "https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/newsline_2020.jpg"
     }
-    li = xbmcgui.ListItem(kodiutils.get_string(30080), offscreen=True)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30080), offscreen=True)
     info_labels = {}
     info_labels['mediatype'] = 'episode'
     info_labels['Plot'] = kodiutils.get_string(30081)
-    li.setInfo('video', info_labels)
-    li.addStreamInfo('video', kodiutils.get_sd_video_info())
-    li.setArt(art)
+    list_item.setInfo('video', info_labels)
+    list_item.addStreamInfo('video', kodiutils.get_sd_video_info())
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle,
-                                plugin.url_for(news_programs_index), li, True)
-    return (True)
+                                plugin.url_for(news_programs_index), list_item,
+                                True)
+    return True
 
 
 # News program list
 @plugin.route('/news/programs/index')
 def news_programs_index():
-    xbmc.log('Displaying At News Index')
+    """
+    News Programs - Index
+    """
+    xbmc.log("Displaying News Programs Index")
     success = False
     programs = news_programs.get_programs()
 
-    if (len(programs)) > 0:
+    if len(programs) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, programs, len(programs))
         kodiutils.set_video_directory_information(
             plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'tvshows')
@@ -202,7 +229,10 @@ def news_programs_index():
 
 # Add on-demand menu item
 def add_on_demand_menu_item():
-    xbmc.log('Adding on-demand menu item')
+    """
+    On-demand - Menu item
+    """
+    xbmc.log("Adding on-demand menu item")
     # Getting random on-demand episode to show
     featured_episodes = url.get_json(
         nhk_api.rest_url['homepage_ondemand'])['data']['items']
@@ -210,18 +240,19 @@ def add_on_demand_menu_item():
     pgm_title = None
     try_count = 0
     program_json = []
-    # Fine a valid episode to highlight
-    while (pgm_title is None):
+    episode = Episode()
+
+    # Find a valid random episode to highlight
+    while pgm_title is None:
         try_count = try_count + 1
         xbmc.log(
-            'Check if random episode has a valid title. Try count:{0}'.format(
-                try_count))
+            f"Check if random episode has a valid title. Try count: {try_count}"
+        )
         featured_episode = random.randint(0, no_of_epsisodes - 1)
         program_json = featured_episodes[featured_episode]
         pgm_title = program_json['pgm_title_clean']
 
-    if (program_json is not None):
-        episode = Episode()
+    if program_json is not None:
         episode.title = kodiutils.get_string(30020)
         episode.plot = kodiutils.get_string(30022).format(
             utils.get_episode_name(pgm_title, program_json['subtitle']))
@@ -233,9 +264,8 @@ def add_on_demand_menu_item():
         episode.video_info = kodiutils.get_video_info(USE_720P)
         xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_index),
                                     episode.kodi_list_item, True)
-        return True
-    else:
-        return False
+
+    return episode
 
 
 # Add live stream menu item
@@ -249,7 +279,7 @@ def add_live_stream_menu_item(use_720p=USE_720P):
     Returns:
         [Episode]: Episode with the live stream
     """
-    xbmc.log('Adding live stream menu item')
+    xbmc.log("Adding live stream menu item")
     program_json = url.get_json(nhk_api.rest_url['get_livestream'],
                                 False)['channel']['item']
 
@@ -267,7 +297,7 @@ def add_live_stream_menu_item(use_720p=USE_720P):
     episode.playcount = 0
 
     # Title and Description
-    plot = '{0}\n\n{1}'.format(row['title'], row['description'])
+    plot = f"{row['title']}\n\n{row['description']}"
     episode.plot = plot
 
     if use_720p:
@@ -278,7 +308,7 @@ def add_live_stream_menu_item(use_720p=USE_720P):
     episode.video_info = kodiutils.get_video_info(use_720p)
     xbmcplugin.addDirectoryItem(plugin.handle, episode.url,
                                 episode.kodi_list_item, False)
-    return (episode)
+    return episode
 
 
 #
@@ -288,7 +318,10 @@ def add_live_stream_menu_item(use_720p=USE_720P):
 
 # Menu item
 def add_live_schedule_menu_item():
-    xbmc.log('Adding live schedule menu item')
+    """
+    Live schedule - Menu item
+    """
+    xbmc.log("Adding live schedule menu item")
     program_json = url.get_json(nhk_api.rest_url['get_livestream'],
                                 False)['channel']['item']
 
@@ -320,7 +353,7 @@ def add_live_schedule_menu_item():
     xbmcplugin.addDirectoryItem(plugin.handle,
                                 plugin.url_for(live_schedule_index),
                                 episode.kodi_list_item, True)
-    return (True)
+    return True
 
 
 #
@@ -330,11 +363,15 @@ def add_live_schedule_menu_item():
 
 @plugin.route('/live_schedule/index')
 def live_schedule_index():
+    """
+    Live schedule - Index
+    """
     xbmc.log('Adding live schedule index')
     program_json = url.get_json(nhk_api.rest_url['get_livestream'],
                                 False)['channel']['item']
     row_count = 0
     episodes = []
+    success = False
     for row in program_json:
         row_count = row_count + 1
 
@@ -353,7 +390,7 @@ def live_schedule_index():
 
         vod_id = row['vod_id']
         episode.vod_id = vod_id
-        if (len(vod_id) > 0):
+        if len(vod_id) > 0:
             # Can play on-demand -> Add "Play:" before the title
             # and make it playable
             episode.is_playable = True
@@ -363,7 +400,7 @@ def live_schedule_index():
 
         episode.plot = utils.format_plot(episode_name, row['description'])
 
-        if (episode.is_playable):
+        if episode.is_playable:
             # Display the playable episode
             episodes.append((add_playable_episode(episode,
                                                   use_cache=USE_CACHE,
@@ -372,15 +409,15 @@ def live_schedule_index():
             # Simply display text
             episodes.append((None, episode.kodi_list_item, False))
 
-    if (row_count) > 0:
+    if row_count > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         xbmcplugin.endOfDirectory(plugin.handle,
                                   succeeded=True,
                                   cacheToDisc=False)
+        success = True
 
     # Used for unit testing
-    # Return row count
-    return row_count
+    return success
 
 
 #
@@ -390,60 +427,63 @@ def live_schedule_index():
 
 @plugin.route('/vod/index')
 def vod_index():
-    xbmc.log('Creating Video On Demand Menu')
+    """
+    Video On Demand - Menu item
+    """
+    xbmc.log("Creating Video On Demand Menu")
     art = {'thumb': NHK_ICON, 'fanart': NHK_FANART}
     # Programs
-    li = xbmcgui.ListItem(kodiutils.get_string(30040), offscreen=True)
-    li.setArt(art)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30040), offscreen=True)
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_programs),
-                                li, True)
+                                list_item, True)
     # Latest Episodes
-    li = xbmcgui.ListItem(kodiutils.get_string(30043), offscreen=True)
-    li.setArt(art)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30043), offscreen=True)
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(vod_episode_list, 'get_latest_episodes', 'None', 0,
-                       xbmcplugin.SORT_METHOD_UNSORTED), li, True)
+        plugin.url_for(vod_episode_list, "get_latest_episodes", "None", 0,
+                       xbmcplugin.SORT_METHOD_UNSORTED), list_item, True)
 
     # Most Watched
-    li = xbmcgui.ListItem(kodiutils.get_string(30044), offscreen=True)
-    li.setArt(art)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30044), offscreen=True)
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(vod_episode_list, 'get_most_watched_episodes', 'None',
-                       0, xbmcplugin.SORT_METHOD_UNSORTED), li, True)
+        plugin.url_for(vod_episode_list, "get_most_watched_episodes", "None",
+                       0, xbmcplugin.SORT_METHOD_UNSORTED), list_item, True)
 
     # Documentaries
-    li = xbmcgui.ListItem(kodiutils.get_string(30046), offscreen=True)
-    li.setArt(art)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30046), offscreen=True)
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(vod_episode_list, 'get_categories_episode_list', 15, 0,
-                       xbmcplugin.SORT_METHOD_UNSORTED), li, True)
+        plugin.url_for(vod_episode_list, "get_categories_episode_list", 15, 0,
+                       xbmcplugin.SORT_METHOD_UNSORTED), list_item, True)
     # Categories
-    li = xbmcgui.ListItem(kodiutils.get_string(30041), offscreen=True)
-    li.setArt(art)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30041), offscreen=True)
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_categories),
-                                li, True)
+                                list_item, True)
     # Playlists
-    li = xbmcgui.ListItem(kodiutils.get_string(30042), offscreen=True)
-    li.setArt(art)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30042), offscreen=True)
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(plugin.handle, plugin.url_for(vod_playlists),
-                                li, True)
+                                list_item, True)
 
     # All
-    li = xbmcgui.ListItem(kodiutils.get_string(30045), offscreen=True)
-    li.setArt(art)
+    list_item = xbmcgui.ListItem(kodiutils.get_string(30045), offscreen=True)
+    list_item.setArt(art)
     xbmcplugin.addDirectoryItem(
         plugin.handle,
-        plugin.url_for(vod_episode_list, 'get_all_episodes', 'None', 0,
-                       xbmcplugin.SORT_METHOD_TITLE), li, True)
+        plugin.url_for(vod_episode_list, "get_all_episodes", "None", 0,
+                       xbmcplugin.SORT_METHOD_TITLE), list_item, True)
 
     kodiutils.set_video_directory_information(plugin.handle,
                                               xbmcplugin.SORT_METHOD_NONE,
-                                              'videos')
+                                              "videos")
 
-    return (True)
+    return True
 
 
 # By Program (Programs Tab on NHK World Site)
@@ -475,19 +515,19 @@ def vod_programs():
 
             # Create the directory item
             episodes.append(
-                (plugin.url_for(vod_episode_list, 'get_programs_episode_list',
+                (plugin.url_for(vod_episode_list, "get_programs_episode_list",
                                 program_id, 1,
                                 xbmcplugin.SORT_METHOD_UNSORTED),
                  episode.kodi_list_item, True))
 
-    if (row_count > 0):
+    if row_count > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(plugin.handle,
                                                   xbmcplugin.SORT_METHOD_TITLE,
-                                                  'episodes')
+                                                  "episodes")
 
     # Return last program program Id - useful for unit testing
-    return (program_id)
+    return program_id
 
 
 @plugin.route('/vod/categories/')
@@ -518,7 +558,7 @@ def vod_categories():
                             category_id, 0, xbmcplugin.SORT_METHOD_UNSORTED),
              episode.kodi_list_item, True))
 
-    if (row_count > 0):
+    if row_count > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(plugin.handle,
                                                   xbmcplugin.SORT_METHOD_TITLE,
@@ -549,14 +589,14 @@ def vod_playlists():
 
         playlist_id = row['playlist_id']
         episodes.append(
-            (plugin.url_for(vod_episode_list, 'get_playlists_episode_list',
+            (plugin.url_for(vod_episode_list, "get_playlists_episode_list",
                             playlist_id, 0, xbmcplugin.SORT_METHOD_TITLE),
              episode.kodi_list_item, True))
 
-    if (row_count > 0):
+    if row_count > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         kodiutils.set_video_directory_information(
-            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, 'episodes')
+            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, "episodes")
 
     # Return last valid playlist ID - useful for unit testing
     return playlist_id
@@ -579,26 +619,27 @@ def add_playable_episode(episode, use_cache, use_720p):
     # via play_vod_episode()
 
     # Get episode from cache if cache is enabled
-    xbmc.log("add_playable_episode: Add {0}, use cache: {1}".format(
-        episode.vod_id, use_cache))
-    if (use_cache):
+    xbmc.log(
+        f"add_playable_episode: Add {episode.vod_id}, use cache: {use_cache}")
+    if use_cache:
         return_value = vod.get_episode_from_cache(episode, use_720p)
-        if (return_value is not None):
-            xbmc.log("add_playable_episode: Added {0} from cache".format(
-                episode.vod_id))
+        if return_value is not None:
+            xbmc.log(
+                f"add_playable_episode: Added {episode.vod_id} from cache")
             return return_value
 
     # Don't use cache or episode not in cache - need to be resolve dynamically
     play_url = plugin.url_for(resolve_vod_episode, episode.vod_id)
-    xbmc.log('add_playable_episode: Resolved Play URL: {0}'.format(play_url))
+    xbmc.log("add_playable_episode: Resolved Play URL: {play_url}")
     return_value = [play_url, episode.kodi_list_item, False]
     return return_value
 
 
-@plugin.route('/vod/episode_list/<api_method>/<id>/<show_only_subtitle>/' +
-              '<sort_method>/')
+@plugin.route(
+    '/vod/episode_list/<api_method>/<list_id>/<show_only_subtitle>/<sort_method>/'
+)
 def vod_episode_list(api_method,
-                     id,
+                     list_id,
                      show_only_subtitle,
                      sort_method,
                      unit_test=False):
@@ -619,14 +660,14 @@ def vod_episode_list(api_method,
     """
 
     success = False
-    episodes = vod.get_episode_list(api_method, id, show_only_subtitle)
+    episodes = vod.get_episode_list(api_method, list_id, show_only_subtitle)
 
-    if (len(episodes) > 0):
+    if len(episodes) > 0:
         playable_episodes = []
-        if (not unit_test):
+        if not unit_test:
             xbmc.log(
-                'vod_episode_list: {0} episodes, use_cache: {1}, use_720p: {2}'
-                .format(len(episodes), USE_CACHE, USE_720P))
+                f"vod_episode_list: {len(episodes)} episodes, use_cache: {USE_CACHE}, use_720p: {USE_720P}"
+            )
             for episode in episodes:
                 # Add the current episode directory item
                 playable_episodes.append(
@@ -638,11 +679,11 @@ def vod_episode_list(api_method,
                                          len(playable_episodes))
             sort_method = int(sort_method)
             kodiutils.set_video_directory_information(plugin.handle,
-                                                      sort_method, 'episodes')
+                                                      sort_method, "episodes")
         success = True
 
     # Used for unit testing
-    return (success)
+    return success
 
 
 # Video On Demand - Resolve episode
@@ -662,7 +703,7 @@ def resolve_vod_episode(vod_id, use_720p=USE_720P):
     episode = vod.resolve_vod_episode(vod_id, use_720p)
     if (episode is not None and episode.is_playable):
         xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
-        return (episode)
+        return episode
 
 
 #  Play News or At A Glance Item
@@ -672,24 +713,24 @@ def play_news_item(api_url, news_id, item_type, title):
     """ Play a news item
     can either be 'news' or 'ataglance'
     """
-    xbmc.log('ITEM_TYPE: {0}'.format(item_type))
-    xbmc.log('API_URL: {0}'.format(api_url))
-    xbmc.log('NEWS_ID: {0}'.format(news_id))
-    xbmc.log('TITLE: {0}'.format(title))
+    xbmc.log(f"ITEM_TYPE: {item_type}")
+    xbmc.log(f"API_URL: {api_url}")
+    xbmc.log(f"NEWS_ID: {news_id}")
+    xbmc.log(f"TITLE: {title}")
 
-    if (item_type == 'news'):
+    if item_type == 'news':
         video_xml = url.get_url(api_url).text
         play_path = nhk_api.rest_url['news_video_url'].format(
             utils.get_top_stories_play_path(video_xml))
-    elif (item_type == 'ataglance'):
+    elif item_type == 'ataglance':
         video_xml = url.get_url(api_url).text
         play_path = nhk_api.rest_url['ataglance_video_url'].format(
             utils.get_ataglance_play_path(video_xml))
     else:
-        return (False)
+        return False
 
-    xbmc.log('Play Path: {0}'.format(play_path))
-    if (play_path is not None):
+    xbmc.log(f"Play Path: {play_path}")
+    if play_path is not None:
         episode = Episode()
         episode.vod_id = news_id
         episode.title = title
@@ -697,8 +738,8 @@ def play_news_item(api_url, news_id, item_type, title):
         episode.video_info = kodiutils.get_sd_video_info()
         episode.is_playable = True
         xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
-        return (True)
+        return True
     else:
         # Couldn't find video
-        xbmc.log('Could not find video {0}'.format(api_url))
-        return (False)
+        xbmc.log(f"Could not find video {api_url}")
+        return False

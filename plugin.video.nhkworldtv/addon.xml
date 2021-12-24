@@ -6,6 +6,7 @@
         <import addon="script.module.requests-cache" version="0.5.2+matrix.2" />
         <import addon="script.module.routing" version="0.2.3+matrix.1" />
         <import addon="script.module.pytz" version="2019.3.0+matrix.2" />
+        <import addon="script.module.tzlocal" version="3.0.0+matrix.2" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
@@ -26,8 +27,6 @@ Watch NHK World Japan in Full HD
 Content is retrieved and played directly from the NHK World web site.
 
 Plugin supports fallback to HD if you should encounter buffering issues.
-
-Tested on Kodi Matrix.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -38,8 +37,6 @@ Tested on Kodi Matrix.
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
         <news>v1.0.5
 - Removed support for Kodi Leia
-- Removed "We in the time of Corona"-section
-- Removed optional setting of View States so that plugin can be submitted to official repo
         </news>
         <assets>
             <icon>resources/icon.png</icon>
