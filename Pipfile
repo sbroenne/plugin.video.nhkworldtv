@@ -11,15 +11,15 @@ pytest-cov = "*"
 setuptools = "*"
 addon-submitter = {git = "https://github.com/romanvm/kodi-addon-submitter.git"}
 kodi-addon-checker = "*"
-pylint = "*"
+yapf = "*"
+flake8="*"
 
 [packages]
-requests = "*"
+requests = "2.25.1"
 kodistubs = "*"
-requests-cache = "*"
-pytz = "*"
-tzlocal = ""
-
+requests-cache = "0.5.2"
+pytz = "2019.3.0"
+tzlocal = "3.0.0"
 
 [requires]
 python_version = "3.8"

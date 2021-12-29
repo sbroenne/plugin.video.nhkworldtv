@@ -130,9 +130,7 @@ dmypy.json
 .DS_Store
 *.code-workspace
 *.sqlite
-build/leia/*
-build/matrix/*
 
-Pipfile
 Pipfile.lock
 plugin.video.nhkworldtv/cov.xml
+plugin.video.nhkworldtv-*.zip

@@ -1,4 +1,4 @@
-name: Push addon to plugin repo branches
+name: Push Matrix addon to plugin repo branches
 
 on:
   workflow_dispatch:
@@ -22,4 +22,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           EMAIL: ${{secrets.EMAIL}}
         run: |
-          submit-addon -r repo-plugins -b leia --push-branch -s -m plugin.video.nhkworldtv
+          submit-addon -r repo-plugins -b matrix --push-branch -s plugin.video.nhkworldtv

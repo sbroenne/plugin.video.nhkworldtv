@@ -1,4 +1,4 @@
-name: Create NHK World TV Release for Kodi (Leia and Matrix)
+name: Create NHK World TV Release for Kodi (Matrix only)
 
 on:
   push:
@@ -8,41 +8,34 @@ on:
 
 jobs:
   build:
-    name: Create & Upload ZIP Archive
+    name: Check, build and release plugin
     runs-on: ubuntu-latest
+    
     steps:
+     - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version:  python-version: [3.8]
+  
+      - name: Install dependencies with pipenv
+        run: |
+          pip install pipenv
+          pipenv install --dev
+
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Set GIT tag # https://github.community/t5/GitHub-Actions/How-to-get-just-the-tag-name/td-p/31595
-        run: echo "GIT_TAG=${GITHUB_REF##*/}"  >> $GITHUB_ENV
-      - name: Set Plugin version # GIT_TAG without the preceding v
-        run: echo "PLUGIN_VERSION=${GIT_TAG:1}" >> $GITHUB_ENV
-      - name: Deploy pre-requisites
-        id: pre_req
-        run: |
-          sudo -H pip3 install setuptools
-          sudo -H pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
-          sudo -H pip3 install kodi-addon-checker
-      - name: Run kodi-addon-checker for Leia branch # Identical code base for Leia and Matrix
+
+      - name: Run kodi-addon-checker for Matrix branch
         id: kodi-addon-checker
         run: |
-          kodi-addon-checker --branch leia plugin.video.nhkworldtv
-      - name: Build plugin for Leia and Matrix # ZIP archives
+          pipenv run kodi-addon-checker --branch matrix plugin.video.nhkworldtv
+      - name: Build plugin for Matrix # ZIP archives
         id: build_plugin
         run: |
-          submit-addon -z -m -s plugin.video.nhkworldtv
-      - name: Set variables for Leia
-        id: set_variables_leia
-        run: |
-          echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION.zip"
-      - name: Set variables for Matrix
-        id: set_variables_matrix
-        run: |
-          echo "::set-output name=plugin_zip::plugin.video.nhkworldtv-$PLUGIN_VERSION+matrix.1.zip"
+          pipenv run submit-addon -z -s plugin.video.nhkworldtv
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            ${{ steps.set_variables_matrix.outputs.plugin_zip }}
-            ${{ steps.set_variables_leia.outputs.plugin_zip }}
+          files: plugin.video.nhkworldtv-*.zip
+            
