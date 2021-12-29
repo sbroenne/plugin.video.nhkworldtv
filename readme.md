@@ -5,7 +5,7 @@
   - [1.2. Overview](#12-overview)
   - [1.3. How-to Install](#13-how-to-install)
     - [1.3.1. Kodi 19 / Matrix (current Kodi version)](#131-kodi-19--matrix-current-kodi-version)
-    - [1.3.2. Kodi 18 / Leia (previous Kodi version)](#132-kodi-18--leia-previous-kodi-version)
+    - [1.3.2. Legacy Kodi 18 / Leia (previous Kodi version)](#132-legacy-kodi-18--leia-previous-kodi-version)
   - [1.4. Video Quality](#14-video-quality)
   - [1.5. Design Goals](#15-design-goals)
     - [1.5.1. Inclusion in the official Kodi Repo](#151-inclusion-in-the-official-kodi-repo)
@@ -31,11 +31,11 @@ NHK World TV is a plug-in that displays most of the content from [NHK World Japa
 - Top Stories and At a Glance
 - News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
 
-Content is retrieved and played directly from the NHK World web site/Akamai.
+Content is retrieved and played directly from the NHK World web site or their content delivery network (Akamai).
+
+The plug-in uses a [companion cloud cache service](https://github.com/sbroenne/nhkworldtv-backend) to speed up video play-back because these NHK APIs are very slow.
 
 Plugin supports fallback to HD (720p) if you should encounter buffering issues.
-
-Tested on Kodi 18.6+ (Leia) and 19 (Matrix).
 
 ## 1.3. How-to Install
 
@@ -49,9 +49,9 @@ For more details, have a look at the [pull request](https://github.com/xbmc/repo
 
 You can install the current Matrix version of the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne/repository.sbroenne-0.0.13.zip). The plug-in will **auto-update** itself regularly from this repo.
 
-### 1.3.2. Kodi 18 / Leia (previous Kodi version)
+### 1.3.2. Legacy Kodi 18 / Leia (previous Kodi version)
 
-You can also download the **Leia** version from a [Github release](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.4/plugin.video.nhkworldtv-1.0.4.zip) but you need to install this as ZIP file and it will **not auto-update**!
+There is a version of this plug-in that still supports Kodi 18/Leia. However, I no longer actively maintain it so over time it will stop working. You can download this version from a [Github release](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.4/plugin.video.nhkworldtv-1.0.4.zip).
 
 ## 1.4. Video Quality
 
@@ -73,7 +73,7 @@ If you like to add the other content that can be found in Best Of NHK, please fe
 
 "Snappiness" was one of my design goals when developing this plug-in. For example, most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to two hours)
 
-The plug-in uses a companion cloud service to speed up video play-back because these specific  NHK APIs are very slow.
+The plug-in uses a companion cloud service to speed up video play-back because these NHK APIs are very slow.
 
 You can disable this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer and that you will loose a bit of UI functionality (e.g. Kodi will not store how much of a program you have already watched)
 
