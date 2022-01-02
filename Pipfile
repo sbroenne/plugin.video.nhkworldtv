@@ -13,6 +13,7 @@ addon-submitter = {git = "https://github.com/romanvm/kodi-addon-submitter.git"}
 kodi-addon-checker = "*"
 yapf = "*"
 flake8="*"
+mypy = "*"
 
 [packages]
 requests = "2.25.1"
