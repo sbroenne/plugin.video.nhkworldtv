@@ -634,7 +634,7 @@ def add_playable_episode(episode, use_cache, use_720p):
 
     # Don't use cache or episode not in cache - need to be resolve dynamically
     play_url = plugin.url_for(resolve_vod_episode, episode.vod_id)
-    xbmc.log("add_playable_episode: Resolved Play URL: {play_url}")
+    xbmc.log(f"add_playable_episode: Resolved Play URL: {play_url}")
     return_value = [play_url, episode.kodi_list_item, False]
     return return_value
 
