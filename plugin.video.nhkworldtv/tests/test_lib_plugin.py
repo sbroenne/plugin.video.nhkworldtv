@@ -56,9 +56,9 @@ def test_get_news_programs_index():
     assert (plugin.news_programs_index() is True)
 
 
-# Kodi OK dialog box
+# Kodi TextViewer dialog box
 
 
-def test_show_ok_dialog_box():
-    assert (isinstance(plugin.show_ok_dialog_box("Title", "Plot"),
+def test_show_textviewer_dialog_box():
+    assert (isinstance(plugin.show_textviewer_dialog_box("Title", "Plot"),
                        xbmcgui.Dialog))

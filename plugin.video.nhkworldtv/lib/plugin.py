@@ -122,7 +122,7 @@ def topstories_index():
         else:
             # No video attached to it
             episodes.append(
-                (plugin.url_for(show_ok_dialog_box, episode.title,
+                (plugin.url_for(show_textviewer_dialog_box, episode.title,
                                 episode.plot), episode.kodi_list_item, False))
 
     if len(episodes) > 0:
@@ -410,7 +410,7 @@ def live_schedule_index():
         else:
             # Simply display text
             episodes.append(
-                (plugin.url_for(show_ok_dialog_box, episode.title,
+                (plugin.url_for(show_textviewer_dialog_box, episode.title,
                                 episode.plot), episode.kodi_list_item, False))
 
     if row_count > 0:
@@ -749,14 +749,14 @@ def play_news_item(api_url, news_id, item_type, title):
         return False
 
 
-@plugin.route('/dialog/show_ok_dialog_box/<title>/<plot>')
-def show_ok_dialog_box(title: str, plot: str) -> xbmcgui.Dialog:
-    """ Shows a Kodi OK Dialog box (used for non playable items)
+@plugin.route('/dialog/show_textviewer_dialog_box/<title>/<plot>')
+def show_textviewer_dialog_box(title: str, plot: str) -> xbmcgui.Dialog:
+    """ Shows a Kodi TextViewer Dialog box (used for non playable items)
 
     Args:
         title (str): Episode title
         plot (str): Episode Plot
     """
     dialog = xbmcgui.Dialog()
-    dialog.ok(heading=title, message=plot)
+    dialog.textviewer(heading=title, text=plot)
     return dialog
