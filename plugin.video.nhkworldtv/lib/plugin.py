@@ -121,7 +121,9 @@ def topstories_index():
                                 episode.title), episode.kodi_list_item, False))
         else:
             # No video attached to it
-            episodes.append((None, episode.kodi_list_item, False))
+            episodes.append(
+                (plugin.url_for(show_ok_dialog_box, episode.title,
+                                episode.plot), episode.kodi_list_item, False))
 
     if len(episodes) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
@@ -407,7 +409,9 @@ def live_schedule_index():
                                                   use_720p=USE_720P)))
         else:
             # Simply display text
-            episodes.append((None, episode.kodi_list_item, False))
+            episodes.append(
+                (plugin.url_for(show_ok_dialog_box, episode.title,
+                                episode.plot), episode.kodi_list_item, False))
 
     if row_count > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
@@ -743,3 +747,16 @@ def play_news_item(api_url, news_id, item_type, title):
         # Couldn't find video
         xbmc.log(f"Could not find video {api_url}")
         return False
+
+
+@plugin.route('/dialog/show_ok_dialog_box/<title>/<plot>')
+def show_ok_dialog_box(title: str, plot: str) -> xbmcgui.Dialog:
+    """ Shows a Kodi OK Dialog box (used for non playable items)
+
+    Args:
+        title (str): Episode title
+        plot (str): Episode Plot
+    """
+    dialog = xbmcgui.Dialog()
+    dialog.ok(heading=title, message=plot)
+    return dialog

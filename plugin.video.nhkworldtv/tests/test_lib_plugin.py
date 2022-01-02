@@ -1,4 +1,5 @@
 import lib.plugin as plugin
+import xbmcgui
 
 
 def test_main_menu():
@@ -53,3 +54,11 @@ def test_get_topstories_index():
 
 def test_get_news_programs_index():
     assert (plugin.news_programs_index() is True)
+
+
+# Kodi OK dialog box
+
+
+def test_show_ok_dialog_box():
+    assert (isinstance(plugin.show_ok_dialog_box("Title", "Plot"),
+                       xbmcgui.Dialog))
