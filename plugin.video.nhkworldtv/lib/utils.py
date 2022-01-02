@@ -19,8 +19,15 @@ if len(PLUGIN_PATH) == 0:
 
 
 def to_local_time(timestamp):
-    """ Convert from a UNIX timestamp to a valid date time """
-    local_time = datetime.fromtimestamp(timestamp)
+    """
+    Convert from a UNIX timestamp to a valid date time
+    """
+
+    try:
+        local_time = datetime.fromtimestamp(timestamp)
+    except OverflowError:
+        local_time = datetime.max
+
     return local_time
 
 
@@ -102,7 +109,7 @@ def get_timestamp_from_datestring(datestring):
                         minute=int(datestring[10:12]),
                         second=int(datestring[12:14]),
                         tzinfo=tokyo)
-    
+
     # Convert to local time zone
     local_tz = get_localzone()
     local_dt = tokyo_dt.astimezone(local_tz)
