@@ -10,13 +10,13 @@ jobs:
   build:
     name: Check, build and release plugin
     runs-on: ubuntu-latest
-    
+
     steps:
-     - name: Set up Python 3.8
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
-  
+          python-version: "3.8"
+
       - name: Install dependencies with pipenv
         run: |
           pip install pipenv
@@ -38,4 +38,3 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: plugin.video.nhkworldtv-*.zip
-            
