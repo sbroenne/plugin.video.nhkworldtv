@@ -15,8 +15,6 @@ jobs:
         python-version: [3.8]
 
     steps:
-      - uses: actions/checkout@v2
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -25,6 +23,9 @@ jobs:
       - name: Delete sqlite DB if it exists
         run: |
           rm -f nhk_world_cache.sqlite
+
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Install dependencies with pipenv
         run: |

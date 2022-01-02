@@ -17,13 +17,13 @@ jobs:
         with:
           python-version: "3.8"
 
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Install dependencies with pipenv
         run: |
           pip install pipenv
           pipenv install --dev
-
-      - name: Checkout code
-        uses: actions/checkout@v2
 
       - name: Run kodi-addon-checker for Matrix branch
         id: kodi-addon-checker
