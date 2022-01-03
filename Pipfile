@@ -18,7 +18,7 @@ mypy = "*"
 [packages]
 requests = "2.25.1"
 kodistubs = "*"
-requests-cache = "0.5.2"
+requests-cache = "0.9.0"
 pytz = "2019.3.0"
 tzlocal = "3.0.0"
 
