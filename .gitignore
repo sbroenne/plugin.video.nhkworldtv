@@ -131,6 +131,5 @@ dmypy.json
 *.code-workspace
 *.sqlite
 
-Pipfile.lock
 plugin.video.nhkworldtv/cov.xml
 plugin.video.nhkworldtv-*.zip
