@@ -19,7 +19,7 @@ mypy = "*"
 requests = "2.25.1"
 kodistubs = "*"
 requests-cache = "0.5.2"
-pytz = "2019.3.0"
+pytz = "2021.3"
 tzlocal = "3.0.0"
 
 [requires]
