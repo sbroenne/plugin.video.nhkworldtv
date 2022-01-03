@@ -20,7 +20,7 @@ requests = "2.25.1"
 kodistubs = "*"
 requests-cache = "0.5.2"
 pytz = "2019.3.0"
-tzlocal = "3.0.0"
+tzlocal = "4.1"
 
 [requires]
 python_version = "3.8"
