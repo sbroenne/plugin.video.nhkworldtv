@@ -16,7 +16,7 @@ flake8="*"
 mypy = "*"
 
 [packages]
-requests = "2.25.1"
+requests = "2.27.1"
 kodistubs = "19.0.3"
 requests-cache = "0.5.2"
 pytz = "2019.3.0"
