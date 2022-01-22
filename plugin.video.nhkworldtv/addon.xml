@@ -2,10 +2,9 @@
 <addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.5" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
-        <import addon="script.module.requests" version="2.25.1+matrix.1" />
         <import addon="script.module.requests-cache" version="0.5.2+matrix.2" />
         <import addon="script.module.routing" version="0.2.3+matrix.1" />
-        <import addon="script.module.pytz" version="2019.3.0+matrix.2" />
+        <import addon="script.module.pytz" version="2021.3.0+matrix.1" />
         <import addon="script.module.tzlocal" version="3.0.0+matrix.2" />
     </requires>
 
@@ -37,6 +36,7 @@ Plugin supports fallback to HD if you should encounter buffering issues.
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
         <news>v1.0.5
 - Removed support for Kodi Leia
+- Optimizations for Python 3.x
         </news>
         <assets>
             <icon>resources/icon.png</icon>

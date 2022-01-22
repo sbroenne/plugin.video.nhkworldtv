@@ -16,11 +16,10 @@ flake8="*"
 mypy = "*"
 
 [packages]
-requests = "2.25.1"
-kodistubs = "19.0.3"
-requests-cache = "0.5.2"
-pytz = "2019.3.0"
-tzlocal = "3.0.0"
+kodistubs = "*"
+requests-cache = "*"
+pytz = "*"
+tzlocal = "*"
 
 [requires]
 python_version = "3.8"
