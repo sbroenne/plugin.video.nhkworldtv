@@ -28,11 +28,11 @@ msgid "Max 'At A Glance'-items"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Use Azure CDN to resolve episode Url"
+msgid "Caching"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Enable to speed-up video playback (recommended)"
+msgid "Use episode Url cache from Azure CDN (recommended)"
 msgstr ""
 
 msgctxt "#30016"
@@ -40,7 +40,7 @@ msgid "Run Set-up Wizard when plugin starts"
 msgstr ""
 
 msgctxt "#30017"
-msgid "Use 720p instead of 1080p (in case you are running into buffering issues)"
+msgid "Use 720p instead of 1080p (in case you are encountering buffering issues)"
 msgstr ""
 # plugin.py
 

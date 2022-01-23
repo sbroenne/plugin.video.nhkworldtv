@@ -3,10 +3,10 @@
     <category label="30001">
         <setting id="use_720P" type="bool" label="30017" default="false" />
         <setting id="run_wizard" type="bool" label="30016" default="true" />
-        <setting label="30004" type="slider" id="url_cache_minutes" default="240" range="60,60,1200" option="int" />
     </category>
     <category label="30008">
         <setting id="use_backend" type="bool" label="30009" default="true" />
+        <setting id="url_cache_minutes" label="30004" type="slider" default="240" range="60,60,1200" option="int" />
     </category>
     <category label="30003">
         <setting label="30006" type="slider" id="max_news_items" default="39" range="10,10,60" option="int" />
