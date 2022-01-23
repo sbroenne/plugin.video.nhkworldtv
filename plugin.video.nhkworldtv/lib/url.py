@@ -94,8 +94,6 @@ def get_api_request_params(url):
     # Populate request_params if needed
     if api_keys.NHK_API_BASE_URL in url:
         request_params = {'apikey': api_keys.NHK_API_KEY}
-    elif api_keys.CACHE_API_BASE_URL in url:
-        request_params = {'code': api_keys.CACHE_API_KEY}
     else:
         request_params = None
 
