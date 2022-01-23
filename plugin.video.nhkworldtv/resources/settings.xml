@@ -6,10 +6,10 @@
     </category>
     <category label="30008">
         <setting id="use_backend" type="bool" label="30009" default="true" />
-        <setting id="url_cache_minutes" label="30004" type="slider" default="240" range="60,60,1200" option="int" />
+        <setting id="url_cache_minutes" type="slider" label="30004" default="240" range="60,60,1200" option="int" />
     </category>
     <category label="30003">
-        <setting label="30006" type="slider" id="max_news_items" default="39" range="10,10,60" option="int" />
-        <setting label="30007" type="slider" id="max_ataglance_items" default="83" range="44,40,1000" option="int" />
+        <setting id="max_news_items" type="slider" label="30006" default="39" range="10,10,60" option="int" />
+        <setting id="max_ataglance_items" type="slider" label="30007" default="83" range="44,40,1000" option="int" />
     </category>
 </settings>
