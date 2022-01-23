@@ -3,31 +3,27 @@ NHK Cache API - gets episode VOD information from the companion Azure service
 """
 import xbmc
 
-from . import api_keys, url
-
-# Cache backend (Azure Functions) API
-
-REST_URL = {
-    'cache_get_program_list':
-    api_keys.CACHE_API_BASE_URL + '/Program/v2/List/{0}',
-}
+from . import url
 
 BASE_URL = "https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/mp4:mm/flvmedia/5905"
 
 
-def get_program_metdadata_cache(max_items):
-    """Use NHK World TV Cloud Service to speed-up episode URLlookup.
-    The service runs on Azure in West Europe but should still speed up
-    the lookup process dramatically since it uses a pre-loaded cache
+def get_program_metdadata_cache():
+    """ 
+    Load the VOD program URLs from a json file that is generated every few hours
+    by the [Azure Cache for NHK World TV Kodi Plugin](https://github.com/sbroenne/nhkworldtv-backend)
+    service.
 
-    Arguments:
-        max_items {int} -- Amount of items to retrieve
+    This file is delivered by the Azure CDN and will speed up resolving of episodes dramatically.
+
 
     Returns:
-        {dict} -- A JSON dict with the cache items
+        {dict} -- A JSON dict with the cache items or None if the request failed
     """
-    cache = url.get_json(REST_URL['cache_get_program_list'].format(max_items))
+    cache_file = "https://nhkworldtv.azureedge.net/program-list-v2/cache.json"
+
+    cache = url.get_json(cache_file)
     xbmc.log(
-        f"cache_api.get_program_metdadata_cache: Got {len(cache)} episodes from Azure"
+        f"cache_api.get_program_metdadata_cache: Got {len(cache)} episodes from Azure CDN"
     )
     return cache

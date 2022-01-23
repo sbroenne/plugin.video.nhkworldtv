@@ -10,9 +10,6 @@ msgctxt "#30001"
 msgid "General"
 msgstr ""
 
-msgctxt "#30002"
-msgid "Microsoft Azure Cache"
-msgstr ""
 
 msgctxt "#30003"
 msgid "Display Limits"
@@ -31,11 +28,11 @@ msgid "Max 'At A Glance'-items"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Enable to speed-up video playback (recommended)"
+msgid "Use Azure CDN to resolve episode Url"
 msgstr ""
 
 msgctxt "#30009"
-msgid "Maximum episodes to cache"
+msgid "Enable to speed-up video playback (recommended)"
 msgstr ""
 
 msgctxt "#30016"

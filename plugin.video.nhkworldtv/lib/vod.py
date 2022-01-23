@@ -13,26 +13,14 @@ EPISODE_CACHE = None
 ADDON = xbmcaddon.Addon()
 
 if ADDON.getSettingBool('use_backend'):
-    xbmc.log('vod.py: Loading episode cache from Azure')
-    # Define how many program should be retrieved from meta data cache
-    cache_items = ADDON.getSettingInt("max_program_metadate_cache_items")
-    # Try to get the meta dara cache from Azure
-    # Under unit test, cache_items will be 0
-    # So an empty cache will be retrieved
-    EPISODE_CACHE = cache_api.get_program_metdadata_cache(cache_items)
+    xbmc.log('vod.py: Loading program metadata cache from Azure CDN')
+    # Try to get the meta data cache from Azure CDN (it is a file)
+    EPISODE_CACHE = cache_api.get_program_metdadata_cache()
 
     # Only use it if we got valid dict back
-    # Also means that the service is running and we can use it
     if isinstance(EPISODE_CACHE, dict):
         USE_CACHE = True
-        xbmc.log('vod.py: Using program metadata cache from Azure')
-
-if utils.UNIT_TEST:
-    # Run under unit test - set some default data since we will not
-    # be able to retrieve data from settings.xml
-
-    # Always enable meta data cache for testing
-    EPISODE_CACHE = cache_api.get_program_metdadata_cache(2000)
+        xbmc.log('vod.py: Loaded program metadata cache from Azure CDN')
 
 
 def get_episode_list(api_method, episode_list_id, show_only_subtitle):
