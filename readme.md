@@ -41,9 +41,7 @@ Plugin supports fallback to HD (720p) if you should encounter buffering issues.
 
 I submitted the plugin to the official Kodi repo but unfortunately this request was declined. The reason is that the they only accept one plugin per content provider.
 
-For NHK World that is the **NHK Live** plugin - looks like they have a first-come first-serve policy.
-
-For more details, have a look at the [pull request](https://github.com/xbmc/repo-plugins/pull/3426) that was created in March 2021.
+For NHK World that is the **NHK Live** plugin.
 
 ### 1.3.1. Kodi 19 / Matrix (current Kodi version)
 
@@ -91,7 +89,7 @@ The plug-in is feature complete and stable.
 
 Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site. I also run scheduled unit tests on Github to alert me on breaking changes.
 
-The plug-in is localized but translation only exists for English (GB). It is also Python3-compatible (by using python-future and kodi-six).
+The plug-in is localized but translation only exists for English (GB). It only runs on Kodi Matrix.
 
 ## 1.8. Future development roadmap
 
