@@ -30,7 +30,7 @@ def get_api_from_nhk():
     """
     xbmc.log("nhk_api_parser.py: Getting API from NHK")
     raw_api_json = url.get_json(
-        "https://www3.nhk.or.jp/nhkworld/assets/api_sdk/api.json")
+        "https://www3.nhk.or.jp/nhkworld/assets/api_sdk/api2.json")
     nhk_api = {}
     for row in raw_api_json['api']:
         prefix = row['prefix']
