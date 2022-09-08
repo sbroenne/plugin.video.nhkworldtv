@@ -4,15 +4,16 @@ Commonly used utility functions
 import re
 import time
 from datetime import datetime
+
 import pytz
-from tzlocal import get_localzone
 import xbmcaddon
+from tzlocal import get_localzone
 
 UNIT_TEST = False
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
-PLUGIN_PATH = ADDON.getAddonInfo('path')
+PLUGIN_PATH = ADDON.getAddonInfo("path")
 if len(PLUGIN_PATH) == 0:
     # Running under unit test
     UNIT_TEST = True
@@ -32,7 +33,7 @@ def to_local_time(timestamp):
 
 
 def get_episode_name(title, subtitle):
-    """ Construct an episode name from the title and the subtitle"""
+    """Construct an episode name from the title and the subtitle"""
     if len(subtitle) == 0:
         subtitle = subtitle.replace("<p></p>", "")
         episode_name = f"{title}"
@@ -43,8 +44,8 @@ def get_episode_name(title, subtitle):
 
 
 def get_top_stories_play_path(xmltext):
-    """ Extracts the play path from a top story XML file """
-    find = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ'
+    """Extracts the play path from a top story XML file"""
+    find = "rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ"
 
     matches = re.compile(find).findall(xmltext)
     if len(matches) == 1:
@@ -55,8 +56,8 @@ def get_top_stories_play_path(xmltext):
 
 
 def get_ataglance_play_path(xmltext):
-    """ Extracts the play path from a At a Glance XML file """
-    find = '<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>'
+    """Extracts the play path from a At a Glance XML file"""
+    find = "<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>"
 
     matches = re.compile(find).findall(xmltext)
     if len(matches) == 1:
@@ -67,8 +68,8 @@ def get_ataglance_play_path(xmltext):
 
 
 def get_news_program_play_path(xmltext):
-    """ Extracts the play path from a news program file """
-    find = 'rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/programs/(.+?)hq.mp4'
+    """Extracts the play path from a news program file"""
+    find = "rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/programs/(.+?).mp4"
 
     matches = re.compile(find).findall(xmltext)
     if len(matches) == 1:
@@ -101,14 +102,16 @@ def get_timestamp_from_datestring(datestring):
         {unicode} -- NHK Timestamp (e.g. 1587008460000)
     """
     # Convert news date string to a Tokyo date
-    tokyo = pytz.timezone('Asia/Tokyo')
-    tokyo_dt = datetime(year=int(datestring[0:4]),
-                        month=int(datestring[4:6]),
-                        day=int(datestring[6:8]),
-                        hour=int(datestring[8:10]),
-                        minute=int(datestring[10:12]),
-                        second=int(datestring[12:14]),
-                        tzinfo=tokyo)
+    tokyo = pytz.timezone("Asia/Tokyo")
+    tokyo_dt = datetime(
+        year=int(datestring[0:4]),
+        month=int(datestring[4:6]),
+        day=int(datestring[6:8]),
+        hour=int(datestring[8:10]),
+        minute=int(datestring[10:12]),
+        second=int(datestring[12:14]),
+        tzinfo=tokyo,
+    )
 
     # Convert to local time zone
     local_tz = get_localzone()

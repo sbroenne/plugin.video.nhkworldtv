@@ -13,20 +13,20 @@ def get_menu_item():
     """
 
     # Getting top story
-    featured_news = url.get_json(nhk_api.rest_url['homepage_news'],
-                                 False)['data'][0]
-    thumbnails = featured_news['thumbnails']
+    featured_news = url.get_json(nhk_api.rest_url["homepage_news"], False)["data"][0]
+    thumbnails = featured_news["thumbnails"]
 
     menu_item = Episode()
 
-    menu_item.thumb = thumbnails['small']
-    menu_item.fanart = thumbnails['middle']
+    menu_item.thumb = thumbnails["small"]
+    menu_item.fanart = thumbnails["middle"]
 
     menu_item.title = kodiutils.get_string(30010)
 
     # Create the plot field
     menu_item.plot = kodiutils.get_string(30012).format(
-        featured_news['title'], featured_news['description'])
+        featured_news["title"], featured_news["description"]
+    )
 
     # Create the directory item
     menu_item.video_info = kodiutils.get_sd_video_info()
@@ -35,7 +35,7 @@ def get_menu_item():
 
 
 def get_episodes(max_items, icon, fanart):
-    """ Get the list of "Top stories" episodes
+    """Get the list of "Top stories" episodes
 
     Args:
         max_items ([inr]): Maximum amount of episodes to display
@@ -44,9 +44,9 @@ def get_episodes(max_items, icon, fanart):
         [list]: List of Episodes
     """
 
-    api_result_json = url.get_json(nhk_api.rest_url['homepage_news'], False)
+    api_result_json = url.get_json(nhk_api.rest_url["homepage_news"], False)
     max_row_count = max_items
-    result_row_count = len(api_result_json['data'])
+    result_row_count = len(api_result_json["data"])
     row_count = 0
     episodes = []
     # Only display MAX ROWS
@@ -54,48 +54,48 @@ def get_episodes(max_items, icon, fanart):
         max_row_count = result_row_count
 
     for row_count in range(0, max_row_count):
-        row = api_result_json['data'][row_count]
+        row = api_result_json["data"][row_count]
 
         episode = Episode()
-        title = row['title']
-        news_id = row['id']
+        title = row["title"]
+        news_id = row["id"]
 
-        thumbnails = row['thumbnails']
+        thumbnails = row["thumbnails"]
         if thumbnails is None:
             # Featured news does not have a thumbnail
             episode.thumb = icon
             episode.fanart = fanart
         else:
-            episode.thumb = thumbnails['small']
-            episode.fanart = thumbnails['middle']
-        episode.broadcast_start_date = row['updated_at']
+            episode.thumb = thumbnails["small"]
+            episode.fanart = thumbnails["middle"]
+        episode.broadcast_start_date = row["updated_at"]
 
-        if row['videos'] is not None:
-            video = row['videos']
+        if row["videos"] is not None:
+            video = row["videos"]
             # Top stories that have a video attached to them
             episode.title = kodiutils.get_string(30063).format(title)
             episode.vod_id = news_id
-            episode.duration = video['duration']
+            episode.duration = video["duration"]
             episode.plot_include_time_difference = True
-            episode.plot = row['description']
+            episode.plot = row["description"]
             episode.video_info = kodiutils.get_sd_video_info()
             episode.is_playable = True
-            episode.url = url.get_nhk_website_url(video['config'])
+            episode.url = url.get_nhk_website_url(video["config"])
         else:
             # No video attached to it
             episode.title = title
             # Get detailed news information
-            api_url = nhk_api.rest_url['news_detail'].format(news_id)
-            news_detail_json = url.get_json(api_url)['data']
-            detail = news_detail_json['detail']
+            api_url = nhk_api.rest_url["news_detail"].format(news_id)
+            news_detail_json = url.get_json(api_url)["data"]
+            detail = news_detail_json["detail"]
             detail = detail.replace("<br />", "\n")
             detail = detail.replace("\n\n", "\n")
             episode.plot_include_time_difference = True
             episode.plot = detail
-            thumbnails = news_detail_json['thumbnails']
+            thumbnails = news_detail_json["thumbnails"]
             if thumbnails is not None:
-                episode.thumb = thumbnails['small']
-                episode.fanart = thumbnails['middle']
+                episode.thumb = thumbnails["small"]
+                episode.fanart = thumbnails["middle"]
             episode.is_playable = False
         episodes.append(episode)
     return episodes

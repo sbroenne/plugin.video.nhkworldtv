@@ -5,11 +5,13 @@ import xbmc
 
 from . import url
 
-BASE_URL = "https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/mp4:mm/flvmedia/5905"
+BASE_URL = (
+    "https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/mp4:mm/flvmedia/5905"
+)
 
 
 def get_program_metdadata_cache():
-    """ 
+    """
     Load the VOD program URLs from a json file that is generated every few hours
     by the [Azure Cache for NHK World TV Kodi Plugin](https://github.com/sbroenne/nhkworldtv-backend)
     service.
