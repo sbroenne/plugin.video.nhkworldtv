@@ -10,8 +10,7 @@ ADDON = xbmcaddon.Addon()
 
 
 def get_string(string_id):
-    """Get a localized string
-    """
+    """Get a localized string"""
     localized_string = ADDON.getLocalizedString(string_id)
 
     if len(localized_string) > 0:
@@ -24,7 +23,7 @@ def get_string(string_id):
 
 
 def get_video_info(use_720p):
-    """ Returns a list item video info
+    """Returns a list item video info
 
     Args:
         use720p ([boolean]): Use 720P or 1080p.
@@ -42,7 +41,7 @@ def __get_1080_video_info():
     """
     Returns a Full-HD (1080p) video info array
     """
-    video_info = {'aspect': "1.78", 'width': "1920", 'height': "1080"}
+    video_info = {"aspect": "1.78", "width": "1920", "height": "1080"}
     return video_info
 
 
@@ -50,7 +49,7 @@ def __get_720_video_info():
     """
     Returns a HD (720p) video info array
     """
-    video_info = {'aspect': "1.78", 'width': "1280", 'height': "720"}
+    video_info = {"aspect": "1.78", "width": "1280", "height": "720"}
     return video_info
 
 
@@ -58,13 +57,11 @@ def get_sd_video_info():
     """
     Returns a SD video info array
     """
-    video_info = {'aspect': "1.82", 'width': "640", 'height': "368"}
+    video_info = {"aspect": "1.82", "width": "640", "height": "368"}
     return video_info
 
 
-def set_video_directory_information(plugin_handle,
-                                    sort_method,
-                                    content_type='videos'):
+def set_video_directory_information(plugin_handle, sort_method, content_type="videos"):
     """Sets the metadate like SORT_METHOD on the
     current Kodi directory
 
@@ -74,7 +71,7 @@ def set_video_directory_information(plugin_handle,
         content_type {str} -- videos, episodes, tvshows, etc.
     """
     # Debug logging
-    current_sort_method = xbmc.getInfoLabel('Container.SortMethod')
+    current_sort_method = xbmc.getInfoLabel("Container.SortMethod")
     xbmc.log(f"Current sort method: {current_sort_method}")
     xbmc.log(f"Requested sort method: {sort_method}")
 

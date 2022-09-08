@@ -83,7 +83,7 @@ def get_json(url, cached=True):
 
 
 def get_api_request_params(url):
-    """ Returns the API request paramaters for the NHK and the Cache API
+    """ Returns the API request parameters for the NHK and the Cache API
 
     Args:
         url ([str]): Url
@@ -169,7 +169,7 @@ def get_url(url, cached=True):
         status_code = request.status_code
 
         if status_code == 200:
-            # Call was successfull
+            # Call was successful
             xbmc.log(f"Successfully fetched URL: {url} - Status {status_code} \
                     - Retrieved from cache {request.from_cache}")
             break

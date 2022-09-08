@@ -4,7 +4,7 @@ NHK API
 from . import nhk_api_parser
 
 # NHK World API - parsed from api.js
-# Note: Some URLs cannot be found in api.js and are therefor static
+# Note: Some URLs cannot be found in api.js and are therefore static
 rest_url = {
     'homepage_ondemand':
     nhk_api_parser.get_homepage_ondemand_url(),
@@ -46,7 +46,7 @@ rest_url = {
     'news_program_xml':
     "https://www3.nhk.or.jp/nhkworld/data/en/news/programs/{0}.xml",
     'news_programs_video_url':
-    "https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/programs/{0},l,h,q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5",
+    "https://vod-stream.nhk.jp/nhkworld/upld/medias/en/news/programs/{0}/index.m3u8",
     'live_stream_url_720p':
     "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_1M.m3u8",
     'live_stream_url_1080p':
