@@ -45,7 +45,7 @@ For NHK World that is the **NHK Live** plugin.
 
 ### 1.3.1. Kodi 19 / Matrix (current Kodi version)
 
-You can install the current Matrix version of the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/tree/master/repository.sbroenne/repository.sbroenne-0.0.13.zip). The plug-in will **auto-update** itself regularly from this repo.
+You can install the current Matrix version of the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/raw/main/repository.sbroenne/repository.sbroenne-0.0.13.zip). The plug-in will **auto-update** itself regularly from this repo.
 
 ### 1.3.2. Legacy Kodi 18 / Leia (previous Kodi version)
 
