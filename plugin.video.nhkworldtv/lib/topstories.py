@@ -14,12 +14,13 @@ def get_menu_item():
 
     # Getting top story
     featured_news = url.get_json(nhk_api.rest_url["homepage_news"], False)["data"][0]
-    thumbnails = featured_news["thumbnails"]
 
     menu_item = Episode()
 
-    menu_item.thumb = thumbnails["small"]
-    menu_item.fanart = thumbnails["middle"]
+    if featured_news["thumbnails"] is not None:
+        thumbnails = featured_news["thumbnails"]
+        menu_item.thumb = thumbnails["small"]
+        menu_item.fanart = thumbnails["middle"]
 
     menu_item.title = kodiutils.get_string(30010)
 
