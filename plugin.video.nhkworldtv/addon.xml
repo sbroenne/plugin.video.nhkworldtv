@@ -37,8 +37,8 @@
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.0.9
-            - Fixed News Programs playback issue
+        <news>v1.0.10
+            - Fixed start-up issue
         </news>
         <assets>
             <icon>resources/icon.png</icon>

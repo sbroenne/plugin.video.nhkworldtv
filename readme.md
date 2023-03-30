@@ -43,7 +43,7 @@ I submitted the plugin to the official Kodi repo but unfortunately this request 
 
 For NHK World that is the **NHK Live** plugin.
 
-You can install the plugin by **first** installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/raw/main/repository.sbroenne/repository.sbroenne-0.0.13.zip). The plug-in will **auto-update** itself regularly from this repo.
+You can install the plugin by **first** installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/raw/main/repository.sbroenne/repository.sbroenne-0.0.14.zip). The plug-in will **auto-update** itself regularly from this repo.
 
 ## 1.4. Video Quality
 
