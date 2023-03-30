@@ -4,8 +4,6 @@
   - [1.1. Disclaimer](#11-disclaimer)
   - [1.2. Overview](#12-overview)
   - [1.3. How-to Install](#13-how-to-install)
-    - [1.3.1. Kodi 19 / Matrix (current Kodi version)](#131-kodi-19--matrix-current-kodi-version)
-    - [1.3.2. Legacy Kodi 18 / Leia (previous Kodi version)](#132-legacy-kodi-18--leia-previous-kodi-version)
   - [1.4. Video Quality](#14-video-quality)
   - [1.5. Design Goals](#15-design-goals)
     - [1.5.1. Inclusion in the official Kodi Repo](#151-inclusion-in-the-official-kodi-repo)
@@ -37,19 +35,15 @@ The plug-in uses a [companion cloud cache service](https://github.com/sbroenne/n
 
 Plugin supports fallback to HD (720p) if you should encounter buffering issues.
 
+The plugin has been tested on the current Kodi version (Nexus) but should also work on Matrix (19).
+
 ## 1.3. How-to Install
 
 I submitted the plugin to the official Kodi repo but unfortunately this request was declined. The reason is that the they only accept one plugin per content provider.
 
 For NHK World that is the **NHK Live** plugin.
 
-### 1.3.1. Kodi 19 / Matrix (current Kodi version)
-
-You can install the current Matrix version of the plugin by installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/raw/main/repository.sbroenne/repository.sbroenne-0.0.13.zip). The plug-in will **auto-update** itself regularly from this repo.
-
-### 1.3.2. Legacy Kodi 18 / Leia (previous Kodi version)
-
-There is a version of this plug-in that still supports Kodi 18/Leia. However, I no longer actively maintain it so over time it will stop working. You can download this version from a [Github release](https://github.com/sbroenne/plugin.video.nhkworldtv/releases/download/v1.0.4/plugin.video.nhkworldtv-1.0.4.zip).
+You can install the plugin by **first** installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/raw/main/repository.sbroenne/repository.sbroenne-0.0.13.zip). The plug-in will **auto-update** itself regularly from this repo.
 
 ## 1.4. Video Quality
 
@@ -89,7 +83,7 @@ The plug-in is feature complete and stable.
 
 Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site. I also run scheduled unit tests on Github to alert me on breaking changes.
 
-The plug-in is localized but translation only exists for English (GB). It only runs on Kodi Matrix.
+The plug-in is localized but translation only exists for English (GB). It only runs on Kodi Nexus.
 
 ## 1.8. Future development roadmap
 
