@@ -15,10 +15,10 @@ def get_menu_item():
     """
 
     menu_item = Episode()
-    # Getting firststory
+    # Getting the first story
     featured_news = url.get_json(nhk_api.rest_url["get_news_ataglance"])["data"][0]
     thumbnails = featured_news["image"]
-    menu_item.thumb = thumbnails["list_sp"]
+    menu_item.thumb = thumbnails["list_pc"]
     menu_item.fanart = thumbnails["main_pc"]
     menu_item.title = kodiutils.get_string(30015)
 
