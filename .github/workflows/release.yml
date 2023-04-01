@@ -10,15 +10,12 @@ jobs:
   build:
     name: Check, build and release plugin
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.10]
-
+  
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.10' 
 
       - name: Checkout code
         uses: actions/checkout@v3

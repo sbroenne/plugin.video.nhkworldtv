@@ -10,15 +10,11 @@ on:
 jobs:
   pytest:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.10]
-
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.10' 
 
       - name: Delete sqlite DB if it exists
         run: |
@@ -34,7 +30,7 @@ jobs:
 
       - name: Install pre-requisites (Routing)
         env:
-          PYTHON_VERSION: ${{ matrix.python-version }}
+          PYTHON_VERSION: '3.10'
         run: |
           pipenv run ./install_packages.sh
         working-directory: build
