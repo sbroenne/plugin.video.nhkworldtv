@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.9" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.0.10" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
-        <import addon="script.module.requests" version="2.27.1+matrix.1" />
-        <import addon="script.module.requests-cache" version="0.5.2+matrix.2" />
-        <import addon="script.module.routing" version="0.2.3+matrix.1" />
-        <import addon="script.module.pytz" version="2021.3.0+matrix.1" />
-        <import addon="script.module.tzlocal" version="3.0.0+matrix.2" />
+        <import addon="script.module.requests" version="2.27" />
+        <import addon="script.module.requests-cache" version="0.5.2" />
+        <import addon="script.module.routing" version="0.2.3" />
+        <import addon="script.module.pytz" version="2021.3.0" />
+        <import addon="script.module.tzlocal" version="3.0.0" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
@@ -14,19 +14,21 @@
     </extension>
 
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Watch NHK World Japan in Full HD - live stream, on-demand and news programs</summary>
+        <summary lang="en_GB">Watch NHK World Japan in Full HD - live stream, on-demand and news
+            programs</summary>
         <description lang="en_GB">
-Watch NHK World Japan in Full HD
+            Watch NHK World Japan in Full HD
 
-- Live Stream 
-- On demand programs - By program, latest and most watched, categories and playlist. You can also browse and search through all programs.
-- Live schedule
-- Top Stories and At a Glance
-- News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
+            - Live Stream
+            - On demand programs - By program, latest and most watched, categories and playlist. You
+            can also browse and search through all programs.
+            - Live schedule
+            - Top Stories and At a Glance
+            - News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
 
-Content is retrieved and played directly from the NHK World web site.
+            Content is retrieved and played directly from the NHK World web site.
 
-Plugin supports fallback to HD if you should encounter buffering issues.
+            Plugin supports fallback to HD if you should encounter buffering issues.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -35,8 +37,8 @@ Plugin supports fallback to HD if you should encounter buffering issues.
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.0.9
-- Fixed News Programs playback issue
+        <news>v1.0.10
+            - Fixed start-up issue
         </news>
         <assets>
             <icon>resources/icon.png</icon>
