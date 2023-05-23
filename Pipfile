@@ -16,7 +16,7 @@ pylint = "*"
 [packages]
 kodistubs = "*"
 # Match versions from addon.xml
-requests= "==2.27.1"
+requests= "==2.31.0"
 requests-cache = "==0.5.2"
 pytz = "==2021.3.0"
 tzlocal = "==3.0.0"
