@@ -5,10 +5,6 @@ import xbmc
 
 from . import url
 
-BASE_URL = (
-    "https://nhkw-mzvod.akamaized.net/www60/mz-nhk10/_definst_/mp4:mm/flvmedia/5905"
-)
-
 
 def get_program_metdadata_cache():
     """

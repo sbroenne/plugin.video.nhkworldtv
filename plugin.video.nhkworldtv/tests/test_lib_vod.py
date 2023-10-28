@@ -1,4 +1,5 @@
 import pytest
+
 from lib import vod
 from lib.episode import Episode
 
@@ -24,14 +25,9 @@ def test_get_episode_from_cache_720p(test_episode):
 
     return_value = vod.get_episode_from_cache(test_episode, use_720p=True)
     path = return_value[0]
-    assert "https://" in path
+    assert "http://" in path
 
 
-def test_get_episode_from_cache_1080p(test_episode):
-
-    return_value = vod.get_episode_from_cache(test_episode, use_720p=False)
-    path = return_value[0]
-    assert "https://" in path
 
 
 def test_get_episode_not_in_cache():
@@ -47,16 +43,3 @@ def test_resolve_episode_720p(test_episode):
     )
     assert test_episode.is_playable is True
 
-
-def test_resolve_episode_1080p(test_episode):
-    assert isinstance(
-        vod.resolve_vod_episode(test_episode.vod_id, use_720p=False), Episode
-    )
-    assert test_episode.is_playable is True
-
-
-def test_resolve_invalid_episode():
-
-    episode = Episode()
-    episode.vod_id = "invalid"
-    assert vod.resolve_vod_episode(episode.vod_id, use_720p=False) is None

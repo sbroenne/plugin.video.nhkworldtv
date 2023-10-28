@@ -125,10 +125,10 @@ def get_episode_from_cache(episode, use_720p=False):
         # In cache - display directly
         # If we should use 720P or there is no 1080P file, use 720P
         if use_720p or cached_episode["P1080P"] is None:
-            episode.url = cache_api.BASE_URL + cached_episode["P720P"]
+            episode.url = cached_episode["P720P"]
             episode.video_info = kodiutils.get_video_info(use_720p=True)
         else:
-            episode.url = cache_api.BASE_URL + cached_episode["P1080P"]
+            episode.url = cached_episode["P1080P"]
             episode.video_info = kodiutils.get_video_info(use_720p=False)
         episode.onair = cached_episode["OnAir"]
 
@@ -137,6 +137,47 @@ def get_episode_from_cache(episode, use_720p=False):
             f"vod.get_episode_from_cache: Added episode {episode.vod_id} from cache"
         )
     return return_value
+
+
+def get_between(string, start, end):
+    """Extracts a string between two other strings"""
+    start_index = string.index(start) + len(start)
+    end_index = string.index(end, start_index)
+    return string[start_index:end_index]
+
+
+def get_media_information_api_url(vod_id):
+    """Extracts the Media Information Url from the NHK Web Player - very slow operation!
+
+    Args:
+        vod_id (string): VodId from the NHK Api
+
+    Returns:
+        string: A API url to get the media information
+    """
+
+    xbmc.log(f"vod.resolve_vod_episode: Using Player.js to retrieve vod_id: {vod_id}")
+    request = url.get_url(nhk_api.rest_url["player_url"])
+    if request.status_code == 200:
+        contents = request.text
+
+        # First, find the block in the js that contains the prod token and url
+        prod_block = get_between(contents, "prod:{", "}.prod;")
+        # Extract the relevant information
+        api_url = get_between(prod_block, 'apiUrl:"', '"')
+        token = get_between(prod_block, 'token:"', '"')
+        media_information_url = (
+            f"{api_url}/?token={token}&type=json&optional_id={vod_id}&active_flg=1"
+        )
+
+        # check if the URI is correct
+        if media_information_url.startswith("http"):
+            return media_information_url
+        else:
+            xbmc.log(
+                f"Could not construct valid GetMediaInformationApiUrl: { media_information_url}"
+            )
+            return None
 
 
 def resolve_vod_episode(vod_id, use_720p):
@@ -151,61 +192,41 @@ def resolve_vod_episode(vod_id, use_720p):
         [Episode]: The resolved Episode - only used for unit testing
     """
 
+    xbmc.log(
+        f"vod.resolve_vod_episode: Getting episode information for vod_id: {vod_id}"
+    )
     episode = None
-    xbmc.log(f"vod.resolve_vod_episode: Using Player.js to retrieve vod_id: {vod_id}")
-    request = url.get_url(nhk_api.rest_url["player_url"].format(vod_id, vod_id))
-    if request.status_code == 200:
-        # Player content retrieved
-        player_js = request.text
-        # Parse the output of the Player JS file for the UUID of the episode
-        uuid_match = re.compile("'data-de-program-uuid','(.+?)'").findall(player_js)
+    # Get episode detail
+    episode_detail = url.get_json(
+        nhk_api.rest_url["get_episode_detail"].format(vod_id)
+    )["data"]["episodes"][0]
+    # Fill the episode details
+    episode = Episode()
+    episode.vod_id = vod_id
+    episode.title = episode_detail["title_clean"]
+    episode.broadcast_start_date = episode_detail["onair"]
+    episode.plot = episode_detail["description_clean"]
+    episode.pgm_no = episode_detail["pgm_no"]
+    episode.duration = episode_detail["movie_duration"]
 
-        # Only continue if we could retrieve the uuid
-        if len(uuid_match) > 0:
-            program_uuid = uuid_match[0]
-            xbmc.log(f"vod.resolve_vod_episode: Parsed UUID: {program_uuid}")
-            # Get episode detail
-            episode_detail = url.get_json(
-                nhk_api.rest_url["get_episode_detail"].format(vod_id)
-            )["data"]["episodes"][0]
-            if request.status_code == 200:
-                # Fill the episode details
-                episode = Episode()
-                episode.vod_id = vod_id
-                episode.title = episode_detail["title_clean"]
-                episode.broadcast_start_date = episode_detail["onair"]
-                episode.plot = episode_detail["description_clean"]
-                episode.pgm_no = episode_detail["pgm_no"]
-                episode.duration = episode_detail["movie_duration"]
+    # # Get the media information from the streaming API
+    xbmc.log(
+        f"vod.resolve_vod_episode: Using Player to get media information API url for vod_id: {vod_id}"
+    )
+    api_url = get_media_information_api_url(vod_id)
 
-                # Get episode URL and video information
-                player_url = nhk_api.rest_url["video_url"].format(program_uuid)
-                xbmc.log(f"vod.resolve_vod_episode: Player Url: {player_url}")
+    xbmc.log(
+        f"vod.resolve_vod_episode: Getting episode media information from API for vod_id: {vod_id}"
+    )
+    media_information = url.get_json(api_url)["meta"][0]
 
-                assets_json = url.get_json(player_url)["response"]["WsProgramResponse"][
-                    "program"
-                ]["asset"]
-
-                if isinstance(assets_json, dict):
-                    # Valid JSON
-                    # Get the reference file (HD)
-                    reference_file_json = assets_json["referenceFile"]
-                    play_path = reference_file_json["rtmp"]["play_path"].split("?")[0]
-
-                    # Only add the reference URL if exists
-                    reference_url = nhk_api.rest_url["episode_url"].format(play_path)
-                    if url.check_url_exists(reference_url) is True and not use_720p:
-                        episode.url = nhk_api.rest_url["episode_url"].format(play_path)
-                        episode.video_info = kodiutils.get_video_info(use_720p=False)
-                        episode.is_playable = True
-                    else:
-                        # Prefer 720P or video doesn't have a reference file.
-                        # Then use the 720P Version instead
-                        # Asset #0 is the 720P Version
-                        asset = assets_json["assetFiles"][0]
-                        play_path = asset["rtmp"]["play_path"].split("?")[0]
-                        episode.url = nhk_api.rest_url["episode_url"].format(play_path)
-                        episode.video_info = kodiutils.get_video_info(use_720p=True)
-                        episode.is_playable = True
+    if isinstance(media_information, dict):
+        # Valid JSON
+        # Currently, we only support 720p because of the new streaming Api
+        episode.url = media_information["movie_url"]["mb_hd"]
+        xbmc.log(f"vod.resolve_vod_episode: Url vod_id: {vod_id}, Use 720p: {use_720p}")
+    
+        episode.video_info = kodiutils.get_video_info(use_720p=True)
+        episode.is_playable = True
 
     return episode

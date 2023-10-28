@@ -144,7 +144,7 @@ msgid "Information about 720p and 1080p"
 msgstr ""
 
 msgctxt "#30071"
-msgid "NHK provides streams via Akamai in 720p and 1080p - the plug-in defaults to 1080p where available.[CR]If you encounter buffering issues, you can fall-back to 720p in addon-settings.[CR][CR]The wizard has finished and will close now.[CR]Enjoy NHK World TV!"
+msgid "NHK currently only provides on-demand programs in 720p. The live program is also available in 1080p. [CR]If you encounter buffering issues in the live program, you can fall-back to 720p in addon-settings.[CR][CR]The wizard has finished and will close now.[CR]Enjoy NHK World TV!"
 msgstr ""
 
 # News Programs
