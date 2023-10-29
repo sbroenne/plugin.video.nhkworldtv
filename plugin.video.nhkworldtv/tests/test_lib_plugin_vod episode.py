@@ -3,6 +3,7 @@ Test episode functionality
 """
 
 import pytest
+
 from lib import plugin, vod
 from lib.episode import Episode
 
@@ -30,7 +31,7 @@ def test_add_playable_episode_cached_720p(test_episode):
     )
     assert isinstance(return_value, list)
     path = return_value[0]
-    assert "https://" in path
+    assert "http://" in path
 
 
 def test_add_playable_episode_cached_1080p(test_episode):
@@ -40,7 +41,7 @@ def test_add_playable_episode_cached_1080p(test_episode):
     )
     assert isinstance(return_value, list)
     path = return_value[0]
-    assert "https://" in path
+    assert "http://" in path
 
 
 # Episode that needs to be resolved from NHK
@@ -55,6 +56,9 @@ def test_add_playable_episode_needs_to_be_resolved(test_episode):
 
 
 # Resolve URLs from NHK
+def test_get_media_information_api_url(test_episode):
+    vod_id = test_episode.vod_id
+    assert vod.get_media_information_api_url(vod_id).startswith('https://api01-platform.stream.co.jp/apiservice/getMediaByParam/')
 
 
 def test_resolve_episode_from_NHK_720p(test_episode):
@@ -63,14 +67,3 @@ def test_resolve_episode_from_NHK_720p(test_episode):
     assert resolved_episode.url is not None
     assert resolved_episode.video_info["height"] == "720"
 
-
-def test_resolve_episode_from_NHK_1080p(test_episode):
-    resolved_episode = plugin.resolve_vod_episode(test_episode.vod_id, use_720p=False)
-    assert resolved_episode.url is not None
-    # Sometimes an episode only has 720p available
-    # There is no good way to handle this in this test code
-
-    if resolved_episode.video_info["height"] == "1080":
-        assert resolved_episode.video_info["height"] == "1080"
-    else:
-        assert resolved_episode.video_info["height"] == "720"

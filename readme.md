@@ -21,7 +21,7 @@ This plug-in is a fan project and not related in any way to NHK! I built this pl
 
 ## 1.2. Overview
 
-NHK World TV is a plug-in that displays most of the content from [NHK World Japan](https://www3.nhk.or.jp/nhkworld/en/live/) in Kodi in the highest possible quality (1080p) where available:
+NHK World TV is a plug-in that displays most of the content from [NHK World Japan](https://www3.nhk.or.jp/nhkworld/en/live/) in Kodi in the highest possible quality (720ü or 1080p where available):
 
 - Live Stream
 - On demand programs (by program, latest and most watched, categories and playlist) - you can also browse and search through all programs
@@ -29,13 +29,9 @@ NHK World TV is a plug-in that displays most of the content from [NHK World Japa
 - Top Stories and At a Glance
 - News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
 
-Content is retrieved and played directly from the NHK World web site or their content delivery network (Akamai).
+Content is retrieved and played directly from the NHK World web site or their content delivery network.
 
 The plug-in uses a [companion cloud cache service](https://github.com/sbroenne/nhkworldtv-backend) to speed up video play-back because these NHK APIs are very slow.
-
-Plugin supports fallback to HD (720p) if you should encounter buffering issues.
-
-The plugin has been tested on the current Kodi version (Nexus) but should also work on Matrix (19).
 
 ## 1.3. How-to Install
 
