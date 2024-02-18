@@ -126,7 +126,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 #Custom
-.vscode
 .DS_Store
 *.code-workspace
 *.sqlite

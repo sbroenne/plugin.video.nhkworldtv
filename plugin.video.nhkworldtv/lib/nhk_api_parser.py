@@ -70,7 +70,7 @@ def get_full_nhk_url(path):
 
 def replace_path_parameters_version_language(path, version, language):
     """
-    Replaces parametes in the path with the actual values
+    Replaces parameters in the path with the actual values
     """
     path = path.replace("{version}", version)
     path = path.replace("{lang}", language)

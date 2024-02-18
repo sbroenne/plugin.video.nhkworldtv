@@ -43,11 +43,11 @@ def get_episode_name(title, subtitle):
     return episode_name
 
 
-def get_top_stories_play_path(xmltext):
+def get_top_stories_play_path(xml_text):
     """Extracts the play path from a top story XML file"""
     find = "rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ"
 
-    matches = re.compile(find).findall(xmltext)
+    matches = re.compile(find).findall(xml_text)
     if len(matches) == 1:
         play_path = matches[0]
     else:
@@ -55,11 +55,11 @@ def get_top_stories_play_path(xmltext):
     return play_path
 
 
-def get_ataglance_play_path(xmltext):
+def get_ataglance_play_path(xml_text):
     """Extracts the play path from a At a Glance XML file"""
     find = "<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>"
 
-    matches = re.compile(find).findall(xmltext)
+    matches = re.compile(find).findall(xml_text)
     if len(matches) == 1:
         play_path = matches[0]
     else:
@@ -67,11 +67,11 @@ def get_ataglance_play_path(xmltext):
     return play_path
 
 
-def get_news_program_play_path(xmltext):
+def get_news_program_play_path(xml_text):
     """Extracts the play path from a news program file"""
     find = "rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/programs/(.+?).mp4"
 
-    matches = re.compile(find).findall(xmltext)
+    matches = re.compile(find).findall(xml_text)
     if len(matches) == 1:
         play_path = matches[0]
     else:

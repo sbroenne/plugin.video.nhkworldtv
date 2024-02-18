@@ -50,7 +50,7 @@ rest_url = {
     'live_stream_url_720p':
     "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_1M.m3u8",
     'live_stream_url_1080p':
-    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_4M.m3u8",
+    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_1M.m3u8", # Same as 720p
     'player_url':
     "https://www3.nhk.or.jp/nhkworld/common/player/tv/vod/world/player/js/movie-content-player.js",
     'video_url':

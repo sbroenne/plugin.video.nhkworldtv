@@ -2,6 +2,7 @@
 Main plugin code
 """
 import random
+
 import routing
 import xbmc
 import xbmcaddon
@@ -278,7 +279,7 @@ def add_on_demand_menu_item():
     featured_episodes = url.get_json(nhk_api.rest_url["homepage_ondemand"])["data"][
         "items"
     ]
-    no_of_epsisodes = len(featured_episodes)
+    no_of_episodes = len(featured_episodes)
     pgm_title = None
     try_count = 0
     program_json = []
@@ -288,7 +289,7 @@ def add_on_demand_menu_item():
     while pgm_title is None:
         try_count = try_count + 1
         xbmc.log(f"Check if random episode has a valid title. Try count: {try_count}")
-        featured_episode = random.randint(0, no_of_epsisodes - 1)
+        featured_episode = random.randint(0, no_of_episodes - 1)
         program_json = featured_episodes[featured_episode]
         pgm_title = program_json["pgm_title_clean"]
 
@@ -371,8 +372,8 @@ def add_live_schedule_menu_item():
     ]
 
     # Featured Episode
-    no_of_epsisodes = len(program_json)
-    featured_episode = random.randint(1, no_of_epsisodes - 1)
+    no_of_episodes = len(program_json)
+    featured_episode = random.randint(1, no_of_episodes - 1)
     row = program_json[featured_episode]
 
     # Add live-schedule text

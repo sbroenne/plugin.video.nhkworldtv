@@ -1,8 +1,6 @@
 """
 Video-on-demand (VOD)
 """
-import re
-
 import xbmc
 import xbmcaddon
 
@@ -225,7 +223,7 @@ def resolve_vod_episode(vod_id, use_720p):
         # Currently, we only support 720p because of the new streaming Api
         episode.url = media_information["movie_url"]["mb_hd"]
         xbmc.log(f"vod.resolve_vod_episode: Url vod_id: {vod_id}, Use 720p: {use_720p}")
-    
+
         episode.video_info = kodiutils.get_video_info(use_720p=True)
         episode.is_playable = True
 

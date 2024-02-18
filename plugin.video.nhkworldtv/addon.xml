@@ -2,11 +2,11 @@
 <addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.1.0" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
-        <import addon="script.module.requests" version="2.27" />
+        <import addon="script.module.requests" version="2.31.0" />
         <import addon="script.module.requests-cache" version="0.5.2" />
         <import addon="script.module.routing" version="0.2.3" />
-        <import addon="script.module.pytz" version="2021.3.0" />
-        <import addon="script.module.tzlocal" version="3.0.0" />
+        <import addon="script.module.pytz" version="2023.3.0" />
+        <import addon="script.module.tzlocal" version="5.0.1" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
@@ -25,7 +25,7 @@ Watch NHK World Japan in HD
 - Top Stories and At a Glance
 - News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
 
-Content is retrieved and played directly from the NHK World web site in the highest possible quality (either 1080p or 720p).
+Content is retrieved and played directly from the NHK World web site.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -34,7 +34,8 @@ Content is retrieved and played directly from the NHK World web site in the high
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.1.0
+        <news>v1.1.1
+- Changed Live stream to 720P as well
 - Support for the new NHK streaming infrastructure
 - Unfortunately, On-demand episodes now only play in 720p instead of 1080p
         </news>
