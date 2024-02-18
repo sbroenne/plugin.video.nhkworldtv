@@ -25,7 +25,7 @@ Watch NHK World Japan in HD
 - Top Stories and At a Glance
 - News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
 
-Content is retrieved and played directly from the NHK World web site in the highest possible quality (either 1080p or 720p).
+Content is retrieved and played directly from the NHK World web site.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -34,7 +34,8 @@ Content is retrieved and played directly from the NHK World web site in the high
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.1.0
+        <news>v1.1.1
+- Changed Live stream to 720P as well
 - Support for the new NHK streaming infrastructure
 - Unfortunately, On-demand episodes now only play in 720p instead of 1080p
         </news>
