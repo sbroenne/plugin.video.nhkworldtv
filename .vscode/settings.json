@@ -1,0 +1,34 @@
+{
+    "python.testing.pytestArgs": [
+        "plugin.video.nhkworldtv"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "cSpell.enabled": true,
+    "cSpell.words": [
+        "apikey",
+        "astimezone",
+        "ataglance",
+        "datestring",
+        "fanart",
+        "Kodi",
+        "kodiutils",
+        "LOGDEBUG",
+        "Misty's",
+        "mktime",
+        "NEWSLINE",
+        "nhkworldtv",
+        "ondemand",
+        "pytz",
+        "refs",
+        "rtmp",
+        "setuptools",
+        "softprops",
+        "topstories",
+        "tzlocal",
+        "xbmc",
+        "xbmcaddon",
+        "xbmcgui",
+        "xbmcplugin"
+    ],
+}
