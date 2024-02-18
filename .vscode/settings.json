@@ -4,7 +4,6 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "cSpell.enabled": true,
     "cSpell.words": [
         "apikey",
         "astimezone",
@@ -29,6 +28,19 @@
         "xbmc",
         "xbmcaddon",
         "xbmcgui",
-        "xbmcplugin"
+        "xbmcplugin",
+        "metadata",
+        "onair",
+        "vodrecommend",
+        "playcount",
+        "nhkworld",
+        "offscreen",
+        "mediatype",
+        "tvshows",
+        "episodelist",
+        "textviewer",
+        "localzone",
+        "upld",
+        "medias"
     ],
 }

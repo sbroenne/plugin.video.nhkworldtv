@@ -62,7 +62,7 @@ def get_sd_video_info():
 
 
 def set_video_directory_information(plugin_handle, sort_method, content_type="videos"):
-    """Sets the metadate like SORT_METHOD on the
+    """Sets the metadata like SORT_METHOD on the
     current Kodi directory
 
     Arguments:
@@ -86,7 +86,7 @@ def set_video_directory_information(plugin_handle, sort_method, content_type="vi
 
 
 def get_episodelist_title(title, total_episodes):
-    """Returns a formated episode list title
+    """Returns a formatted episode list title
     Arguments:
         title {unicode} -- episode list title
         total_episodes {unicode} -- number of episodes
