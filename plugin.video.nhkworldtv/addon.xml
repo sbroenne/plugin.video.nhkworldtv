@@ -2,11 +2,11 @@
 <addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.1.0" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
-        <import addon="script.module.requests" version="2.27" />
+        <import addon="script.module.requests" version="2.31.0" />
         <import addon="script.module.requests-cache" version="0.5.2" />
         <import addon="script.module.routing" version="0.2.3" />
-        <import addon="script.module.pytz" version="2021.3.0" />
-        <import addon="script.module.tzlocal" version="3.0.0" />
+        <import addon="script.module.pytz" version="2023.3.0" />
+        <import addon="script.module.tzlocal" version="5.0.1" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
