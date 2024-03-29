@@ -1,10 +1,14 @@
 # Local Build Instructions
 
-Minimum supported Kodi version is Matrix and Python 3.8.
+Minimum supported Kodi version is Matrix and Python 3.11.
 
 ## Prerequisites
 
 Pipenv is used to install the required [Python packages](../Pipfile).
+
+```bash
+pipenv install -d
+```
 
 ### Packages not in PyPi
 
