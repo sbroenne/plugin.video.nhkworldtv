@@ -35,6 +35,6 @@ jobs:
           pipenv run submit-addon -z -s plugin.video.nhkworldtv
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: plugin.video.nhkworldtv-*.zip
