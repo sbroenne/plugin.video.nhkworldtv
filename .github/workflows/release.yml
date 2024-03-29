@@ -25,11 +25,12 @@ jobs:
           pip install pipenv
           pipenv install --dev
 
-      - name: Run kodi-addon-checker for Matrix branch
-        id: kodi-addon-checker
-        run: |
-          pipenv run kodi-addon-checker --branch matrix plugin.video.nhkworldtv
-      - name: Build plugin for Matrix # ZIP archives
+      # - name: Run kodi-addon-checker for Matrix branch
+      #   id: kodi-addon-checker
+      #   run: |
+      #     pipenv run kodi-addon-checker --branch nexus plugin.video.nhkworldtv
+
+      - name: Build plugin for Nexus # ZIP archives
         id: build_plugin
         run: |
           pipenv run submit-addon -z -s plugin.video.nhkworldtv
