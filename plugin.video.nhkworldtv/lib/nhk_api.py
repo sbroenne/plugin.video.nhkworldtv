@@ -20,10 +20,6 @@ rest_url = {
     nhk_api_parser.get_categories_url(),
     'get_categories_episode_list':
     nhk_api_parser.get_categories_episode_list_url(),
-    'get_playlists':
-    nhk_api_parser.get_playlists_url(),
-    'get_playlists_episode_list':
-    nhk_api_parser.get_playlists_episode_list_url(),
     'get_latest_episodes':
     nhk_api_parser.get_all_episodes_url('23'),
     'get_most_watched_episodes':

@@ -19,7 +19,7 @@ def test_replace_path_parameters_version_language():
 
 def test_get_homepage_ondemand_url():
     assert (
-        "https://nwapi.nhk.jp/nhkworld/vodrecommend/v7b/en/list.json"
+        "https://nwapi.nhk.jp/nhkworld/vodesdlist/v7b/mostwatch/all/en/all/all.json"
         == parser.get_homepage_ondemand_url()
     )
 
@@ -65,19 +65,6 @@ def test_get_categories_episode_list_url():
         == parser.get_categories_episode_list_url()
     )
 
-
-def test_get_playlists_url():
-    assert (
-        "https://nwapi.nhk.jp/nhkworld/vodplaylist/v8b/en/playlist/all.json"
-        == parser.get_playlists_url()
-    )
-
-
-def test_get_playlists_episode_list_url():
-    assert (
-        "https://nwapi.nhk.jp/nhkworld/vodplaylist/v8b/en/playlist/{0}.json"
-        == parser.get_playlists_episode_list_url()
-    )
 
 
 def test_get_latest_episodes_url():

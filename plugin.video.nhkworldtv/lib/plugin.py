@@ -277,7 +277,7 @@ def add_on_demand_menu_item():
     xbmc.log("Adding on-demand menu item")
     # Getting random on-demand episode to show
     featured_episodes = url.get_json(nhk_api.rest_url["homepage_ondemand"])["data"][
-        "items"
+        "episodes"
     ]
     no_of_episodes = len(featured_episodes)
     pgm_title = None
@@ -291,15 +291,15 @@ def add_on_demand_menu_item():
         xbmc.log(f"Check if random episode has a valid title. Try count: {try_count}")
         featured_episode = random.randint(0, no_of_episodes - 1)
         program_json = featured_episodes[featured_episode]
-        pgm_title = program_json["pgm_title_clean"]
+        pgm_title = program_json["title_clean"]
 
     if program_json is not None:
         episode.title = kodiutils.get_string(30020)
         episode.plot = kodiutils.get_string(30022).format(
-            utils.get_episode_name(pgm_title, program_json["subtitle"])
+            utils.get_episode_name(pgm_title, program_json["sub_title"])
         )
-        episode.thumb = program_json["image_sp"]
-        episode.fanart = program_json["image_pc"]
+        episode.thumb = program_json["image"]
+        episode.fanart = program_json["image_l"]
 
         # Create the directory item
 
@@ -546,12 +546,7 @@ def vod_index():
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(vod_categories), list_item, True
     )
-    # Playlists
-    list_item = xbmcgui.ListItem(kodiutils.get_string(30042), offscreen=True)
-    list_item.setArt(art)
-    xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(vod_playlists), list_item, True
-    )
+
 
     # All
     list_item = xbmcgui.ListItem(kodiutils.get_string(30045), offscreen=True)
@@ -674,51 +669,6 @@ def vod_categories():
 
     # Return last valid category ID - useful useful for unit testing
     return category_id
-
-
-@plugin.route("/vod/playlists/")
-def vod_playlists():
-    """VOD Playlists (Playlists Tab on NHK World Site)
-    Returns:
-        [str] -- [Last playlist ID added]
-    """
-    api_result_json = url.get_json(nhk_api.rest_url["get_playlists"])
-    row_count = 0
-    episodes = []
-    playlist_id = None
-    for row in api_result_json["data"]["playlist"]:
-        row_count = row_count + 1
-
-        episode = Episode()
-        episode.title = kodiutils.get_episodelist_title(
-            row["title_clean"], row["track_total"]
-        )
-        episode.thumb = row["image_square"]
-        episode.fanart = row["image_square"]
-
-        playlist_id = row["playlist_id"]
-        episodes.append(
-            (
-                plugin.url_for(
-                    vod_episode_list,
-                    "get_playlists_episode_list",
-                    playlist_id,
-                    0,
-                    xbmcplugin.SORT_METHOD_TITLE,
-                ),
-                episode.kodi_list_item,
-                True,
-            )
-        )
-
-    if row_count > 0:
-        xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
-        kodiutils.set_video_directory_information(
-            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, "episodes"
-        )
-
-    # Return last valid playlist ID - useful for unit testing
-    return playlist_id
 
 
 def add_playable_episode(episode, use_cache, use_720p):

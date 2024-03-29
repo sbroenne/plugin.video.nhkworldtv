@@ -81,11 +81,12 @@ def get_homepage_ondemand_url():
     """
     Returns the url for the on-demand homepage content
     """
-    command = create_command("vod", "RecommendListFetch")
+    command = create_command("vod", "EpisodeByMostWatchedListFetch")
     version = API[command]["version"]
     params = API[command]["params"]
     path = str(params["path"])
     path = replace_path_parameters_version_language(path, version, API_LANGUAGE)
+    path = path.replace("{l_mode}", "all")
     path = get_full_api_url(path)
     return path
 
@@ -171,40 +172,6 @@ def get_categories_episode_list_url():
     path = replace_path_parameters_version_language(path, version, API_LANGUAGE)
     path = path.replace(L_MODE, "all")
     path = path.replace("Id", "0")
-    path = get_full_api_url(path)
-    return path
-
-
-def get_playlists_url():
-    """
-    Gets the vod play list url
-    """
-    command = create_command("vod", "PlayListFetch")
-    params = API[command]["params"]
-    location_params = get_location_params_values(params["locationParams"])
-    mode = str(location_params["mode"])
-    version = str(location_params["version"])
-    path = str(params["path"])
-    path = replace_path_parameters_version_language(path, version, API_LANGUAGE)
-    path = path.replace("{playlist_id}", "all")
-    path = path.replace(MODE, mode)
-    path = get_full_api_url(path)
-    return path
-
-
-def get_playlists_episode_list_url():
-    """
-    Gets vod play list by playlist Id url
-    """
-    command = create_command("vod", "PlayListFetch")
-    params = API[command]["params"]
-    path = str(params["path"])
-    location_params = get_location_params_values(params["locationParams"])
-    mode = str(location_params["mode"])
-    version = str(location_params["version"])
-    path = replace_path_parameters_version_language(path, version, API_LANGUAGE)
-    path = path.replace("{playlist_id}", "{0}")
-    path = path.replace(MODE, mode)
     path = get_full_api_url(path)
     return path
 
