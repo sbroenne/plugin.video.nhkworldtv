@@ -1,4 +1,5 @@
 import xbmcgui
+
 from lib import plugin
 
 
@@ -13,12 +14,6 @@ def test_vod_menu_get_programs():
 
 def test_vod_menu__get_categories():
     detail_url = plugin.vod_categories()
-    print(detail_url)
-    assert detail_url is not None
-
-
-def test_vod_menu_get_playlists():
-    detail_url = plugin.vod_playlists()
     print(detail_url)
     assert detail_url is not None
 

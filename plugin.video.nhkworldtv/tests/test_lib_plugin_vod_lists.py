@@ -1,4 +1,5 @@
 import xbmcplugin
+
 from lib import plugin
 
 # Episode lists
@@ -26,21 +27,6 @@ def test_get_categories_episodes():
         plugin.vod_episode_list(
             "get_categories_episode_list",
             category_id,
-            0,
-            xbmcplugin.SORT_METHOD_TITLE,
-            unit_test=True,
-        )
-        is True
-    )
-
-
-def test_get_playlists_episodes():
-    playlist_id = plugin.vod_playlists()
-    assert playlist_id is not None
-    assert (
-        plugin.vod_episode_list(
-            "get_playlists_episode_list",
-            playlist_id,
             0,
             xbmcplugin.SORT_METHOD_TITLE,
             unit_test=True,

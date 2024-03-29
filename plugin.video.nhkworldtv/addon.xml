@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.1.2" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.2" provider-name="sbroenne">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
         <import addon="script.module.requests" version="2.31.0" />
@@ -20,7 +20,7 @@
 Watch NHK World Japan in HD
 
 - Live Stream
-- On demand programs - By program, latest and most watched, categories and playlist. You can also browse and search through all programs.
+- On demand programs - By program, latest and most watched and categories. You can also browse and search through all programs.
 - Live schedule
 - Top Stories and At a Glance
 - News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
@@ -34,7 +34,8 @@ Content is retrieved and played directly from the NHK World web site.
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.1.2
+        <news>v1.2
+- Removed Playlists section
 - Changed Live stream to 720P as well
 - Support for the new NHK streaming infrastructure
 - Unfortunately, On-demand episodes now only play in 720p instead of 1080p

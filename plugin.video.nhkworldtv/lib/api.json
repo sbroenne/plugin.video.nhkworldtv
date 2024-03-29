@@ -23,7 +23,7 @@
     },
     {
       "prefix": "news",
-      "version": "v6a",
+      "version": "v6b",
       "resources": {
         "Fetch": {
           "requireKey": false,
@@ -51,7 +51,7 @@
         },
         "RankingFetch": {
           "requireKey": false,
-          "comment": "news list api",
+          "comment": "news list api <br> time: [ all | top5boom | top10oftoday ]",
           "path": "/nhkworld/data/en/news/{time}.json",
           "locationParams": [{
             "paramName": "time",
@@ -81,7 +81,7 @@
         },
         "CatVideoList": {
           "requireKey": true,
-          "comment": "news video list by category",
+          "comment": "news video list by category <br> CategoryName: [ all | JAPAN | ASIA | WORLD | BIZTCH ]",
           "path": "pg/{version}/list/{lang}/newsvideos/all/{CategoryName}.json",
           "locationParams": [{
             "paramName": "CategoryName",
@@ -94,31 +94,22 @@
           "path": "/nhkworld/data/{lang}/banner/news.json",
           "locationParams": []
         },
-        "MLListFetch": {
-          "requireKey": true,
-          "comment": "news list multi language.",
-          "path": "rdnewsweb/{version}/{lang}/headline/list.json",
-          "locationParams": [{
-            "paramName": "version",
-            "default": "v6a"
-          }]
-        },
         "MLOutlineFetch": {
           "requireKey": true,
           "comment": "news list multi language.",
           "path": "rdnewsweb/{version}/{lang}/outline/list.json",
           "locationParams": [{
             "paramName": "version",
-            "default": "v6a"
+            "default": "v7b"
           }]
         },
         "MLFetch": {
           "requireKey": true,
           "comment": "news list multi language.",
-          "path": "rdnewsweb/v6a/{lang}/detail/{Id}.json",
+          "path": "rdnewsweb/v6b/{lang}/detail/{Id}.json",
           "locationParams": [{
               "paramName": "version",
-              "default": "v6a"
+              "default": "v6b"
             },
             {
               "paramName": "Id",
@@ -185,17 +176,39 @@
           "comment": "editors list",
           "path": "/nhkworld/data/{lang}/news/video_list.json",
           "locationParams": []
+        },
+        "Search": {
+          "requireKey": true,
+          "comment": "news search <br> from: 取得位置　<br> size: 取得件数",
+          "path": "search/{index}/{from}/{size}/{searchkey}/list.json",
+          "locationParams": [{
+              "paramName": "index",
+              "default": "nhkworld@en@news"
+            },
+            {
+              "paramName": "from",
+              "default": "0"
+            },
+            {
+              "paramName": "size",
+              "default": "10"
+            },
+            {
+              "paramName": "searchkey",
+              "require": true
+            }
+          ]
         }
       }
     },
     {
       "prefix": "radio",
-      "version": "v6a",
+      "version": "v6b",
       "resources": {
         "EpisodeFetch": {
           "requireKey": true,
-          "comment": "fetch radio episode",
-          "path": "rod/v6a/episode/{slug}/{onairDate}/{lang}.json",
+          "comment": "fetch radio episode<br>slug: 番組ディレクトリ名 <br>onairDate: yyyymmddhhmm",
+          "path": "rod/v6b/episode/{slug}/{onairDate}/{lang}.json",
           "locationParams": [{
               "paramName": "slug",
               "require": true
@@ -206,31 +219,9 @@
             }
           ]
         },
-        "EpisodeFetchTmp": {
-          "requireKey": false,
-          "comment": "fetch radio episode",
-          "path": "/nhkworld/apibase/{lang}/radio/episodes/{OnairDate}_{Seq}_{Order}-{Slug}.json",
-          "locationParams": [{
-              "paramName": "Slug",
-              "require": true
-            },
-            {
-              "paramName": "OnairDate",
-              "require": true
-            },
-            {
-              "paramName": "Seq",
-              "require": true
-            },
-            {
-              "paramName": "Order",
-              "require": true
-            }
-          ]
-        },
         "ProgramFetch": {
           "requireKey": false,
-          "comment": "fetch radio program",
+          "comment": "fetch radio program <br>slug: 番組ディレクトリ名",
           "path": "/nhkworld/data/{lang}/radio/program/{Slug}.json",
           "locationParams": [{
             "paramName": "Slug",
@@ -240,16 +231,16 @@
         "ProgramListFetch": {
           "requireKey": true,
           "comment": "radio program list api",
-          "path": "rdpg/v6a/{lang}.json",
+          "path": "rdpg/v6b/{lang}.json",
           "locationParams": []
         },
         "EpisodeListFetch": {
           "requireKey": true,
           "comment": "episode live list.",
-          "path": "repg/{version}/{lang}/latest.json",
+          "path": "repg/{version}/{lang}/catchup/web.json",
           "locationParams": [{
             "paramName": "version",
-            "default": "v6a"
+            "default": "v7b"
           }]
         },
         "ComingSoon": {
@@ -258,7 +249,7 @@
           "path": "repg/{version}/{lang}/soon.json",
           "locationParams": [{
             "paramName": "version",
-            "default": "v6a"
+            "default": "v6b"
           }]
         },
         "ScheduleListFetch": {
@@ -267,14 +258,8 @@
           "path": "repg/{version}/{lang}/schedule.json",
           "locationParams": [{
             "paramName": "version",
-            "default": "v6a"
+            "default": "v6b"
           }]
-        },
-        "ProgramScheduleFetch": {
-          "requireKey": true,
-          "comment": "program schedule",
-          "path": "base/x2j/v1a/RJlive_program3.json",
-          "locationParams": []
         },
         "BannerFetch": {
           "requireKey": false,
@@ -282,22 +267,13 @@
           "path": "/nhkworld/data/{lang}/banner/radio_v2.json",
           "locationParams": []
         },
-        "RODListFetch": {
-          "requireKey": true,
-          "comment": "rod fetch",
-          "path": "rod/{version}/clip_list/{lang}.json",
-          "locationParams": [{
-            "paramName": "version",
-            "default": "v6a"
-          }]
-        },
         "EpisodeListWithROD": {
           "requireKey": true,
-          "comment": "episode list with rod.",
-          "path": "rod/{version}/episode_list/{Slug}/{lang}.json",
+          "comment": "episode list with rod. <br>slug: 番組ディレクトリ名",
+          "path": "rod/{version}/episode_list/{Slug}/{lang}/web.json",
           "locationParams": [{
               "paramName": "version",
-              "default": "v6a"
+              "default": "v7b"
             },
             {
               "paramName": "Slug",
@@ -311,13 +287,19 @@
           "path": "/nhkworld/resources/rj/schedule_24h.json",
           "locationParams": []
         },
+        "ScheduleRe24": {
+          "requireKey": false,
+          "comment": "schedule RS4 English 24h",
+          "path": "/nhkworld/resources/rj/schedule_re24h.json",
+          "locationParams": []
+        },
         "NewsClip": {
           "requireKey": true,
           "comment": "news audio",
           "path": "rdonews/{version}/{lang}/news.json",
           "locationParams": [{
             "paramName": "version",
-            "default": "v6a"
+            "default": "v6b"
           }]
         }
       }
@@ -329,11 +311,11 @@
     },
     {
       "prefix": "tv",
-      "version": "v7a",
+      "version": "v7b",
       "resources": {
         "EpisodeFetch": {
           "requireKey": false,
-          "comment": "fetch tv episode",
+          "comment": "fetch tv episode <br>slug: 番組ディレクトリ名 <br> OnairDate: yyyymmdd <br>Id: 例)2035081 番組コード(4桁) + 放送回コード(3桁) ",
           "path": "/nhkworld/data/{lang}/tv/episode/{Slug}/{OnairDate}_{Id}.json",
           "locationParams": [{
               "paramName": "Slug",
@@ -351,7 +333,7 @@
         },
         "EpisodeListFetch": {
           "requireKey": false,
-          "comment": "fetch episode list",
+          "comment": "fetch episode list <br>slug: 番組ディレクトリ名",
           "path": "/nhkworld/data/{lang}/tv/episode_list/{Slug}.json",
           "locationParams": [{
             "paramName": "Slug",
@@ -360,8 +342,8 @@
         },
         "EpisodeWithMeta": {
           "requireKey": true,
-          "comment": "episode with vod, pgm",
-          "path": "tvepisode/v6a/detail/{slug}/{onairDate}_{id}.json",
+          "comment": "episode with vod, pgm  <br>slug: 番組ディレクトリ名 <br> OnairDate: yyyymmdd <br>id: 例)2035081 番組コード(4桁) + 放送回コード(3桁)",
+          "path": "tvepisode/v6b/detail/{slug}/{onairDate}_{id}.json",
           "locationParams": [{
               "paramName": "slug",
               "require": true
@@ -378,8 +360,8 @@
         },
         "EpisodeListWithMeta": {
           "requireKey": true,
-          "comment": "episode list with vod, pgm",
-          "path": "tvepisode/v6a/list/{slug}/all.json",
+          "comment": "episode list with vod, pgm <br>slug: 番組ディレクトリ名",
+          "path": "tvepisode/v6b/list/{slug}/all.json",
           "locationParams": [{
             "paramName": "slug",
             "require": true
@@ -387,7 +369,7 @@
         },
         "ProgramFetch": {
           "requireKey": false,
-          "comment": "fetch tv program",
+          "comment": "fetch tv program <br>Slug: 番組ディレクトリ名",
           "path": "/nhkworld/data/{lang}/tv/program/{Slug}.json",
           "locationParams": [{
             "paramName": "Slug",
@@ -414,7 +396,7 @@
         },
         "EPGBySlug": {
           "requireKey": true,
-          "comment": "TV Episode Fetch by slug",
+          "comment": "TV Episode Fetch by slug <br>region: [ japan | jstrm | world | wstrm ] <br>slug: 番組ディレクトリ名",
           "path": "epg/{version}/{region}/P{Slug}P.json",
           "locationParams": [{
             "paramName": "Slug",
@@ -423,7 +405,7 @@
         },
         "EPGFetch": {
           "requireKey": true,
-          "comment": "EPG",
+          "comment": "EPG List <br>region: [ japan | jstrm | world | wstrm ] <br> time: [ now | 12h | 24h | 48h | 50h | all ]",
           "path": "epg/{version}/{region}/{Time}.json",
           "locationParams": [{
             "paramName": "Time",
@@ -432,7 +414,7 @@
         },
         "EPGByID": {
           "requireKey": true,
-          "comment": "EPG By id",
+          "comment": "EPG By id <br>region: [ japan | jstrm | world | wstrm ] <br>Id: 例)1003 番組コード(4桁)",
           "path": "epg/{version}/{region}/{Id}.json",
           "locationParams": [{
             "paramName": "Id",
@@ -441,7 +423,7 @@
         },
         "EPGEpisodeFetch": {
           "requireKey": true,
-          "comment": "Episode from EPG",
+          "comment": "Episode from EPG <br>region: [ japan | jstrm | world | wstrm ] <br>Pgm_id: 例)1003 番組コード(4桁) <br>Pgm_no: 例)001 放送回コード(3桁) ",
           "path": "epg/{version}/{region}/{Pgm_id}-{Pgm_no}.json",
           "locationParams": [{
               "paramName": "Pgm_id",
@@ -464,8 +446,8 @@
         },
         "HowtoWatch": {
           "requireKey": true,
-          "comment": "",
-          "path": "base/x2j/v1a/howtowatch_{watchLang}.json",
+          "comment": "watchLang: [ j | e ]",
+          "path": "base/x2j/v1b/howtowatch_{watchLang}.json",
           "locationParams": [{
             "paramName": "watchLang",
             "default": "e"
@@ -473,16 +455,16 @@
         },
         "HowtoWatchUS": {
           "requireKey": true,
-          "comment": "",
-          "path": "base/x2j/v1a/howtowatch_{watchLang}_us.json",
-          "locationParams": [{
+          "comment": "watchLang: [ j | e ]",
+          "path": "base/x2j/v1b/howtowatch_{watchLang}_us.json",
+          "locationParams": [{ 
             "paramName": "watchLang",
             "default": "e"
           }]
         },
         "RangeListFetch": {
           "requireKey": true,
-          "comment": "Episode Fetch between range",
+          "comment": "Episode Fetch between range <br> Start,End : unixtime(ミリ秒)",
           "path": "epg/{version}/{region}/s{Start}-e{End}.json",
           "locationParams": [{
               "paramName": "Start",
@@ -498,11 +480,11 @@
     },
     {
       "prefix": "vod",
-      "version": "v7a",
+      "version": "v7b",
       "resources": {
         "PickupList": {
           "requireKey": true,
-          "comment": "vod pickup list",
+          "comment": "vod pickup list <br> mode: [ voice | caption | all ]",
           "path": "vodesdlist/{version}/pickup/all/{lang}/{mode}/all.json",
           "locationParams": [{
             "paramName": "mode",
@@ -511,7 +493,7 @@
         },
         "EpisodeListFetch": {
           "requireKey": true,
-          "comment": "vod episode list",
+          "comment": "vod episode list <br> mode,keyについては<a target='_blank' href='https://jibworld.backlog.jp/git/NW_SITE_DEVELOP/document/blob/master/%E6%96%B0API%E6%A7%8B%E7%AF%89%E8%B3%87%E6%96%99/API%E4%B8%80%E5%BC%8F/Ondemand%20API/VOD/API/02.%E6%96%B0API%E6%94%B9%E4%BF%AE.v7.%E6%94%BE%E9%80%81%E5%9B%9E%E4%B8%80%E8%A6%A7%E5%8F%96%E5%BE%97.md'>こちら</a>を参照 <br>limit: 取得件数",
           "path": "vodesdlist/{version}/{mode}/{key}/{lang}/{l_mode}/{limit}.json",
           "locationParams": [{
             "paramName": "mode",
@@ -535,17 +517,20 @@
           "comment": "program list",
           "path": "vodpglist/{version}/{lang}/{l_mode}/list.json",
           "locationParams": [{
+            "paramName": "version",
+            "default": "v8b"
+          },{
             "paramName": "l_mode",
             "default": "voice"
           }]
         },
         "CategoryListFetch": {
           "requireKey": true,
-          "comment": "category list",
+          "comment": "category list <br> mode: [all | notzero ] <br> content_type: [ondemand | shortclip ]",
           "path": "vodcatlist/{version}/{mode}/{lang}/{content_type}/list.json",
           "locationParams": [{
               "paramName": "version",
-              "default": "v7a"
+              "default": "v7b"
             },
             {
               "paramName": "mode",
@@ -586,7 +571,7 @@
         },
         "EpisodeByProgramListFetch": {
           "requireKey": true,
-          "comment": "episode by program id",
+          "comment": "episode by program id <br> pgm_gr_id: 番組ディレクトリ名",
           "path": "vodesdlist/{version}/program/{pgm_gr_id}/{lang}/{l_mode}/all.json",
           "locationParams": [{
               "paramName": "pgm_gr_id",
@@ -600,7 +585,7 @@
         },
         "EpisodeByCodeListFetch": {
           "requireKey": true,
-          "comment": "episode by code",
+          "comment": "episode by code <br>EpisodeCode: 例)2035-081 番組コード(4桁) - 放送回コード(3桁)",
           "path": "vodesdlist/{version}/episode/{EpisodeCode}/{lang}/{l_mode}/all.json",
           "locationParams": [{
               "paramName": "EpisodeCode",
@@ -632,7 +617,7 @@
         },
         "ShortClipListFetch": {
           "requireKey": true,
-          "comment": "vod short clip list",
+          "comment": "vod short clip list <br> mode,keyについては<a target='_blank' href='https://jibworld.backlog.jp/git/NW_SITE_DEVELOP/document/blob/master/%E6%96%B0API%E6%A7%8B%E7%AF%89%E8%B3%87%E6%96%99/API%E4%B8%80%E5%BC%8F/Ondemand%20API/VOD/API/05.%E6%96%B0API%E6%94%B9%E4%BF%AE.v7.Shortclip%E4%B8%80%E8%A6%A7%E5%8F%96%E5%BE%97.md'>こちら</a>を参照 <br>limit: 取得件数",
           "path": "vodcliplist/{version}/{mode}/{key}/{lang}/{l_mode}/{limit}.json",
           "locationParams": [{
               "paramName": "lang",
@@ -662,7 +647,7 @@
           "path": "vodplaylist/{version}/{lang}/{mode}/{playlist_id}.json",
           "locationParams": [{
             "paramName": "version",
-            "default": "v8"
+            "default": "v8b"
           }, {
             "paramName": "lang",
             "require": true
@@ -687,7 +672,7 @@
     },
     {
       "prefix": "rod",
-      "version": "v7a",
+      "version": "v7b",
       "resources": {
         "ProgramFetch": {
           "requireKey": true,
@@ -700,7 +685,7 @@
         },
         "EpisodeFetch": {
           "requireKey": true,
-          "comment": "rod episode fetch",
+          "comment": "rod episode fetch <br> mode,keyについては<a target='_blank' href='https://jibworld.backlog.jp/git/NW_SITE_DEVELOP/document/blob/master/%E6%96%B0API%E6%A7%8B%E7%AF%89%E8%B3%87%E6%96%99/API%E4%B8%80%E5%BC%8F/Ondemand%20API/ROD/API/02.%E6%96%B0API%E6%94%B9%E4%BF%AE.v7.%E6%94%BE%E9%80%81%E5%9B%9E%E4%B8%80%E8%A6%A7%E5%8F%96%E5%BE%97.md'>こちら</a>を参照 <br>limit: 取得件数",
           "path": "rodesdlist/{version}/{mode}/{key}/{lang}/{limit}.json",
           "locationParams": [{
             "paramName": "mode",
@@ -718,7 +703,7 @@
         },
         "CategoryFetch": {
           "requireKey": true,
-          "comment": "rod category fetch",
+          "comment": "rod category fetch <br> mode: [ all | notzero ] <br> content_type: [ ondemand | shortclip ]",
           "path": "rodcatlist/{version}/{mode}/{lang}/{content_type}/list.json",
           "locationParams": [{
               "paramName": "mode",
@@ -756,20 +741,34 @@
       }
     },
     {
-      "prefix": "zh",
-      "version": "v8",
+      "prefix": "shows",
+      "version": "v1",
       "resources": {
-        "LiveEPGFetch": {
+        "Search": {
           "requireKey": true,
-          "comment": "zvod live",
-          "path": "zepg/{version}/{region}/{mode}.json",
-          "locationParams": [{
-            "paramName": "region",
-            "default": "japan"
-          }, {
-            "paramName": "mode",
-            "default": "now"
-          }]
+          "path": "showssearch/{version}/{index}/list.json",
+          "locationParams": [
+            {
+              "paramName": "index",
+              "require": true
+            },
+            {
+            "paramName": "from",
+            "default": "0"
+            },
+            {
+              "paramName": "size",
+              "default": "10"
+            },
+            {
+              "paramName":"sort",
+              "default": "score" 
+            },
+            {
+              "paramName": "searchkey",
+              "require": true
+            }
+          ]
         }
       }
     }

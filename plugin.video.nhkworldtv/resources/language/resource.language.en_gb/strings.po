@@ -94,10 +94,6 @@ msgctxt "#30041"
 msgid "Categories"
 msgstr ""
 
-msgctxt "#30042"
-msgid "Playlists"
-msgstr ""
-
 msgctxt "#30043"
 msgid "Latest Episodes"
 msgstr ""
