@@ -6,15 +6,16 @@ on:
   schedule:
     # Run every Saturday at 01:00
     - cron: "0 1 * * 5"
+  workflow_dispatch:
 
 jobs:
   pytest:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' 
+          python-version: '3.12' 
 
       - name: Delete sqlite DB if it exists
         run: |
@@ -25,12 +26,12 @@ jobs:
 
       - name: Install dependencies with pipenv
         run: |
-          pip install pipenv
+          sudo apt install pipenv
           pipenv install --dev
 
       - name: Install pre-requisites (Routing)
         env:
-          PYTHON_VERSION: '3.11'
+          PYTHON_VERSION: '3.12'
         run: |
           pipenv run ./install_packages.sh
         working-directory: build

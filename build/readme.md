@@ -1,12 +1,13 @@
 # Local Build Instructions
 
-Minimum supported Kodi version is Matrix and Python 3.11.
+Minimum supported Kodi version is Matrix and Python 3.12.
 
 ## Prerequisites
 
-Pipenv is used to install the required [Python packages](../Pipfile).
+Pipenv is used to install the required [Python packages](../Pipfile). I use Ubuntu 24.04 / WSL as my dev platform.
 
 ```bash
+sudo apt install pipenv
 pipenv install -d
 ```
 
@@ -29,11 +30,11 @@ chmod u+x build.sh
 
 The resulting ZIP file can then be found in the [Home](..) folder.
 
-## Copy to local WSL 2 on Windows 10/11 Kodi
+## Copy to local WSL 2 on Windows 11 Kodi
 
 I develop on Windows 11 with WSL v2.
 
-The [copy_local_wsl script](./copy_local_wsl.sh) will copy the plugin to the [dist](./dist) folder & from there copy it to the local Kodi installation folder so you can update the plug-in easily while developing. This script works **only on Windows 10 using WSL2 as the development environment** but but should be easy to adapt to your environment.
+The [copy_local_wsl script](./copy_local_wsl.sh) will copy the plugin to the [dist](./dist) folder & from there copy it to the local Kodi installation folder so you can update the plug-in easily while developing. This script works **only on Windows 11 using WSL2 as the development environment** but but should be easy to adapt to your environment.
 
 You will need to modify the *local_kodi* variable to match your local path.
 

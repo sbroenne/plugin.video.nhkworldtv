@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     name: Push addon to plugin repo branches
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
