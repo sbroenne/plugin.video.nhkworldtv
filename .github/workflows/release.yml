@@ -12,17 +12,17 @@ jobs:
     runs-on: ubuntu-latest
   
     steps:
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' 
+          python-version: '3.12' 
 
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Install dependencies with pipenv
         run: |
-          pip install pipenv
+          sudo apt install pipenv
           pipenv install --dev
 
       # - name: Run kodi-addon-checker for Matrix branch
