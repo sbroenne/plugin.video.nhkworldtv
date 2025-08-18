@@ -22,7 +22,7 @@ jobs:
           rm -f nhk_world_cache.sqlite
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install dependencies with pipenv
         run: |
