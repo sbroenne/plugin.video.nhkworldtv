@@ -44,9 +44,9 @@ rest_url = {
     'news_programs_video_url':
     "https://vod-stream.nhk.jp/nhkworld/upld/medias/en/news/programs/{0}/index.m3u8",
     'live_stream_url_720p':
-    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_1M.m3u8",
+    "https://master.nhkworld.jp/nhkworld-tv/playlist/live.m3u8",
     'live_stream_url_1080p':
-    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index_1M.m3u8", # Same as 720p
+    "https://master.nhkworld.jp/nhkworld-tv/playlist/live.m3u8",  # Same as 720p
     'player_url':
     "https://www3.nhk.or.jp/nhkworld/common/player/tv/vod/world/player/js/movie-content-player.js",
     'video_url':
