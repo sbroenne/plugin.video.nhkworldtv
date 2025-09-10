@@ -12,16 +12,16 @@ def get_program_metdadata_cache():
     by the [Azure Cache for NHK World TV Kodi Plugin](https://github.com/sbroenne/nhkworldtv-backend)
     service.
 
-    This file is delivered by the Azure CDN and will speed up resolving of episodes dramatically.
+    This file is stored in Azure Blob Storage and will speed up resolving of episodes dramatically.
 
 
     Returns:
         {dict} -- A JSON dict with the cache items or None if the request failed
     """
-    cache_file = "https://nhkworldtv.azureedge.net/program-list-v2/cache.json"
+    cache_file = "https://nhkworldtv.blob.core.windows.net/program-list-v2/cache.json"
 
     cache = url.get_json(cache_file)
     xbmc.log(
-        f"cache_api.get_program_metdadata_cache: Got {len(cache)} episodes from Azure CDN"
+        f"cache_api.get_program_metdadata_cache: Got {len(cache)} episodes from Azure Blob Storage"
     )
     return cache
