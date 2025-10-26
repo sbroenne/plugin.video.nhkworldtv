@@ -1,10 +1,34 @@
 {
 	"recommendations": [
+        // Core Python support
         "ms-python.python",
-		"charliermarsh.ruff",
-        "njpwerner.autodocstring",
-        "streetsidesoftware.code-spell-checker",
-        "ryanluker.vscode-coverage-gutters",
+        "ms-python.debugpy",
+        "ms-python.pylint",
+        "ms-python.mypy-type-checker",
 
+        // Code quality and formatting
+		"charliermarsh.ruff",
+
+        // Documentation and comments
+        "njpwerner.autodocstring",
+        "aaron-bond.better-comments",
+
+        // Testing and coverage
+        "ryanluker.vscode-coverage-gutters",
+        "littlefoxteam.vscode-python-test-adapter",
+
+        // Code assistance
+        "streetsidesoftware.code-spell-checker",
+        "ms-python.isort",
+
+        // File management
+        "ms-python.black-formatter",
+        "ms-vscode.vscode-json",
+
+        // Git integration
+        "donjayamanne.githistory",
+
+        // Kodi development
+        "ms-vscode.xml"
 	]
 }

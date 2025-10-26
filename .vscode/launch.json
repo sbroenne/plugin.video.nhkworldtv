@@ -1,0 +1,61 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Kodi Addon",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/plugin.video.nhkworldtv/main.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/plugin.video.nhkworldtv",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/plugin.video.nhkworldtv:${workspaceFolder}/plugin.video.nhkworldtv/lib"
+            },
+            "justMyCode": false
+        },
+        {
+            "name": "Debug Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/plugin.video.nhkworldtv:${workspaceFolder}/plugin.video.nhkworldtv/lib"
+            }
+        },
+        {
+            "name": "Debug Tests",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "${workspaceFolder}/plugin.video.nhkworldtv/tests",
+                "-v",
+                "--tb=short"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/plugin.video.nhkworldtv:${workspaceFolder}/plugin.video.nhkworldtv/lib"
+            }
+        },
+        {
+            "name": "Debug Single Test",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "${file}",
+                "-v",
+                "--tb=short"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/plugin.video.nhkworldtv:${workspaceFolder}/plugin.video.nhkworldtv/lib"
+            }
+        }
+    ]
+}
