@@ -80,7 +80,7 @@ There are no main open topics.
 
 ## 1.8. Local development environment
 
-You will find scripts to build the plugin in locally in the [build](./build/) folder. [More Information](./build/readme.md)
+You will find scripts to build the plugin in locally in the [build](../build/) folder. [More Information](build.md)
 
 ## 1.9. Bugs & Issues
 
