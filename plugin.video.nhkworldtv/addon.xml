@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.3.0" provider-name="sbroenne">
+<addon id="plugin.video.nhkworldtv" name="NHK World TV" version="1.4.0" provider-name="sbroenne">
     <requires>
-        <import addon="xbmc.python" version="3.0.0" />
+        <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" version="2.31.0" />
-        <import addon="script.module.requests-cache" version="0.5.2" />
+        <import addon="script.module.requests-cache" version="1.0.0" />
         <import addon="script.module.routing" version="0.2.3" />
         <import addon="script.module.pytz" version="2023.3.0" />
         <import addon="script.module.tzlocal" version="5.0.1" />
+        <import addon="inputstream.adaptive" version="20.3.0" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
@@ -14,18 +15,16 @@
     </extension>
 
     <extension point="xbmc.addon.metadata">
-        <summary lang="en_GB">Watch NHK World Japan in HD - live stream, on-demand and news
-            programs</summary>
+        <summary lang="en_GB">Watch NHK World Japan in HD - live stream and on-demand programs</summary>
         <description lang="en_GB">
 Watch NHK World Japan in HD
 
-- Live Stream
+- Live Stream (HLS)
 - On demand programs - By program, latest and most watched and categories. You can also browse and search through all programs.
 - Live schedule
-- Top Stories and At a Glance
-- News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
+- Top Stories and At a Glance news
 
-Content is retrieved and played directly from the NHK World web site.
+Content is retrieved and played directly from the NHK World web site using HLS streaming.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
         <platform>all</platform>
@@ -34,7 +33,19 @@ Content is retrieved and played directly from the NHK World web site.
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.2.0
+        <news>v1.4.0
+- Simplified codebase: Removed dynamic API parser in favor of hardcoded URL constants (easier to maintain)
+- Removed Azure cloud cache dependency - episodes now resolve directly from NHK
+- Removed first-run wizard (no longer needed)
+- Removed 720p/1080p toggle - NHK only supports 720p for on-demand content
+- Removed deprecated News Programs section (no longer supported by NHK)
+- Added HLS streaming support via inputstream.adaptive
+- Updated dependencies for Kodi Omega compatibility
+- Enhanced error handling with user-friendly messages throughout
+- Cleaned up obsolete settings and code
+- Overall: Removed 2,500+ lines of code for better maintainability
+
+v1.2.0
 - Removed Playlists section
 - Changed Live stream to 720P as well
 - Support for the new NHK streaming infrastructure

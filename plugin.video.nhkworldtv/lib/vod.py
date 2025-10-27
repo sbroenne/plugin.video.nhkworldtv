@@ -3,22 +3,12 @@ Video-on-demand (VOD)
 """
 import xbmc
 import xbmcaddon
+import xbmcgui
 
-from . import cache_api, kodiutils, nhk_api, url, utils
+from . import kodiutils, nhk_api, url, utils
 from .episode import Episode
 
-EPISODE_CACHE = None
 ADDON = xbmcaddon.Addon()
-
-if ADDON.getSettingBool("use_backend"):
-    xbmc.log("vod.py: Loading program metadata cache from Azure CDN")
-    # Try to get the meta data cache from Azure CDN (it is a file)
-    EPISODE_CACHE = cache_api.get_program_metdadata_cache()
-
-    # Only use it if we got valid dict back
-    if isinstance(EPISODE_CACHE, dict):
-        USE_CACHE = True
-        xbmc.log("vod.py: Loaded program metadata cache from Azure CDN")
 
 
 def get_episode_list(api_method, episode_list_id, show_only_subtitle):
@@ -30,9 +20,9 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
     Args:
         api_method ([str]): The NHK API method to use
         episode_list_id ([str]): ID to use (optional)
-        show_only_subtitle ([bool]): Only show subtitles
+        show_only_subtitle ([int]): Only show subtitles (0 or 1)
     Returns:
-        [list] -- List of episodes
+        [list] -- List of episodes, empty list if API call fails
     """
 
     # Only format api_url when a non-0 value for id was provided
@@ -42,7 +32,19 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
     else:
         api_url = nhk_api.rest_url[api_method]
 
-    api_result_json = url.get_json(api_url)["data"]
+    # Get API result with null safety
+    api_result = url.get_json(api_url)
+    if api_result is None:
+        xbmc.log("vod.get_episode_list: API call failed - no response", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load episodes. Please try again later.")
+        return []
+    
+    if "data" not in api_result:
+        xbmc.log("vod.get_episode_list: API response missing 'data' field", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load episodes. Please try again later.")
+        return []
+    
+    api_result_json = api_result["data"]
 
     if "episodes" in api_result_json:
         # "Normal" episode list
@@ -52,17 +54,24 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
         program_json = api_result_json["playlist"][0]["track"]
     else:
         # Unknown source, abort
-        return None
+        xbmc.log("vod.get_episode_list: Unknown API response format", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load episodes. Please try again later.")
+        return []
 
     episodes = []
-    episode = None
     for row in program_json:
         episode = Episode()
         episode.is_playable = True
-        title = row["title_clean"]
-        subtitle = row["sub_title_clean"]
+        title = row.get("title_clean", "")
+        subtitle = row.get("sub_title_clean", "")
 
-        if int(show_only_subtitle) == 1:
+        # Convert show_only_subtitle to int safely
+        try:
+            show_subtitle_only = int(show_only_subtitle) == 1
+        except (ValueError, TypeError):
+            show_subtitle_only = False
+
+        if show_subtitle_only:
             # Show only subtitle
             if len(subtitle) > 0:
                 # There is a subtitle, use it
@@ -81,67 +90,42 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
                 episode_name = utils.get_episode_name(title, subtitle)
 
         episode.title = episode_name
-        description = row["description_clean"]
-        episode.thumb = row["image"]
-        episode.fanart = row["image_l"]
-        episode.vod_id = row["vod_id"]
-        episode.pgm_no = row["pgm_no"]
-        episode.duration = row["movie_duration"]
+        episode.plot = row.get("description_clean", "")
+        episode.thumb = row.get("image", "")
+        episode.fanart = row.get("image_l", "")
+        episode.vod_id = row.get("vod_id", "")
+        episode.pgm_no = row.get("pgm_no", "")
+        episode.duration = row.get("movie_duration", 0)
 
         # Check if we have an aired date
-        broadcast_start_timestamp = row["onair"]
+        broadcast_start_timestamp = row.get("onair")
 
         if broadcast_start_timestamp is not None:
             episode.broadcast_start_date = broadcast_start_timestamp
-            episode.broadcast_end_date = row["vod_to"]
+            episode.broadcast_end_date = row.get("vod_to")
             episode.plot_include_broadcast_detail = True
 
-        episode.plot = description
         episodes.append(episode)
     return episodes
 
 
-def get_episode_from_cache(episode, use_720p=False):
-    """Add a Kodi directory item for a playable episode
-
-    Args:
-        episode ([Episode]): The episode
-        use_720p ([boolean], optional): Use 720P or 1080p.
-        Defaults to USE_720P from add-on settings
-
-    Returns:
-        [type]: [description]
-    """
-    # If the vod_id is in cache and cache is being used,
-    # directly add the URL otherwise dynamically resolve it
-    # via play_vod_episode()
-    #
-    # Use the cache backend or not
-    return_value = None
-    if episode.vod_id in EPISODE_CACHE:
-        cached_episode = EPISODE_CACHE[episode.vod_id]
-        # In cache - display directly
-        # If we should use 720P or there is no 1080P file, use 720P
-        if use_720p or cached_episode["P1080P"] is None:
-            episode.url = cached_episode["P720P"]
-            episode.video_info = kodiutils.get_video_info(use_720p=True)
-        else:
-            episode.url = cached_episode["P1080P"]
-            episode.video_info = kodiutils.get_video_info(use_720p=False)
-        episode.onair = cached_episode["OnAir"]
-
-        return_value = [episode.url, episode.kodi_list_item, False]
-        xbmc.log(
-            f"vod.get_episode_from_cache: Added episode {episode.vod_id} from cache"
-        )
-    return return_value
-
-
 def get_between(string, start, end):
-    """Extracts a string between two other strings"""
-    start_index = string.index(start) + len(start)
-    end_index = string.index(end, start_index)
-    return string[start_index:end_index]
+    """Extracts a string between two other strings
+    
+    Args:
+        string (str): The source string
+        start (str): Starting delimiter
+        end (str): Ending delimiter
+        
+    Returns:
+        str: Extracted string, or None if delimiters not found
+    """
+    try:
+        start_index = string.index(start) + len(start)
+        end_index = string.index(end, start_index)
+        return string[start_index:end_index]
+    except ValueError:
+        return None
 
 
 def get_media_information_api_url(vod_id):
@@ -151,80 +135,142 @@ def get_media_information_api_url(vod_id):
         vod_id (string): VodId from the NHK Api
 
     Returns:
-        string: A API url to get the media information
+        string: A API url to get the media information, or None if extraction fails
     """
 
-    xbmc.log(f"vod.resolve_vod_episode: Using Player.js to retrieve vod_id: {vod_id}")
+    xbmc.log(f"vod.get_media_information_api_url: Using Player.js to retrieve vod_id: {vod_id}")
     request = url.get_url(nhk_api.rest_url["player_url"])
-    if request.status_code == 200:
-        contents = request.text
+    
+    if request.status_code != 200:
+        xbmc.log(f"vod.get_media_information_api_url: Failed to get player.js (status {request.status_code})", xbmc.LOGERROR)
+        return None
+        
+    contents = request.text
+    if not contents:
+        xbmc.log("vod.get_media_information_api_url: Empty response from player.js", xbmc.LOGERROR)
+        return None
 
-        # First, find the block in the js that contains the prod token and url
-        prod_block = get_between(contents, "prod:{", "}.prod;")
-        # Extract the relevant information
-        api_url = get_between(prod_block, 'apiUrl:"', '"')
-        token = get_between(prod_block, 'token:"', '"')
-        media_information_url = (
-            f"{api_url}/?token={token}&type=json&optional_id={vod_id}&active_flg=1"
+    # First, find the block in the js that contains the prod token and url
+    prod_block = get_between(contents, "prod:{", "}.prod;")
+    if prod_block is None:
+        xbmc.log("vod.get_media_information_api_url: Could not find prod block in player.js", xbmc.LOGERROR)
+        return None
+    
+    # Extract the relevant information
+    api_url = get_between(prod_block, 'apiUrl:"', '"')
+    token = get_between(prod_block, 'token:"', '"')
+    
+    if api_url is None or token is None:
+        xbmc.log("vod.get_media_information_api_url: Could not extract API URL or token from player.js", xbmc.LOGERROR)
+        return None
+    
+    media_information_url = (
+        f"{api_url}/?token={token}&type=json&optional_id={vod_id}&active_flg=1"
+    )
+
+    # check if the URI is correct
+    if media_information_url.startswith("http"):
+        xbmc.log(f"vod.get_media_information_api_url: Successfully constructed URL for {vod_id}")
+        return media_information_url
+    else:
+        xbmc.log(
+            f"vod.get_media_information_api_url: Invalid URL constructed: {media_information_url}", 
+            xbmc.LOGERROR
         )
-
-        # check if the URI is correct
-        if media_information_url.startswith("http"):
-            return media_information_url
-        else:
-            xbmc.log(
-                f"Could not construct valid GetMediaInformationApiUrl: { media_information_url}"
-            )
-            return None
+        return None
 
 
-def resolve_vod_episode(vod_id, use_720p):
-    """Resolve a VOD episode directly from NHK
+def resolve_vod_episode(vod_id):
+    """Resolve a VOD episode directly from NHK (720p only)
 
     Args:
         vod_id ([str]): The VOD Id
-        use_720p ([boolean]): Use 720P or 1080p.
-        Defaults to USE_720P from add-on settings
 
     Returns:
-        [Episode]: The resolved Episode - only used for unit testing
+        [Episode]: The resolved Episode with playback URL, or None if failed
     """
 
     xbmc.log(
         f"vod.resolve_vod_episode: Getting episode information for vod_id: {vod_id}"
     )
-    episode = None
-    # Get episode detail
-    episode_detail = url.get_json(
+    
+    # Get episode detail with null safety
+    episode_result = url.get_json(
         nhk_api.rest_url["get_episode_detail"].format(vod_id)
-    )["data"]["episodes"][0]
+    )
+    
+    if episode_result is None:
+        xbmc.log(f"vod.resolve_vod_episode: Failed to get episode details for {vod_id}", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load episode. Please try again.")
+        return None
+    
+    if "data" not in episode_result or "episodes" not in episode_result["data"]:
+        xbmc.log(f"vod.resolve_vod_episode: Invalid episode details response for {vod_id}", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load episode. Please try again.")
+        return None
+    
+    episodes = episode_result["data"]["episodes"]
+    if not episodes or len(episodes) == 0:
+        xbmc.log(f"vod.resolve_vod_episode: No episodes found for {vod_id}", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Episode not found.")
+        return None
+    
+    episode_detail = episodes[0]
+    
     # Fill the episode details
     episode = Episode()
     episode.vod_id = vod_id
-    episode.title = episode_detail["title_clean"]
-    episode.broadcast_start_date = episode_detail["onair"]
-    episode.plot = episode_detail["description_clean"]
-    episode.pgm_no = episode_detail["pgm_no"]
-    episode.duration = episode_detail["movie_duration"]
+    episode.title = episode_detail.get("title_clean", "Unknown Title")
+    episode.broadcast_start_date = episode_detail.get("onair")
+    episode.plot = episode_detail.get("description_clean", "")
+    episode.pgm_no = episode_detail.get("pgm_no", "")
+    episode.duration = episode_detail.get("movie_duration", 0)
 
-    # # Get the media information from the streaming API
+    # Get the media information from the streaming API
     xbmc.log(
         f"vod.resolve_vod_episode: Using Player to get media information API url for vod_id: {vod_id}"
     )
     api_url = get_media_information_api_url(vod_id)
+    
+    if api_url is None:
+        xbmc.log(f"vod.resolve_vod_episode: Failed to get media information URL for {vod_id}", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to get video URL. Please try again.")
+        return None
 
     xbmc.log(
         f"vod.resolve_vod_episode: Getting episode media information from API for vod_id: {vod_id}"
     )
-    media_information = url.get_json(api_url)["meta"][0]
+    media_result = url.get_json(api_url)
+    
+    if media_result is None:
+        xbmc.log(f"vod.resolve_vod_episode: Failed to get media information for {vod_id}", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to get video URL. Please try again.")
+        return None
+    
+    if "meta" not in media_result or not media_result["meta"]:
+        xbmc.log(f"vod.resolve_vod_episode: Invalid media information response for {vod_id}", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to get video URL. Please try again.")
+        return None
+    
+    media_information = media_result["meta"][0]
 
-    if isinstance(media_information, dict):
-        # Valid JSON
-        # Currently, we only support 720p because of the new streaming Api
-        episode.url = media_information["movie_url"]["mb_hd"]
-        xbmc.log(f"vod.resolve_vod_episode: Url vod_id: {vod_id}, Use 720p: {use_720p}")
-
-        episode.video_info = kodiutils.get_video_info(use_720p=True)
-        episode.is_playable = True
+    if isinstance(media_information, dict) and "movie_url" in media_information:
+        # Valid JSON - NHK only supports 720p for on-demand content
+        movie_url = media_information.get("movie_url", {})
+        video_url = movie_url.get("mb_hd")
+        
+        if video_url:
+            episode.url = video_url
+            xbmc.log(f"vod.resolve_vod_episode: Successfully resolved URL for vod_id: {vod_id} (720p)")
+            episode.video_info = kodiutils.get_video_info()
+            episode.is_playable = True
+        else:
+            xbmc.log(f"vod.resolve_vod_episode: No video URL found for {vod_id}", xbmc.LOGERROR)
+            kodiutils.show_notification("NHK World TV", "Video is not available.")
+            return None
+    else:
+        xbmc.log(f"vod.resolve_vod_episode: Invalid media information format for {vod_id}", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Video is not available.")
+        return None
 
     return episode

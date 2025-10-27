@@ -44,13 +44,6 @@ def test_get_topstories_index():
     assert plugin.topstories_index() is True
 
 
-# News programs
-
-
-def test_get_news_programs_index():
-    assert plugin.news_programs_index() is True
-
-
 # Kodi TextViewer dialog box
 
 

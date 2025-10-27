@@ -3,6 +3,7 @@ Kodi specific utils
 """
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcplugin
 
 # read settings
@@ -22,32 +23,26 @@ def get_string(string_id):
     return return_string
 
 
-def get_video_info(use_720p):
-    """Returns a list item video info
-
+def show_notification(title, message, time_ms=5000):
+    """Show a Kodi notification to the user
+    
     Args:
-        use720p ([boolean]): Use 720P or 1080p.
+        title (str): Notification title
+        message (str): Notification message
+        time_ms (int): Display time in milliseconds (default 5000)
+    """
+    try:
+        xbmcgui.Dialog().notification(title, message, xbmcgui.NOTIFICATION_INFO, time_ms)
+    except Exception as e:
+        # Fallback to log if notification fails (e.g., during unit tests)
+        xbmc.log(f"Notification: {title} - {message}", xbmc.LOGINFO)
+
+
+def get_video_info():
+    """Returns a list item video info for 720p (only supported resolution)
 
     Returns:
         [dict]: A video_info dict
-    """
-    if use_720p:
-        return __get_720_video_info()
-    else:
-        return __get_1080_video_info()
-
-
-def __get_1080_video_info():
-    """
-    Returns a Full-HD (1080p) video info array
-    """
-    video_info = {"aspect": "1.78", "width": "1920", "height": "1080"}
-    return video_info
-
-
-def __get_720_video_info():
-    """
-    Returns a HD (720p) video info array
     """
     video_info = {"aspect": "1.78", "width": "1280", "height": "720"}
     return video_info
