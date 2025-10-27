@@ -262,33 +262,46 @@ def news_programs_index():
 def add_on_demand_menu_item():
     """
     On-demand - Menu item
+    
+    Returns:
+        Episode or None if API call fails
     """
     xbmc.log("Adding on-demand menu item")
     # Getting random on-demand episode to show
-    featured_episodes = url.get_json(nhk_api.rest_url["homepage_ondemand"])["data"][
-        "episodes"
-    ]
+    api_result = url.get_json(nhk_api.rest_url["homepage_ondemand"])
+    
+    if api_result is None or "data" not in api_result or "episodes" not in api_result["data"]:
+        xbmc.log("plugin.add_on_demand_menu_item: Failed to load on-demand data", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load on-demand menu.")
+        return None
+    
+    featured_episodes = api_result["data"]["episodes"]
     no_of_episodes = len(featured_episodes)
+    
+    if no_of_episodes == 0:
+        xbmc.log("plugin.add_on_demand_menu_item: No episodes available", xbmc.LOGERROR)
+        return None
+    
     pgm_title = None
     try_count = 0
-    program_json = []
+    program_json = {}
     episode = Episode()
 
     # Find a valid random episode to highlight
-    while pgm_title is None:
+    while pgm_title is None and try_count < 10:  # Prevent infinite loop
         try_count = try_count + 1
         xbmc.log(f"Check if random episode has a valid title. Try count: {try_count}")
         featured_episode = random.randint(0, no_of_episodes - 1)
         program_json = featured_episodes[featured_episode]
-        pgm_title = program_json["title_clean"]
+        pgm_title = program_json.get("title_clean")
 
-    if program_json is not None:
+    if pgm_title:
         episode.title = kodiutils.get_string(30020)
         episode.plot = kodiutils.get_string(30022).format(
-            utils.get_episode_name(pgm_title, program_json["sub_title"])
+            utils.get_episode_name(pgm_title, program_json.get("sub_title", ""))
         )
-        episode.thumb = program_json["image"]
-        episode.fanart = program_json["image_l"]
+        episode.thumb = program_json.get("image", "")
+        episode.fanart = program_json.get("image_l", "")
 
         # Create the directory item
 
@@ -296,6 +309,8 @@ def add_on_demand_menu_item():
         xbmcplugin.addDirectoryItem(
             plugin.handle, plugin.url_for(vod_index), episode.kodi_list_item, True
         )
+    else:
+        xbmc.log("plugin.add_on_demand_menu_item: Could not find valid episode", xbmc.LOGWARNING)
 
     return episode
 
@@ -305,12 +320,22 @@ def add_live_stream_menu_item():
     """Creates a menu item for the NHK live stream (720p)
 
     Returns:
-        [Episode]: Episode with the live stream
+        [Episode]: Episode with the live stream, or None if API call fails
     """
     xbmc.log("Adding live stream menu item")
-    program_json = url.get_json(nhk_api.rest_url["get_livestream"], False)["channel"][
-        "item"
-    ]
+    api_result = url.get_json(nhk_api.rest_url["get_livestream"], False)
+    
+    if api_result is None or "channel" not in api_result or "item" not in api_result["channel"]:
+        xbmc.log("plugin.add_live_stream_menu_item: Failed to load live stream data", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load live stream.")
+        return None
+    
+    program_json = api_result["channel"]["item"]
+    
+    if not program_json or len(program_json) == 0:
+        xbmc.log("plugin.add_live_stream_menu_item: No live stream data available", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Live stream not available.")
+        return None
 
     # Add live stream text
     episode = Episode()
@@ -320,13 +345,13 @@ def add_live_stream_menu_item():
     row = program_json[0]
 
     # Schedule Information
-    episode.thumb = row["thumbnail_s"]
-    episode.fanart = row["thumbnail"]
+    episode.thumb = row.get("thumbnail_s", "")
+    episode.fanart = row.get("thumbnail", "")
     episode.is_playable = True
     episode.playcount = 0
 
     # Title and Description
-    plot = f"{row['title']}\n\n{row['description']}"
+    plot = f"{row.get('title', '')}\n\n{row.get('description', '')}"
     episode.plot = plot
 
     episode.url = nhk_api.rest_url["live_stream_url"]
@@ -347,14 +372,26 @@ def add_live_stream_menu_item():
 def add_live_schedule_menu_item():
     """
     Live schedule - Menu item
+    
+    Returns:
+        bool: True if successful, False otherwise
     """
     xbmc.log("Adding live schedule menu item")
-    program_json = url.get_json(nhk_api.rest_url["get_livestream"], False)["channel"][
-        "item"
-    ]
+    api_result = url.get_json(nhk_api.rest_url["get_livestream"], False)
+    
+    if api_result is None or "channel" not in api_result or "item" not in api_result["channel"]:
+        xbmc.log("plugin.add_live_schedule_menu_item: Failed to load live schedule data", xbmc.LOGERROR)
+        kodiutils.show_notification("NHK World TV", "Unable to load live schedule.")
+        return False
+    
+    program_json = api_result["channel"]["item"]
 
     # Featured Episode
     no_of_episodes = len(program_json)
+    if no_of_episodes < 2:
+        xbmc.log("plugin.add_live_schedule_menu_item: Not enough episodes for schedule", xbmc.LOGWARNING)
+        return False
+        
     featured_episode = random.randint(1, no_of_episodes - 1)
     row = program_json[featured_episode]
 
@@ -363,16 +400,16 @@ def add_live_schedule_menu_item():
     episode.title = kodiutils.get_string(30036)
 
     # Schedule Information
-    episode.broadcast_start_date = row["pubDate"]
-    episode.broadcast_end_date = row["endDate"]
-    episode.thumb = row["thumbnail_s"]
-    episode.fanart = row["thumbnail"]
+    episode.broadcast_start_date = row.get("pubDate")
+    episode.broadcast_end_date = row.get("endDate")
+    episode.thumb = row.get("thumbnail_s", "")
+    episode.fanart = row.get("thumbnail", "")
 
     title = utils.get_schedule_title(
-        episode.broadcast_start_date, episode.broadcast_end_date, row["title"]
+        episode.broadcast_start_date, episode.broadcast_end_date, row.get("title", "")
     )
     episode.plot = utils.format_plot(
-        kodiutils.get_string(30022).format(title), row["description"]
+        kodiutils.get_string(30022).format(title), row.get("description", "")
     )
 
     # Do not show duration
