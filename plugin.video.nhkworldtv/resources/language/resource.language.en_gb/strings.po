@@ -67,35 +67,59 @@ msgctxt "#30030"
 msgid "Watch live now >"
 msgstr ""
 
-# Schedule Menu Item
+# Schedule Menu Items
 
 msgctxt "#30036"
-msgid "Live Schedule >"
+msgid "Today's Schedule >"
+msgstr ""
+
+msgctxt "#30037"
+msgid "View today's programming schedule"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Past Schedule >"
+msgstr ""
+
+msgctxt "#30039"
+msgid "View previously aired programs"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Upcoming Schedule >"
+msgstr ""
+
+msgctxt "#30041"
+msgid "View upcoming programs"
 msgstr ""
 
 # On-Demand Menu
 
-msgctxt "#30040"
+msgctxt "#30042"
 msgid "Programs"
 msgstr ""
 
-msgctxt "#30041"
-msgid "Categories"
+msgctxt "#30042"
+msgid "Programs"
 msgstr ""
 
 msgctxt "#30043"
-msgid "Latest Episodes"
+msgid "Categories"
 msgstr ""
 
 msgctxt "#30044"
-msgid "Most Watched"
+msgid "Latest Episodes"
 msgstr ""
 
 msgctxt "#30045"
-msgid "All Episodes"
+msgid "Most Watched"
 msgstr ""
 
 msgctxt "#30046"
+msgid "All Episodes"
+msgstr ""
+
+msgctxt "#30047"
 msgid "Documentaries"
 msgstr ""
 
