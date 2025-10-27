@@ -216,6 +216,10 @@ class Episode(object):
             info_label["mediatype"] = "episode"
             list_item.setMimeType("application/x-mpegURL")
             list_item.setContentLookup(False)
+            
+            # Enable inputstream.adaptive for HLS streams
+            list_item.setProperty("inputstream", "inputstream.adaptive")
+            list_item.setProperty("inputstream.adaptive.manifest_type", "hls")
 
         # Only add Stream Info if the the video_info property is not none
         if self.video_info is not None:

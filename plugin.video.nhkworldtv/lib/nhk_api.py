@@ -46,12 +46,12 @@ rest_url = {
     'get_episode_detail':
     f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/vod_id/{{0}}/{LANG}/all/1.json",
     
-    # TV - Live stream and EPG (720p only)
+    # TV - Live stream and EPG (HLS streaming)
     'get_livestream':
     f"{NHK_API_BASE}epg/{TV_VERSION}/world/now.json",
     
     'live_stream_url':
-    "https://master.nhkworld.jp/nhkworld-tv/playlist/live.m3u8",
+    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index.m3u8",
     
     # News endpoints
     'homepage_news':
@@ -68,15 +68,6 @@ rest_url = {
     
     'ataglance_video_url':
     "https://nhkworld-vh.akamaihd.net/i/nhkworld/english/news/ataglance/{0}/master.m3u8?set-akamai-hls-revision=5",
-    
-    'news_program_config':
-    f"{NHK_BASE}/nhkworld/common/assets/news/config/en.json",
-    
-    'news_program_xml':
-    f"{NHK_BASE}/nhkworld/data/en/news/programs/{{0}}.xml",
-    
-    'news_programs_video_url':
-    "https://vod-stream.nhk.jp/nhkworld/upld/medias/en/news/programs/{0}/index.m3u8",
     
     # Player and video endpoints
     'player_url':

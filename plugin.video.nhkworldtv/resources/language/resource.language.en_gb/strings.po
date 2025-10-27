@@ -122,15 +122,6 @@ msgctxt "#30063"
 msgid "PLAY: {0}"
 msgstr ""
 
-# News Programs
-msgctxt "#30080"
-msgid "News Programs >"
-msgstr ""
-
-msgctxt "#30081"
-msgid "Watch NHK News Programs like NEWSLINE, NEWSLINE IN DEPTH & NEWSROOM TOKYO on-demand.[CR]Only currently broadcasted programs will be shown."
-msgstr ""
-
 # kodiutils.py
 msgctxt "#30090"
 msgid "{0} - {1} episode"
