@@ -3,6 +3,7 @@ Kodi specific utils
 """
 import xbmc
 import xbmcaddon
+import xbmcgui
 import xbmcplugin
 
 # read settings
@@ -20,6 +21,21 @@ def get_string(string_id):
         return_string = f"UNIT TEST LOCALIZED STRING {string_id}"
 
     return return_string
+
+
+def show_notification(title, message, time_ms=5000):
+    """Show a Kodi notification to the user
+    
+    Args:
+        title (str): Notification title
+        message (str): Notification message
+        time_ms (int): Display time in milliseconds (default 5000)
+    """
+    try:
+        xbmcgui.Dialog().notification(title, message, xbmcgui.NOTIFICATION_INFO, time_ms)
+    except Exception as e:
+        # Fallback to log if notification fails (e.g., during unit tests)
+        xbmc.log(f"Notification: {title} - {message}", xbmc.LOGINFO)
 
 
 def get_video_info():
