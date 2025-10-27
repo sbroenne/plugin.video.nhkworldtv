@@ -632,9 +632,13 @@ def vod_programs():
     Returns:
         [str] -- [Last program ID added]
     """
-    program_json = url.get_json(nhk_api.rest_url["get_programs"])["vod_programs"][
-        "programs"
-    ]
+    api_result = url.get_json(nhk_api.rest_url["get_programs"])
+    if api_result is None or "vod_programs" not in api_result:
+        xbmc.log("VOD Programs API call failed", xbmc.LOGERROR)
+        kodiutils.show_notification("Error", "Unable to load programs. Please try again later.")
+        return None
+    
+    program_json = api_result["vod_programs"].get("programs", {})
     row_count = 0
     episodes = []
     program_id = None
@@ -686,6 +690,11 @@ def vod_categories():
         [str] -- [Last category ID added]
     """
     api_result_json = url.get_json(nhk_api.rest_url["get_categories"])
+    if api_result_json is None or "vod_categories" not in api_result_json:
+        xbmc.log("VOD Categories API call failed", xbmc.LOGERROR)
+        kodiutils.show_notification("Error", "Unable to load categories. Please try again later.")
+        return None
+    
     row_count = 0
     episodes = []
     category_id = None
