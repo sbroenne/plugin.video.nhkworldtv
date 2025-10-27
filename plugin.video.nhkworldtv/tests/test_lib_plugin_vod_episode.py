@@ -15,7 +15,7 @@ def test_episode():
     assert isinstance(episodes, list)
     no_of_episodes = len(episodes)
     assert no_of_episodes > 0
-    # Get the second oldest episode - ensures that this is in the Azure Cache
+    # Get the last episode for testing
     episode = episodes[no_of_episodes - 1]
     assert isinstance(episode, Episode)
     return episode
@@ -29,7 +29,7 @@ def test_add_playable_episode(test_episode):
     return_value = plugin.add_playable_episode(test_episode)
     assert isinstance(return_value, list)
     path = return_value[0]
-    # Should be a plugin URL now since cache is removed
+    # Should be a plugin URL for dynamic resolution
     assert "plugin://" in path
 
 
