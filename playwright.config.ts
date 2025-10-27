@@ -30,6 +30,14 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    
+    /* Force HTTP/1.1 - NHK doesn't support HTTP/2 */
+    launchOptions: {
+      args: [
+        '--disable-http2',
+        '--disable-features=NetworkService',
+      ],
+    },
   },
 
   /* Configure projects for major browsers */

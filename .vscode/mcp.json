@@ -7,7 +7,12 @@
     "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--config",
+        "playwright-mcp-config.json"
+      ]
     }
   }
 }

@@ -1,4 +1,9 @@
-from lib import url
+from lib import nhk_api, url
+
+
+# API request parameters
+def test_get_API_request_params():
+    assert url.get_api_request_params(nhk_api.rest_url["get_livestream"]) is not None
 
 
 # JSON parsing

@@ -126,8 +126,13 @@ pipenv run pytest plugin.video.nhkworldtv/tests/test_lib_url.py -v
 npx playwright test tests/analyze_nhk_api.spec.ts
 ```
 
+**IMPORTANT**: NHK does not support HTTP/2. The Playwright configuration forces HTTP/1.1:
+- `playwright.config.ts` - Uses `--disable-http2` flag in launch args
+- `playwright-mcp-config.json` - MCP server config with HTTP/1.1 enforcement  
+- `.vscode/mcp.json` - MCP server uses the config file
+
 Use Playwright MCP server tools to:
-- Navigate to NHK website pages
+- Navigate to NHK website pages (requires HTTP/1.1)
 - Extract JavaScript files containing API configurations
 - Monitor network requests to identify working endpoints
 - Screenshot pages for documentation
@@ -142,8 +147,11 @@ Use for:
 - Reviewing commits and branches
 
 ### Playwright MCP Server  
+**Configured with HTTP/1.1** (NHK requirement)
+
 Use for:
-- `Playwright_navigate` - Navigate to NHK website
+- `playwright_get` - HTTP GET requests with HTTP/1.1
+- `Playwright_navigate` - Navigate to NHK website (may have HTTP/2 issues)
 - `playwright_get_visible_html` - Extract page HTML
 - `Playwright_evaluate` - Execute JavaScript to extract API keys
 - `Playwright_expect_response` / `Playwright_assert_response` - Monitor API calls

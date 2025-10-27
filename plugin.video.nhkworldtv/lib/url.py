@@ -10,6 +10,8 @@ import xbmc
 import xbmcaddon
 from requests.models import Response
 
+from . import api_keys
+
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
 PLUGIN_PATH = ADDON.getAddonInfo('path')
@@ -81,6 +83,24 @@ def get_json(url, cached=True):
         xbmc.log(f"Could not connect to API: {url}")
 
 
+def get_api_request_params(url):
+    """ Returns the API request parameters for the NHK and the Cache API
+
+    Args:
+        url ([str]): Url
+    Returns:
+        [str]: JSON string with the API key
+    """
+
+    # Populate request_params if needed
+    if api_keys.NHK_API_BASE_URL in url:
+        request_params = {'apikey': api_keys.NHK_API_KEY}
+    else:
+        request_params = None
+
+    return request_params
+
+
 def request_url(url, cached=True):
     """ HELPER: Request URL with handling basic error conditions
 
@@ -92,16 +112,23 @@ def request_url(url, cached=True):
         [response]: Response object - can be None
     """
 
+    request_params = get_api_request_params(url)
     request = Response()
 
     try:
         # Use cached or non-cached result
         if cached:
             # Use session cache
-            request = session.get(url)
+            if request_params is not None:
+                request = session.get(url, params=request_params)
+            else:
+                request = session.get(url)
         else:
             with session.cache_disabled():
-                request = session.get(url)
+                if request_params is not None:
+                    request = session.get(url, params=request_params)
+                else:
+                    request = session.get(url)
         return request
     except requests.ConnectionError:
         # Could not establish connection at all
@@ -181,5 +208,5 @@ def get_url(url, cached=True):
 
 def get_nhk_website_url(path):
     """ Return a full URL from the partial URLs in the JSON results """
-    nhk_website = "https://www3.nhk.or.jp"
+    nhk_website = api_keys.NHK_BASE_URL
     return nhk_website + path
