@@ -32,7 +32,8 @@ if URL_CACHE_MINUTES < 60:
 requests_cache.install_cache(DB_NAME,
                              backend="sqlite",
                              expire_after=URL_CACHE_MINUTES * 60)
-requests_cache.remove_expired_responses()
+# Note: remove_expired_responses() was removed in newer versions of requests-cache
+# The cache automatically handles expiration with the expire_after parameter
 
 # Instantiate request session
 session = requests.Session()

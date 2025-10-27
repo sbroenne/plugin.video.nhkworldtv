@@ -3,6 +3,8 @@ Dynamic NHK API Parser
 """
 
 from builtins import str
+import json
+import os
 
 import xbmc
 
@@ -27,11 +29,29 @@ def create_command(prefix, resource):
 def get_api_from_nhk():
     """
     Retrieves and parses the base API from NHK
+    Falls back to local api.json if remote fetch fails
     """
     xbmc.log("nhk_api_parser.py: Getting API from NHK")
     raw_api_json = url.get_json(
         "https://www3.nhk.or.jp/nhkworld/assets/api_sdk/api2.json"
     )
+    
+    # Fallback to local api.json if remote fetch fails
+    if raw_api_json is None:
+        xbmc.log("nhk_api_parser.py: Remote API fetch failed, using local api.json fallback")
+        try:
+            # Get the directory where this file is located
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            api_json_path = os.path.join(current_dir, "api.json")
+            
+            with open(api_json_path, 'r', encoding='utf-8') as f:
+                raw_api_json = json.load(f)
+            xbmc.log(f"nhk_api_parser.py: Successfully loaded local API from {api_json_path}")
+        except Exception as e:
+            xbmc.log(f"nhk_api_parser.py: Failed to load local API: {str(e)}")
+            # Return empty dict to avoid crash
+            return {}
+    
     nhk_api = {}
     for row in raw_api_json["api"]:
         prefix = row["prefix"]

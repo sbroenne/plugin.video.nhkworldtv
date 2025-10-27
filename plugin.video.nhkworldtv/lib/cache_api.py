@@ -21,7 +21,12 @@ def get_program_metdadata_cache():
     cache_file = "https://nhkworldtv.blob.core.windows.net/program-list-v2/cache.json"
 
     cache = url.get_json(cache_file)
-    xbmc.log(
-        f"cache_api.get_program_metdadata_cache: Got {len(cache)} episodes from Azure Blob Storage"
-    )
+    if cache is not None:
+        xbmc.log(
+            f"cache_api.get_program_metdadata_cache: Got {len(cache)} episodes from Azure Blob Storage"
+        )
+    else:
+        xbmc.log(
+            "cache_api.get_program_metdadata_cache: Failed to retrieve cache from Azure Blob Storage"
+        )
     return cache
