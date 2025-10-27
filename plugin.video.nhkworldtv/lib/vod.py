@@ -131,13 +131,11 @@ def get_media_information_api_url(vod_id):
             return None
 
 
-def resolve_vod_episode(vod_id, use_720p):
-    """Resolve a VOD episode directly from NHK
+def resolve_vod_episode(vod_id):
+    """Resolve a VOD episode directly from NHK (720p only)
 
     Args:
         vod_id ([str]): The VOD Id
-        use_720p ([boolean]): Use 720P or 1080p.
-        Defaults to USE_720P from add-on settings
 
     Returns:
         [Episode]: The resolved Episode - only used for unit testing
@@ -172,12 +170,11 @@ def resolve_vod_episode(vod_id, use_720p):
     media_information = url.get_json(api_url)["meta"][0]
 
     if isinstance(media_information, dict):
-        # Valid JSON
-        # Currently, we only support 720p because of the new streaming Api
+        # Valid JSON - NHK only supports 720p for on-demand content
         episode.url = media_information["movie_url"]["mb_hd"]
-        xbmc.log(f"vod.resolve_vod_episode: Url vod_id: {vod_id}, Use 720p: {use_720p}")
+        xbmc.log(f"vod.resolve_vod_episode: Url vod_id: {vod_id} (720p)")
 
-        episode.video_info = kodiutils.get_video_info(use_720p=True)
+        episode.video_info = kodiutils.get_video_info()
         episode.is_playable = True
 
     return episode

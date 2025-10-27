@@ -22,32 +22,11 @@ def get_string(string_id):
     return return_string
 
 
-def get_video_info(use_720p):
-    """Returns a list item video info
-
-    Args:
-        use720p ([boolean]): Use 720P or 1080p.
+def get_video_info():
+    """Returns a list item video info for 720p (only supported resolution)
 
     Returns:
         [dict]: A video_info dict
-    """
-    if use_720p:
-        return __get_720_video_info()
-    else:
-        return __get_1080_video_info()
-
-
-def __get_1080_video_info():
-    """
-    Returns a Full-HD (1080p) video info array
-    """
-    video_info = {"aspect": "1.78", "width": "1920", "height": "1080"}
-    return video_info
-
-
-def __get_720_video_info():
-    """
-    Returns a HD (720p) video info array
     """
     video_info = {"aspect": "1.78", "width": "1280", "height": "720"}
     return video_info

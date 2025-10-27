@@ -31,17 +31,6 @@ msgctxt "#30008"
 msgid "Caching"
 msgstr ""
 
-msgctxt "#30009"
-msgid "Use episode Url cache from Azure CDN (recommended)"
-msgstr ""
-
-msgctxt "#30016"
-msgid "Run Set-up Wizard when plugin starts"
-msgstr ""
-
-msgctxt "#30017"
-msgid "Use 720p instead of 1080p (in case you are encountering buffering issues)"
-msgstr ""
 # plugin.py
 
 # Top Stories Menu Item
@@ -131,16 +120,6 @@ msgstr ""
 # Live Schedule
 msgctxt "#30063"
 msgid "PLAY: {0}"
-msgstr ""
-
-# First run Wizard
-
-msgctxt "#30070"
-msgid "Information about 720p and 1080p"
-msgstr ""
-
-msgctxt "#30071"
-msgid "NHK currently only provides on-demand programs in 720p. The live program is also available in 1080p. [CR]If you encounter buffering issues in the live program, you can fall-back to 720p in addon-settings.[CR][CR]The wizard has finished and will close now.[CR]Enjoy NHK World TV!"
 msgstr ""
 
 # News Programs

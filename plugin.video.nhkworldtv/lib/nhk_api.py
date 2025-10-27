@@ -46,14 +46,11 @@ rest_url = {
     'get_episode_detail':
     f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/vod_id/{{0}}/{LANG}/all/1.json",
     
-    # TV - Live stream and EPG
+    # TV - Live stream and EPG (720p only)
     'get_livestream':
     f"{NHK_API_BASE}epg/{TV_VERSION}/world/now.json",
     
-    'live_stream_url_720p':
-    "https://master.nhkworld.jp/nhkworld-tv/playlist/live.m3u8",
-    
-    'live_stream_url_1080p':
+    'live_stream_url':
     "https://master.nhkworld.jp/nhkworld-tv/playlist/live.m3u8",
     
     # News endpoints

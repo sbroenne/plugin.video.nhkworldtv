@@ -24,22 +24,9 @@ def test_episode():
 # Directly playable episode
 
 
-def test_add_playable_episode_720p(test_episode):
+def test_add_playable_episode(test_episode):
 
-    return_value = plugin.add_playable_episode(
-        test_episode, use_720p=True, use_cache=False
-    )
-    assert isinstance(return_value, list)
-    path = return_value[0]
-    # Should be a plugin URL now since cache is removed
-    assert "plugin://" in path
-
-
-def test_add_playable_episode_1080p(test_episode):
-
-    return_value = plugin.add_playable_episode(
-        test_episode, use_720p=False, use_cache=False
-    )
+    return_value = plugin.add_playable_episode(test_episode)
     assert isinstance(return_value, list)
     path = return_value[0]
     # Should be a plugin URL now since cache is removed
@@ -49,9 +36,7 @@ def test_add_playable_episode_1080p(test_episode):
 # Episode that needs to be resolved from NHK
 def test_add_playable_episode_needs_to_be_resolved(test_episode):
 
-    return_value = plugin.add_playable_episode(
-        test_episode, use_720p=False, use_cache=False
-    )
+    return_value = plugin.add_playable_episode(test_episode)
     assert isinstance(return_value, list)
     path = return_value[0]
     assert "plugin:///" in path
@@ -63,9 +48,9 @@ def test_get_media_information_api_url(test_episode):
     assert vod.get_media_information_api_url(vod_id).startswith('https://api01-platform.stream.co.jp/apiservice/getMediaByParam/')
 
 
-def test_resolve_episode_from_NHK_720p(test_episode):
+def test_resolve_episode_from_NHK(test_episode):
 
-    resolved_episode = plugin.resolve_vod_episode(test_episode.vod_id, use_720p=True)
+    resolved_episode = plugin.resolve_vod_episode(test_episode.vod_id)
     assert resolved_episode.url is not None
     assert resolved_episode.video_info["height"] == "720"
 

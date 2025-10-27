@@ -27,8 +27,8 @@ def test_get_episode_from_episode_list():
     assert isinstance(episode, Episode)
 
 
-def test_resolve_episode_720p(test_episode):
+def test_resolve_episode(test_episode):
     assert isinstance(
-        vod.resolve_vod_episode(test_episode.vod_id, use_720p=True), Episode
+        vod.resolve_vod_episode(test_episode.vod_id), Episode
     )
     assert test_episode.is_playable is True

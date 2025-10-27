@@ -11,7 +11,6 @@ import xbmcplugin
 
 from . import (
     ataglance,
-    first_run_wizard,
     kodiutils,
     news_programs,
     nhk_api,
@@ -32,10 +31,8 @@ NHK_FANART = ADDON.getAddonInfo("fanart")
 # Default value - can be overwritten by settings
 MAX_NEWS_DISPLAY_ITEMS = 0
 MAX_ATAGLANCE_DISPLAY_ITEMS = 0
-USE_CACHE = True
-USE_720P = False
 
-# Initialize the plugin with default values and the cache
+# Initialize the plugin with default values
 xbmc.log("Initializing plug-in")
 xbmc.log("initialize: Retrieving plug-in setting")
 # Getting the add-on settings - these will be 0 under unit test
@@ -43,16 +40,10 @@ xbmc.log("initialize: Retrieving plug-in setting")
 MAX_NEWS_DISPLAY_ITEMS = ADDON.getSettingInt("max_news_items")
 # Define how many items should be displayed in At A Glance
 MAX_ATAGLANCE_DISPLAY_ITEMS = ADDON.getSettingInt("max_ataglance_items")
-# Define if to ise 720P instead of 1080P
-USE_720P = ADDON.getSettingBool("use_720P")
-xbmc.log(f"initialize: Using 720P instead of 1080p: {USE_720P}")
-USE_CACHE = ADDON.getSettingBool("use_backend")
-xbmc.log(f"initialize: Use Azure cache: {USE_CACHE}")
 
 if utils.UNIT_TEST:
     MAX_NEWS_DISPLAY_ITEMS = 20
     MAX_ATAGLANCE_DISPLAY_ITEMS = 800
-    USE_CACHE = True
 
 #
 # Entry point - this is called from main.py
@@ -62,8 +53,6 @@ if utils.UNIT_TEST:
 
 def run():
     """Run the plugin"""
-    if ADDON.getSettingBool("run_wizard"):
-        first_run_wizard.show_wizard()
     plugin.run()
 
 
@@ -303,7 +292,7 @@ def add_on_demand_menu_item():
 
         # Create the directory item
 
-        episode.video_info = kodiutils.get_video_info(USE_720P)
+        episode.video_info = kodiutils.get_video_info()
         xbmcplugin.addDirectoryItem(
             plugin.handle, plugin.url_for(vod_index), episode.kodi_list_item, True
         )
@@ -312,12 +301,8 @@ def add_on_demand_menu_item():
 
 
 # Add live stream menu item
-def add_live_stream_menu_item(use_720p=USE_720P):
-    """[summary]
-        Creates a menu item for the NHK live stream
-    Args:
-        use_720p ([boolean], optional): Use 720P or 1080p.
-        Defaults to USE_720P from add-on settings
+def add_live_stream_menu_item():
+    """Creates a menu item for the NHK live stream (720p)
 
     Returns:
         [Episode]: Episode with the live stream
@@ -344,12 +329,9 @@ def add_live_stream_menu_item(use_720p=USE_720P):
     plot = f"{row['title']}\n\n{row['description']}"
     episode.plot = plot
 
-    if use_720p:
-        episode.url = nhk_api.rest_url["live_stream_url_720p"]
-    else:
-        episode.url = nhk_api.rest_url["live_stream_url_1080p"]
+    episode.url = nhk_api.rest_url["live_stream_url"]
 
-    episode.video_info = kodiutils.get_video_info(use_720p)
+    episode.video_info = kodiutils.get_video_info()
     xbmcplugin.addDirectoryItem(
         plugin.handle, episode.url, episode.kodi_list_item, False
     )
@@ -397,7 +379,7 @@ def add_live_schedule_menu_item():
     episode.broadcast_start_date = None
     episode.broadcast_end_date = None
 
-    episode.video_info = kodiutils.get_video_info(USE_720P)
+    episode.video_info = kodiutils.get_video_info()
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(live_schedule_index), episode.kodi_list_item, True
     )
@@ -452,7 +434,7 @@ def live_schedule_index():
         if episode.is_playable:
             # Display the playable episode
             episodes.append(
-                (add_playable_episode(episode, use_cache=USE_CACHE, use_720p=USE_720P))
+                (add_playable_episode(episode))
             )
         else:
             # Simply display text
@@ -598,7 +580,7 @@ def vod_programs():
             episode.plot = row["description_clean"]
             episode.thumb = row["image"]
             episode.fanart = row["image_l"]
-            episode.video_info = kodiutils.get_video_info(USE_720P)
+            episode.video_info = kodiutils.get_video_info()
 
             # Create the directory item
             episodes.append(
@@ -643,7 +625,7 @@ def vod_categories():
         episode.absolute_image_url = True
         episode.thumb = row["icon_l"]
         episode.fanart = row["icon_l"]
-        episode.video_info = kodiutils.get_video_info(USE_720P)
+        episode.video_info = kodiutils.get_video_info()
 
         # Create the directory item
         category_id = row["category_id"]
@@ -671,14 +653,11 @@ def vod_categories():
     return category_id
 
 
-def add_playable_episode(episode, use_cache, use_720p):
-    """Add a Kodi directory item for a playable episode
+def add_playable_episode(episode):
+    """Add a Kodi directory item for a playable episode (720p only)
 
     Args:
         episode ([Episode]): The episode
-        use_cache ([boolean]): Deprecated - no longer used
-        use_720p ([boolean]): Use 720P or 1080p.
-        Defaults to USE_720P from add-on settings
 
     Returns:
         [list]: List
@@ -719,15 +698,13 @@ def vod_episode_list(
         playable_episodes = []
         if not unit_test:
             xbmc.log(
-                f"vod_episode_list: {len(episodes)} episodes, use_cache: {USE_CACHE}, use_720p: {USE_720P}"
+                f"vod_episode_list: {len(episodes)} episodes"
             )
             for episode in episodes:
                 # Add the current episode directory item
                 playable_episodes.append(
                     (
-                        add_playable_episode(
-                            episode, use_cache=USE_CACHE, use_720p=USE_720P
-                        )
+                        add_playable_episode(episode)
                     )
                 )
 
@@ -746,19 +723,17 @@ def vod_episode_list(
 
 # Video On Demand - Resolve episode
 @plugin.route("/vod/resolve_episode/<vod_id>/")
-def resolve_vod_episode(vod_id, use_720p=USE_720P):
-    """Resolve a VOD episode directly from NHK
+def resolve_vod_episode(vod_id):
+    """Resolve a VOD episode directly from NHK (720p only)
 
     Args:
         vod_id ([str]): The VOD Id
-        use_720p ([boolean], optional): Use 720P or 1080p.
-        Defaults to USE_720P from add-on settings
 
     Returns:
         [Episode]: The resolved Episode - only used for unit testing
     """
 
-    episode = vod.resolve_vod_episode(vod_id, use_720p)
+    episode = vod.resolve_vod_episode(vod_id)
     if episode is not None and episode.is_playable:
         xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
         return episode
