@@ -676,26 +676,14 @@ def add_playable_episode(episode, use_cache, use_720p):
 
     Args:
         episode ([Episode]): The episode
-        use_cache ([boolean]): Use Azure episode cache
+        use_cache ([boolean]): Deprecated - no longer used
         use_720p ([boolean]): Use 720P or 1080p.
         Defaults to USE_720P from add-on settings
 
     Returns:
         [list]: List
     """
-    # If the vod_id is in cache and cache is being used,
-    # directly add the URL otherwise dynamically resolve it
-    # via play_vod_episode()
-
-    # Get episode from cache if cache is enabled
-    xbmc.log(f"add_playable_episode: Add {episode.vod_id}, use cache: {use_cache}")
-    if use_cache:
-        return_value = vod.get_episode_from_cache(episode, use_720p)
-        if return_value is not None:
-            xbmc.log(f"add_playable_episode: Added {episode.vod_id} from cache")
-            return return_value
-
-    # Don't use cache or episode not in cache - need to be resolve dynamically
+    # Episode needs to be resolved dynamically via play_vod_episode
     play_url = plugin.url_for(resolve_vod_episode, episode.vod_id)
     xbmc.log(f"add_playable_episode: Resolved Play URL: {play_url}")
     return_value = [play_url, episode.kodi_list_item, False]

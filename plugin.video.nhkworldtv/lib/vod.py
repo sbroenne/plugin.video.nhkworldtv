@@ -4,21 +4,10 @@ Video-on-demand (VOD)
 import xbmc
 import xbmcaddon
 
-from . import cache_api, kodiutils, nhk_api, url, utils
+from . import kodiutils, nhk_api, url, utils
 from .episode import Episode
 
-EPISODE_CACHE = None
 ADDON = xbmcaddon.Addon()
-
-if ADDON.getSettingBool("use_backend"):
-    xbmc.log("vod.py: Loading program metadata cache from Azure CDN")
-    # Try to get the meta data cache from Azure CDN (it is a file)
-    EPISODE_CACHE = cache_api.get_program_metdadata_cache()
-
-    # Only use it if we got valid dict back
-    if isinstance(EPISODE_CACHE, dict):
-        USE_CACHE = True
-        xbmc.log("vod.py: Loaded program metadata cache from Azure CDN")
 
 
 def get_episode_list(api_method, episode_list_id, show_only_subtitle):
@@ -99,42 +88,6 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
         episode.plot = description
         episodes.append(episode)
     return episodes
-
-
-def get_episode_from_cache(episode, use_720p=False):
-    """Add a Kodi directory item for a playable episode
-
-    Args:
-        episode ([Episode]): The episode
-        use_720p ([boolean], optional): Use 720P or 1080p.
-        Defaults to USE_720P from add-on settings
-
-    Returns:
-        [type]: [description]
-    """
-    # If the vod_id is in cache and cache is being used,
-    # directly add the URL otherwise dynamically resolve it
-    # via play_vod_episode()
-    #
-    # Use the cache backend or not
-    return_value = None
-    if episode.vod_id in EPISODE_CACHE:
-        cached_episode = EPISODE_CACHE[episode.vod_id]
-        # In cache - display directly
-        # If we should use 720P or there is no 1080P file, use 720P
-        if use_720p or cached_episode["P1080P"] is None:
-            episode.url = cached_episode["P720P"]
-            episode.video_info = kodiutils.get_video_info(use_720p=True)
-        else:
-            episode.url = cached_episode["P1080P"]
-            episode.video_info = kodiutils.get_video_info(use_720p=False)
-        episode.onair = cached_episode["OnAir"]
-
-        return_value = [episode.url, episode.kodi_list_item, False]
-        xbmc.log(
-            f"vod.get_episode_from_cache: Added episode {episode.vod_id} from cache"
-        )
-    return return_value
 
 
 def get_between(string, start, end):

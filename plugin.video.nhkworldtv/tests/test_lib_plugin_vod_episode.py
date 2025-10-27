@@ -24,24 +24,26 @@ def test_episode():
 # Directly playable episode
 
 
-def test_add_playable_episode_cached_720p(test_episode):
+def test_add_playable_episode_720p(test_episode):
 
     return_value = plugin.add_playable_episode(
-        test_episode, use_720p=True, use_cache=True
+        test_episode, use_720p=True, use_cache=False
     )
     assert isinstance(return_value, list)
     path = return_value[0]
-    assert "http://" in path
+    # Should be a plugin URL now since cache is removed
+    assert "plugin://" in path
 
 
-def test_add_playable_episode_cached_1080p(test_episode):
+def test_add_playable_episode_1080p(test_episode):
 
     return_value = plugin.add_playable_episode(
-        test_episode, use_720p=False, use_cache=True
+        test_episode, use_720p=False, use_cache=False
     )
     assert isinstance(return_value, list)
     path = return_value[0]
-    assert "http://" in path
+    # Should be a plugin URL now since cache is removed
+    assert "plugin://" in path
 
 
 # Episode that needs to be resolved from NHK
