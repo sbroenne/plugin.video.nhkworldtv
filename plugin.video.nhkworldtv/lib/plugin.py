@@ -12,7 +12,6 @@ import xbmcplugin
 from . import (
     ataglance,
     kodiutils,
-    news_programs,
     nhk_api,
     topstories,
     url,
@@ -68,7 +67,6 @@ def index():
     add_live_schedule_menu_item()
     add_topstories_menu_item()
     add_ataglance_menu_item()
-    add_news_programs_menu_item()
     # Set-up view
     kodiutils.set_video_directory_information(
         plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, "tvshows"
@@ -214,48 +212,6 @@ def ataglance_index():
 #
 # News Programs
 #
-
-
-# Menu item
-def add_news_programs_menu_item():
-    """
-    News Programs - Menu item
-    """
-    xbmc.log("Displaying News Programs menu item")
-    art = {
-        "thumb": "https://www3.nhk.or.jp/nhkworld/upld/thumbnails/en/news/programs/1001_2.jpg",
-        "fanart": "https://www3.nhk.or.jp/nhkworld/common/assets/news/images/programs/newsline_2020.jpg",
-    }
-    list_item = xbmcgui.ListItem(kodiutils.get_string(30080), offscreen=True)
-    info_labels = {}
-    info_labels["mediatype"] = "episode"
-    info_labels["Plot"] = kodiutils.get_string(30081)
-    list_item.setInfo("video", info_labels)
-    list_item.addStreamInfo("video", kodiutils.get_sd_video_info())
-    list_item.setArt(art)
-    xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(news_programs_index), list_item, True
-    )
-    return True
-
-
-# News program list
-@plugin.route("/news/programs/index")
-def news_programs_index():
-    """
-    News Programs - Index
-    """
-    xbmc.log("Displaying News Programs Index")
-    success = False
-    programs = news_programs.get_programs()
-
-    if len(programs) > 0:
-        xbmcplugin.addDirectoryItems(plugin.handle, programs, len(programs))
-        kodiutils.set_video_directory_information(
-            plugin.handle, xbmcplugin.SORT_METHOD_UNSORTED, "tvshows"
-        )
-        success = True
-    return success
 
 
 # Add on-demand menu item
