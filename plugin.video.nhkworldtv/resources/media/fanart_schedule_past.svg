@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+
+  <!-- NHK Red Diagonal Stripe (bottom right) -->
+  <polygon points="1920,1080 1320,1080 1920,680" fill="#C8102E" opacity="0.7"/>
+
+  <!-- NHK WORLD-JAPAN Logo -->
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="54" font-weight="bold" fill="white" letter-spacing="2">NHK WORLD</text>
+  <rect x="80" y="110" width="380" height="4" fill="#C8102E"/>
+  <text x="80" y="155" font-family="Arial, sans-serif" font-size="36" font-weight="300" fill="#f5f5f5" letter-spacing="3">JAPAN</text>
+
+  <!-- Archive icon elements (film strip) -->
+  <rect x="1400" y="300" width="400" height="6" fill="rgba(200,16,46,0.3)"/>
+  <rect x="1400" y="350" width="400" height="6" fill="rgba(200,16,46,0.3)"/>
+  <!-- Film perforations -->
+  <circle cx="1450" cy="328" r="12" fill="rgba(200,16,46,0.2)"/>
+  <circle cx="1550" cy="328" r="12" fill="rgba(200,16,46,0.2)"/>
+  <circle cx="1650" cy="328" r="12" fill="rgba(200,16,46,0.2)"/>
+  <circle cx="1750" cy="328" r="12" fill="rgba(200,16,46,0.2)"/>
+
+  <!-- Main Title -->
+  <text x="120" y="580" font-family="Arial, sans-serif" font-size="140" font-weight="bold" fill="white" letter-spacing="8">PAST</text>
+  <text x="120" y="720" font-family="Arial, sans-serif" font-size="140" font-weight="bold" fill="white" letter-spacing="8">PROGRAMS</text>
+
+  <!-- Japanese text -->
+  <text x="120" y="820" font-family="Arial, sans-serif" font-size="48" font-weight="300" fill="#f5f5f5">過去の番組</text>
+
+  <!-- Red accent bar -->
+  <rect x="120" y="860" width="500" height="6" fill="#C8102E"/>
+
+  <!-- Bottom subtle text -->
+  <text x="120" y="980" font-family="Arial, sans-serif" font-size="28" fill="#999">Watch previously aired programs</text>
+</svg>

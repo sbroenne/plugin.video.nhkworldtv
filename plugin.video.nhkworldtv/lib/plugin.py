@@ -9,6 +9,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
+import xbmcvfs
 
 from . import ataglance, kodiutils, nhk_api, topstories, url, utils, vod
 from .episode import Episode
@@ -19,6 +20,16 @@ plugin = routing.Plugin()
 ADDON = xbmcaddon.Addon()
 NHK_ICON = ADDON.getAddonInfo("icon")
 NHK_FANART = ADDON.getAddonInfo("fanart")
+
+# Schedule menu images - convert relative paths to full paths for Kodi
+# Use xbmcvfs.translatePath to get proper filesystem paths
+ADDON_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo("path"))
+SCHEDULE_TODAY_THUMB = f"{ADDON_PATH}/resources/media/thumb_schedule_today.png"
+SCHEDULE_TODAY_FANART = f"{ADDON_PATH}/resources/media/fanart_schedule_today.png"
+SCHEDULE_PAST_THUMB = f"{ADDON_PATH}/resources/media/thumb_schedule_past.png"
+SCHEDULE_PAST_FANART = f"{ADDON_PATH}/resources/media/fanart_schedule_past.png"
+SCHEDULE_UPCOMING_THUMB = f"{ADDON_PATH}/resources/media/thumb_schedule_upcoming.png"
+SCHEDULE_UPCOMING_FANART = f"{ADDON_PATH}/resources/media/fanart_schedule_upcoming.png"
 
 # Default value - can be overwritten by settings
 MAX_NEWS_DISPLAY_ITEMS = 0
@@ -320,29 +331,50 @@ def add_live_stream_menu_item():
         epg_url = f"{nhk_api.rest_url['get_livestream']}{today}.json"
         api_result = url.get_json(epg_url, False)
 
+        xbmc.log(f"[NHK] EPG URL: {epg_url}", xbmc.LOGINFO)
         if api_result and "data" in api_result and len(api_result["data"]) > 0:
-            # Currently playing program found (first in list is current)
-            row = api_result["data"][0]
-            episode.thumb = row.get("episodeThumbnailURL") or row.get("thumbnail", "")
-            episode.fanart = row.get("thumbnail", "")
+            # Find first program with a valid thumbnail (news may not have one)
+            current_program = None
+            thumbnail_url = ""
 
-            # Enhanced plot with current program info
-            title = row.get("title", "")
-            episode_title = row.get("episodeTitle", "")
-            description = row.get("description", "")
-
-            program_name = f"{title}: {episode_title}" if episode_title else title
-            if program_name or description:
-                episode.plot = (
-                    f"{program_name}\n\n{description}"
-                    if program_name and description
-                    else (program_name or description)
+            for prog in api_result["data"]:
+                thumb = prog.get("episodeThumbnailURL") or prog.get("thumbnail", "")
+                xbmc.log(
+                    f"[NHK] Checking program: {prog.get('title', '')} thumb={thumb}",
+                    xbmc.LOGINFO,
                 )
+                if thumb and thumb.strip():
+                    current_program = prog
+                    thumbnail_url = thumb
+                    break
+
+            # If we found a program with thumbnail, use it
+            if current_program and thumbnail_url:
+                xbmc.log(
+                    f"[NHK] Using thumbnail for live: {thumbnail_url}", xbmc.LOGINFO
+                )
+                episode.thumb = thumbnail_url
+                episode.fanart = thumbnail_url
+
+                # Enhanced plot with current program info
+                title = current_program.get("title", "")
+                episode_title = current_program.get("episodeTitle", "")
+                description = current_program.get("description", "")
+
+                program_name = f"{title}: {episode_title}" if episode_title else title
+                if program_name or description:
+                    episode.plot = (
+                        f"NOW PLAYING: {program_name}\n\n{description}"
+                        if program_name and description
+                        else f"NOW PLAYING: {program_name or description}"
+                    )
+            else:
+                xbmc.log("[NHK] No valid thumbnail found for live stream", xbmc.LOGINFO)
     except Exception as e:
         # Schedule info is optional, log but continue
         xbmc.log(
             f"Could not load live stream schedule (non-critical): {e}",
-            xbmc.LOGDEBUG,
+            xbmc.LOGINFO,
         )
 
     episode.video_info = kodiutils.get_video_info()
@@ -367,9 +399,10 @@ def add_schedule_today_menu_item():
     xbmc.log("Adding today's schedule menu item")
     episode = Episode()
     episode.title = kodiutils.get_string(30036)  # "Today's Schedule"
-    episode.plot = kodiutils.get_string(30037)  # "View today's programming schedule"
-    episode.thumb = NHK_ICON
-    episode.fanart = NHK_FANART
+    # "View today's programming schedule"
+    episode.plot = kodiutils.get_string(30037)
+    episode.thumb = SCHEDULE_TODAY_THUMB
+    episode.fanart = SCHEDULE_TODAY_FANART
     episode.video_info = kodiutils.get_video_info()
 
     xbmcplugin.addDirectoryItem(
@@ -391,13 +424,17 @@ def add_schedule_past_menu_item():
     xbmc.log("Adding past schedule menu item")
     episode = Episode()
     episode.title = kodiutils.get_string(30038)  # "Past Schedule"
-    episode.plot = kodiutils.get_string(30039)  # "View previously aired programs"
-    episode.thumb = NHK_ICON
-    episode.fanart = NHK_FANART
+    # "View previously aired programs"
+    episode.plot = kodiutils.get_string(30039)
+    episode.thumb = SCHEDULE_PAST_THUMB
+    episode.fanart = SCHEDULE_PAST_FANART
     episode.video_info = kodiutils.get_video_info()
 
     xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(schedule_past_index), episode.kodi_list_item, True
+        plugin.handle,
+        plugin.url_for(schedule_past_index),
+        episode.kodi_list_item,
+        True,
     )
     return True
 
@@ -413,8 +450,8 @@ def add_schedule_upcoming_menu_item():
     episode = Episode()
     episode.title = kodiutils.get_string(30040)  # "Upcoming Schedule"
     episode.plot = kodiutils.get_string(30041)  # "View upcoming programs"
-    episode.thumb = NHK_ICON
-    episode.fanart = NHK_FANART
+    episode.thumb = SCHEDULE_UPCOMING_THUMB
+    episode.fanart = SCHEDULE_UPCOMING_FANART
     episode.video_info = kodiutils.get_video_info()
 
     xbmcplugin.addDirectoryItem(

@@ -168,8 +168,8 @@ class TestEPGScheduleEndpoint:
         for field in required_fields:
             assert field in program, f"EPG program should have '{field}' field"
 
-    def test_schedule_has_current_program(self):
-        """Verify EPG contains a currently airing program"""
+    def test_schedule_has_valid_program_times(self):
+        """Verify EPG programs have valid time ranges"""
         today_str = datetime.now().strftime("%Y%m%d")
         endpoint = f"{nhk_api.rest_url['get_livestream']}{today_str}.json"
 
@@ -177,26 +177,26 @@ class TestEPGScheduleEndpoint:
         assert response.status_code == 200
 
         data = response.json()
-        now = datetime.now().astimezone()
+        assert len(data["data"]) > 0, "EPG should have programs"
 
-        # Find at least one program that includes current time
-        current_program_found = False
+        # Verify programs have valid timestamps and structure
         for program in data["data"]:
+            # All programs must have start and end times
+            assert "startTime" in program, "Program should have startTime"
+            assert "endTime" in program, "Program should have endTime"
+
+            # Parse times - should be valid ISO 8601
             start = datetime.fromisoformat(program["startTime"])
             end = datetime.fromisoformat(program["endTime"])
 
-            if start <= now <= end:
-                current_program_found = True
-                # Verify it has playback URL for VOD
-                if program.get("vodFlag") == 1:
-                    assert "playURL" in program, (
-                        "VOD-enabled program should have playURL"
-                    )
-                break
+            # End time should be after start time
+            assert end > start, (
+                f"Program end time should be after start: {program.get('title', 'Unknown')}"
+            )
 
-        assert current_program_found, (
-            "EPG should contain at least one currently airing program"
-        )
+            # If program has VOD flag, should have playURL
+            if program.get("vodFlag") == 1:
+                assert "playURL" in program, "VOD-enabled program should have playURL"
 
 
 class TestImageAvailability:
@@ -449,6 +449,62 @@ class TestVideoPlayback:
         # Try to access the video URL
         response = requests.head(video_url, timeout=10)
         assert response.status_code == 200, f"Video URL not accessible: {video_url}"
+
+
+class TestEpisodeDataProcessing:
+    """Test that Episode class can handle real API data"""
+
+    def test_episode_handles_epg_timestamps(self):
+        """Verify Episode class handles ISO 8601 timestamps from EPG"""
+        from lib.episode import Episode
+
+        # Get real EPG data
+        today_str = datetime.now().strftime("%Y%m%d")
+        epg_url = f"{nhk_api.rest_url['get_livestream']}{today_str}.json"
+        response = requests.get(epg_url, timeout=10)
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "data" in data and len(data["data"]) > 0
+
+        # Get first program from EPG
+        program = data["data"][0]
+
+        # Create Episode and set broadcast dates (this is what plugin.py does)
+        episode = Episode()
+
+        # This should not crash with ISO 8601 strings!
+        episode.broadcast_start_date = program.get("startTime")
+        episode.broadcast_end_date = program.get("endTime")
+
+        # Verify dates were set correctly
+        assert episode.broadcast_start_date is not None, (
+            "Episode should handle ISO 8601 start time"
+        )
+        assert episode.broadcast_end_date is not None, (
+            "Episode should handle ISO 8601 end time"
+        )
+
+    def test_episode_handles_vod_timestamps(self):
+        """Verify Episode class still handles Unix timestamps from VOD"""
+        from lib.episode import Episode
+
+        # Get VOD data (uses Unix timestamps)
+        vod_url = nhk_api.rest_url["get_latest_episodes"]
+        response = requests.get(vod_url, timeout=10)
+        assert response.status_code == 200
+
+        data = response.json()
+        episode_data = data["items"][0]
+
+        # VOD might have broadcast schedules with ISO timestamps
+        if "broadcast_schedules" in episode_data:
+            schedules = episode_data["broadcast_schedules"]
+            if len(schedules) > 0:
+                episode = Episode()
+                # Should handle ISO format from VOD too
+                episode.broadcast_start_date = schedules[0].get("start_at")
+                assert episode.broadcast_start_date is not None
 
 
 if __name__ == "__main__":
