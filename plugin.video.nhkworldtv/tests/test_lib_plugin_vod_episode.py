@@ -42,15 +42,12 @@ def test_add_playable_episode_needs_to_be_resolved(test_episode):
     assert "plugin:///" in path
 
 
-# Resolve URLs from NHK
-def test_get_media_information_api_url(test_episode):
-    vod_id = test_episode.vod_id
-    assert vod.get_media_information_api_url(vod_id).startswith('https://api01-platform.stream.co.jp/apiservice/getMediaByParam/')
-
-
+# Resolve episode from NHK using new API (provides video URL directly)
 def test_resolve_episode_from_NHK(test_episode):
 
     resolved_episode = plugin.resolve_vod_episode(test_episode.vod_id)
     assert resolved_episode.url is not None
+    # New API provides HLS URL directly
+    assert "masterpl.hls.nhkworld.jp" in resolved_episode.url
     assert resolved_episode.video_info["height"] == "720"
 

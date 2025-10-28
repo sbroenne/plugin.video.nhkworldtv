@@ -39,7 +39,7 @@ def show_notification(title, message, time_ms=5000):
 
 
 def get_video_info():
-    """Returns a list item video info for 720p (only supported resolution)
+    """Returns a list item video info for HD streams
 
     Returns:
         [dict]: A video_info dict

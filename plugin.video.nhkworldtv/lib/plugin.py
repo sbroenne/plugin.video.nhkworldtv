@@ -1,6 +1,7 @@
 """
 Main plugin code
 """
+
 import random
 
 import routing
@@ -9,15 +10,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
-from . import (
-    ataglance,
-    kodiutils,
-    nhk_api,
-    topstories,
-    url,
-    utils,
-    vod,
-)
+from . import ataglance, kodiutils, nhk_api, topstories, url, utils, vod
 from .episode import Episode
 
 plugin = routing.Plugin()
@@ -187,7 +180,6 @@ def ataglance_index():
     episodes = []
 
     for episode in ataglance_episodes:
-
         episodes.append(
             (
                 plugin.url_for(
@@ -218,28 +210,30 @@ def ataglance_index():
 
 # Add on-demand menu item
 def add_on_demand_menu_item():
-    """
-    On-demand - Menu item
-    
+    """Adds a single on-demand menu item to the Kodi interface
+
     Returns:
         Episode or None if API call fails
     """
     xbmc.log("Adding on-demand menu item")
     # Getting random on-demand episode to show
     api_result = url.get_json(nhk_api.rest_url["homepage_ondemand"])
-    
-    if api_result is None or "data" not in api_result or "episodes" not in api_result["data"]:
-        xbmc.log("plugin.add_on_demand_menu_item: Failed to load on-demand data", xbmc.LOGERROR)
+
+    if api_result is None or "items" not in api_result:
+        xbmc.log(
+            "plugin.add_on_demand_menu_item: Failed to load on-demand data",
+            xbmc.LOGERROR,
+        )
         kodiutils.show_notification("NHK World TV", "Unable to load on-demand menu.")
         return None
-    
-    featured_episodes = api_result["data"]["episodes"]
+
+    featured_episodes = api_result["items"]
     no_of_episodes = len(featured_episodes)
-    
+
     if no_of_episodes == 0:
         xbmc.log("plugin.add_on_demand_menu_item: No episodes available", xbmc.LOGERROR)
         return None
-    
+
     pgm_title = None
     try_count = 0
     program_json = {}
@@ -251,15 +245,43 @@ def add_on_demand_menu_item():
         xbmc.log(f"Check if random episode has a valid title. Try count: {try_count}")
         featured_episode = random.randint(0, no_of_episodes - 1)
         program_json = featured_episodes[featured_episode]
-        pgm_title = program_json.get("title_clean")
+
+        pgm_title = program_json.get("title")
 
     if pgm_title:
         episode.title = kodiutils.get_string(30020)
+
+        sub_title = program_json.get("subtitle", "")
         episode.plot = kodiutils.get_string(30022).format(
-            utils.get_episode_name(pgm_title, program_json.get("sub_title", ""))
+            utils.get_episode_name(pgm_title, sub_title)
         )
-        episode.thumb = program_json.get("image", "")
-        episode.fanart = program_json.get("image_l", "")
+
+        # Get images from API structure
+        images_obj = program_json.get("images", {})
+        if isinstance(images_obj, dict):
+            images = images_obj.get("landscape", [])
+            if images:
+                episode.thumb = images[0].get("url", "")
+                if len(images) > 1:
+                    episode.fanart = images[-1].get("url", "")
+                else:
+                    episode.fanart = episode.thumb
+            else:
+                episode.thumb = ""
+                episode.fanart = ""
+        elif isinstance(images_obj, list) and images_obj:
+            # Some endpoints return images as array directly
+            episode.thumb = (
+                images_obj[0].get("url", "") if images_obj[0] else ""
+            )
+            episode.fanart = (
+                images_obj[-1].get("url", "")
+                if len(images_obj) > 1
+                else episode.thumb
+            )
+        else:
+            episode.thumb = ""
+            episode.fanart = ""
 
         # Create the directory item
 
@@ -268,51 +290,61 @@ def add_on_demand_menu_item():
             plugin.handle, plugin.url_for(vod_index), episode.kodi_list_item, True
         )
     else:
-        xbmc.log("plugin.add_on_demand_menu_item: Could not find valid episode", xbmc.LOGWARNING)
+        xbmc.log(
+            "plugin.add_on_demand_menu_item: Could not find valid episode",
+            xbmc.LOGWARNING,
+        )
 
     return episode
 
 
 # Add live stream menu item
 def add_live_stream_menu_item():
-    """Creates a menu item for the NHK live stream (720p)
+    """Creates a menu item for the NHK live stream
 
     Returns:
-        [Episode]: Episode with the live stream, or None if API call fails
+        [Episode]: Episode with the live stream, or None if creation fails
     """
     xbmc.log("Adding live stream menu item")
-    api_result = url.get_json(nhk_api.rest_url["get_livestream"], False)
-    
-    if api_result is None or "channel" not in api_result or "item" not in api_result["channel"]:
-        xbmc.log("plugin.add_live_stream_menu_item: Failed to load live stream data", xbmc.LOGERROR)
-        kodiutils.show_notification("NHK World TV", "Unable to load live stream.")
-        return None
-    
-    program_json = api_result["channel"]["item"]
-    
-    if not program_json or len(program_json) == 0:
-        xbmc.log("plugin.add_live_stream_menu_item: No live stream data available", xbmc.LOGERROR)
-        kodiutils.show_notification("NHK World TV", "Live stream not available.")
-        return None
 
-    # Add live stream text
+    # Create basic live stream menu item
     episode = Episode()
-    episode.title = kodiutils.get_string(30030)
-
-    # Currently playing
-    row = program_json[0]
-
-    # Schedule Information
-    episode.thumb = row.get("thumbnail_s", "")
-    episode.fanart = row.get("thumbnail", "")
+    episode.title = kodiutils.get_string(30030)  # "NHK World TV Live"
+    episode.plot = "Watch NHK World TV live stream"
     episode.is_playable = True
     episode.playcount = 0
-
-    # Title and Description
-    plot = f"{row.get('title', '')}\n\n{row.get('description', '')}"
-    episode.plot = plot
-
     episode.url = nhk_api.rest_url["live_stream_url"]
+
+    # Try to get currently playing program info (optional - non-critical)
+    try:
+        api_result = url.get_json(nhk_api.rest_url["get_livestream"], False)
+
+        if (
+            api_result
+            and "channel" in api_result
+            and "item" in api_result["channel"]
+            and len(api_result["channel"]["item"]) > 0
+        ):
+            # Currently playing program found
+            row = api_result["channel"]["item"][0]
+            episode.thumb = row.get("thumbnail_s", "")
+            episode.fanart = row.get("thumbnail", "")
+
+            # Enhanced plot with current program info
+            title = row.get("title", "")
+            description = row.get("description", "")
+            if title or description:
+                episode.plot = (
+                    f"{title}\n\n{description}"
+                    if title and description
+                    else (title or description)
+                )
+    except Exception as e:
+        # Schedule info is optional, log but continue
+        xbmc.log(
+            f"Could not load live stream schedule (non-critical): {e}",
+            xbmc.LOGDEBUG,
+        )
 
     episode.video_info = kodiutils.get_video_info()
     xbmcplugin.addDirectoryItem(
@@ -329,7 +361,7 @@ def add_live_stream_menu_item():
 def add_schedule_today_menu_item():
     """
     Today's Schedule - Menu item
-    
+
     Returns:
         bool: True if successful, False otherwise
     """
@@ -340,9 +372,12 @@ def add_schedule_today_menu_item():
     episode.thumb = NHK_ICON
     episode.fanart = NHK_FANART
     episode.video_info = kodiutils.get_video_info()
-    
+
     xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(schedule_today_index), episode.kodi_list_item, True
+        plugin.handle,
+        plugin.url_for(schedule_today_index),
+        episode.kodi_list_item,
+        True,
     )
     return True
 
@@ -350,7 +385,7 @@ def add_schedule_today_menu_item():
 def add_schedule_past_menu_item():
     """
     Past Schedule - Menu item
-    
+
     Returns:
         bool: True if successful, False otherwise
     """
@@ -361,7 +396,7 @@ def add_schedule_past_menu_item():
     episode.thumb = NHK_ICON
     episode.fanart = NHK_FANART
     episode.video_info = kodiutils.get_video_info()
-    
+
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(schedule_past_index), episode.kodi_list_item, True
     )
@@ -371,7 +406,7 @@ def add_schedule_past_menu_item():
 def add_schedule_upcoming_menu_item():
     """
     Upcoming Schedule - Menu item
-    
+
     Returns:
         bool: True if successful, False otherwise
     """
@@ -382,9 +417,12 @@ def add_schedule_upcoming_menu_item():
     episode.thumb = NHK_ICON
     episode.fanart = NHK_FANART
     episode.video_info = kodiutils.get_video_info()
-    
+
     xbmcplugin.addDirectoryItem(
-        plugin.handle, plugin.url_for(schedule_upcoming_index), episode.kodi_list_item, True
+        plugin.handle,
+        plugin.url_for(schedule_upcoming_index),
+        episode.kodi_list_item,
+        True,
     )
     return True
 
@@ -392,37 +430,46 @@ def add_schedule_upcoming_menu_item():
 def _get_schedule_episodes(time_filter="all"):
     """
     Helper function to get schedule episodes with optional time filtering
-    
+
     Args:
         time_filter (str): "past", "today", "upcoming", or "all"
-        
+
     Returns:
         list: List of episode tuples for xbmcplugin.addDirectoryItems
     """
     from datetime import datetime, timezone
-    
+
     api_result = url.get_json(nhk_api.rest_url["get_livestream"], False)
-    
-    if api_result is None or "channel" not in api_result or "item" not in api_result["channel"]:
-        xbmc.log(f"plugin._get_schedule_episodes: Failed to load schedule data ({time_filter})", xbmc.LOGERROR)
+
+    if (
+        api_result is None
+        or "channel" not in api_result
+        or "item" not in api_result["channel"]
+    ):
+        xbmc.log(
+            f"plugin._get_schedule_episodes: Failed to load schedule data ({time_filter})",
+            xbmc.LOGERROR,
+        )
         kodiutils.show_notification("NHK World TV", "Unable to load schedule.")
         return []
-    
+
     program_json = api_result["channel"]["item"]
     episodes = []
     now = datetime.now(timezone.utc)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
-    
+
     for row in program_json:
         try:
             pub_date_str = row.get("pubDate")
             if not pub_date_str:
                 continue
-                
+
             # Parse the broadcast start time
-            broadcast_start = datetime.fromisoformat(pub_date_str.replace('Z', '+00:00'))
-            
+            broadcast_start = datetime.fromisoformat(
+                pub_date_str.replace("Z", "+00:00")
+            )
+
             # Apply time filter
             if time_filter == "past" and broadcast_start >= now:
                 continue
@@ -431,20 +478,22 @@ def _get_schedule_episodes(time_filter="all"):
                     continue
             elif time_filter == "upcoming" and broadcast_start <= now:
                 continue
-            
+
             episode = Episode()
             # Schedule Information
             episode.broadcast_start_date = row.get("pubDate")
             episode.broadcast_end_date = row.get("endDate")
-            
+
             # Program information
             episode.thumb = row.get("thumbnail_s", "")
             episode.fanart = row.get("thumbnail", "")
-            episode_name = utils.get_episode_name(row.get("title", ""), row.get("subtitle", ""))
+            episode_name = utils.get_episode_name(
+                row.get("title", ""), row.get("subtitle", "")
+            )
             title = utils.get_schedule_title(
                 episode.broadcast_start_date, episode.broadcast_end_date, episode_name
             )
-            
+
             vod_id = row.get("vod_id", "")
             episode.vod_id = vod_id
             if len(vod_id) > 0:
@@ -453,9 +502,9 @@ def _get_schedule_episodes(time_filter="all"):
                 episode.title = kodiutils.get_string(30063).format(title)
             else:
                 episode.title = title
-            
+
             episode.plot = utils.format_plot(episode_name, row.get("description", ""))
-            
+
             if episode.is_playable:
                 # Display the playable episode
                 episodes.append(add_playable_episode(episode))
@@ -463,15 +512,20 @@ def _get_schedule_episodes(time_filter="all"):
                 # Simply display text
                 episodes.append(
                     (
-                        plugin.url_for(show_textviewer_dialog_box, episode.title, episode.plot),
+                        plugin.url_for(
+                            show_textviewer_dialog_box, episode.title, episode.plot
+                        ),
                         episode.kodi_list_item,
                         False,
                     )
                 )
         except Exception as e:
-            xbmc.log(f"plugin._get_schedule_episodes: Error processing episode: {str(e)}", xbmc.LOGERROR)
+            xbmc.log(
+                f"plugin._get_schedule_episodes: Error processing episode: {str(e)}",
+                xbmc.LOGERROR,
+            )
             continue
-    
+
     return episodes
 
 
@@ -482,7 +536,7 @@ def schedule_today_index():
     """
     xbmc.log("Displaying today's schedule")
     episodes = _get_schedule_episodes("today")
-    
+
     if len(episodes) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         xbmcplugin.endOfDirectory(plugin.handle, succeeded=True, cacheToDisc=False)
@@ -500,7 +554,7 @@ def schedule_past_index():
     """
     xbmc.log("Displaying past schedule")
     episodes = _get_schedule_episodes("past")
-    
+
     if len(episodes) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         xbmcplugin.endOfDirectory(plugin.handle, succeeded=True, cacheToDisc=False)
@@ -518,7 +572,7 @@ def schedule_upcoming_index():
     """
     xbmc.log("Displaying upcoming schedule")
     episodes = _get_schedule_episodes("upcoming")
-    
+
     if len(episodes) > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
         xbmcplugin.endOfDirectory(plugin.handle, succeeded=True, cacheToDisc=False)
@@ -601,7 +655,6 @@ def vod_index():
         plugin.handle, plugin.url_for(vod_categories), list_item, True
     )
 
-
     # All
     list_item = xbmcgui.ListItem(kodiutils.get_string(30046), offscreen=True)
     list_item.setArt(art)
@@ -633,32 +686,48 @@ def vod_programs():
         [str] -- [Last program ID added]
     """
     api_result = url.get_json(nhk_api.rest_url["get_programs"])
-    if api_result is None or "vod_programs" not in api_result:
+    if api_result is None or "items" not in api_result:
         xbmc.log("VOD Programs API call failed", xbmc.LOGERROR)
-        kodiutils.show_notification("Error", "Unable to load programs. Please try again later.")
+        kodiutils.show_notification(
+            "Error", "Unable to load programs. Please try again later."
+        )
         return None
-    
-    program_json = api_result["vod_programs"].get("programs", {})
+
+    program_json = api_result["items"]
     row_count = 0
     episodes = []
     program_id = None
 
-    for program_id in program_json:
-        row = program_json[program_id]
-        row_count = row_count + 1
-        total_episodes = int(row["total_episode"])
+    # API returns list of program objects
+    for row in program_json:
+        program_id = row.get("id")
+        if not program_id:
+            continue
+
+        row_count += 1
+        total_episodes = row.get("video_episodes", {}).get("total", 0)
+
         if total_episodes > 0:
-            # Only show programs that have at lease on episode
             episode = Episode()
             episode.title = kodiutils.get_episodelist_title(
-                row["title_clean"], total_episodes
+                row.get("title", "Unknown"), total_episodes
             )
-            episode.plot = row["description_clean"]
-            episode.thumb = row["image"]
-            episode.fanart = row["image_l"]
+            episode.plot = row.get("description", "")
+
+            # Get image from API structure
+            images = row.get("images", {}).get("landscape", [])
+            if images:
+                episode.thumb = images[0].get("url", "")
+                if len(images) > 1:
+                    episode.fanart = images[-1].get("url", "")
+                else:
+                    episode.fanart = episode.thumb
+            else:
+                episode.thumb = ""
+                episode.fanart = ""
+
             episode.video_info = kodiutils.get_video_info()
 
-            # Create the directory item
             episodes.append(
                 (
                     plugin.url_for(
@@ -690,26 +759,35 @@ def vod_categories():
         [str] -- [Last category ID added]
     """
     api_result_json = url.get_json(nhk_api.rest_url["get_categories"])
-    if api_result_json is None or "vod_categories" not in api_result_json:
+    if api_result_json is None or "items" not in api_result_json:
         xbmc.log("VOD Categories API call failed", xbmc.LOGERROR)
-        kodiutils.show_notification("Error", "Unable to load categories. Please try again later.")
+        kodiutils.show_notification(
+            "Error", "Unable to load categories. Please try again later."
+        )
         return None
-    
+
+    categories = api_result_json["items"]
     row_count = 0
     episodes = []
     category_id = None
-    for row in api_result_json["vod_categories"]:
+
+    for row in categories:
         row_count = row_count + 1
         episode = Episode()
 
-        episode.title = kodiutils.get_episodelist_title(row["name"], row["count"])
+        category_id = row["id"]
+        total_episodes = row.get("video_episodes", {}).get("total", 0)
+        episode.title = kodiutils.get_episodelist_title(
+            row["name"], total_episodes
+        )
+        # No icon in API, use empty string
         episode.absolute_image_url = True
-        episode.thumb = row["icon_l"]
-        episode.fanart = row["icon_l"]
+        episode.thumb = ""
+        episode.fanart = ""
+
         episode.video_info = kodiutils.get_video_info()
 
         # Create the directory item
-        category_id = row["category_id"]
         episodes.append(
             (
                 plugin.url_for(
@@ -778,16 +856,10 @@ def vod_episode_list(
     if len(episodes) > 0:
         playable_episodes = []
         if not unit_test:
-            xbmc.log(
-                f"vod_episode_list: {len(episodes)} episodes"
-            )
+            xbmc.log(f"vod_episode_list: {len(episodes)} episodes")
             for episode in episodes:
                 # Add the current episode directory item
-                playable_episodes.append(
-                    (
-                        add_playable_episode(episode)
-                    )
-                )
+                playable_episodes.append((add_playable_episode(episode)))
 
             xbmcplugin.addDirectoryItems(
                 plugin.handle, playable_episodes, len(playable_episodes)

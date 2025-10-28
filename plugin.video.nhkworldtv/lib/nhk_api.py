@@ -2,77 +2,44 @@
 NHK API URL Constants
 
 All API endpoints are hardcoded here instead of being dynamically parsed.
-This makes the codebase more maintainable and easier to update when NHK changes their API.
+This makes the codebase more maintainable and easier to update when NHK
+changes their API.
+
+Current API: api.nhkworld.jp/showsapi/v1/ (migrated October 28, 2025)
 """
 
 # API Base URLs
-NHK_API_BASE = "https://nwapi.nhk.jp/nhkworld/"
+NHK_API_BASE = "https://api.nhkworld.jp/showsapi/v1/"
 NHK_BASE = "https://www3.nhk.or.jp"
 
-# Current API version for VOD endpoints
-VOD_VERSION = "v7b"
-# Current API version for TV/EPG endpoints  
-TV_VERSION = "v7b"
 # Language
 LANG = "en"
 
 # NHK World API endpoints
 rest_url = {
-    # VOD - On Demand endpoints
-    'homepage_ondemand':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/mostwatch/all/{LANG}/all/all.json",
-    
-    'get_programs':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/program/all/{LANG}/voice/all.json",
-    
-    'get_programs_episode_list':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/episode/0/{LANG}/all/all.json",
-    
-    'get_categories':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/category/all/{LANG}/all/ondemand/all.json",
-    
-    'get_categories_episode_list':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/cat_esd/0/{LANG}/all/all.json",
-    
-    'get_latest_episodes':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/all/all/{LANG}/all/23.json",
-    
-    'get_most_watched_episodes':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/mostwatch/all/{LANG}/all/all.json",
-    
-    'get_all_episodes':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/all/all/{LANG}/all/all.json",
-    
-    'get_episode_detail':
-    f"{NHK_API_BASE}vodesdlist/{VOD_VERSION}/vod_id/{{0}}/{LANG}/all/1.json",
-    
+    # VOD - On Demand endpoints (new showsapi v1)
+    "homepage_ondemand": f"{NHK_API_BASE}{LANG}/video_episodes?limit=20",
+    "get_programs": f"{NHK_API_BASE}{LANG}/video_programs",
+    "get_programs_episode_list": f"{NHK_API_BASE}{LANG}/video_episodes",
+    "get_categories": f"{NHK_API_BASE}{LANG}/categories",
+    "get_categories_episode_list": f"{NHK_API_BASE}{LANG}/video_episodes",
+    "get_latest_episodes": f"{NHK_API_BASE}{LANG}/video_episodes?limit=23",
+    "get_most_watched_episodes": f"{NHK_API_BASE}{LANG}/video_episodes?limit=20",
+    "get_all_episodes": f"{NHK_API_BASE}{LANG}/video_episodes",
+    "get_episode_detail": f"{NHK_API_BASE}{LANG}/video_episodes/{{0}}",
     # TV - Live stream and EPG (HLS streaming)
-    'get_livestream':
-    f"{NHK_API_BASE}epg/{TV_VERSION}/world/now.json",
-    
-    'live_stream_url':
-    "https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index.m3u8",
-    
+    "get_livestream": f"{NHK_BASE}/nhkworld/en/live/",
+    "live_stream_url": "https://masterpl.hls.nhkworld.jp/hls/w/live/master.m3u8",
     # News endpoints
-    'homepage_news':
-    f"{NHK_BASE}/nhkworld/data/en/news/all.json",
-    
-    'news_detail':
-    f"{NHK_BASE}/nhkworld/data/en/news/{{0}}.json",
-    
-    'get_news_ataglance':
-    f"{NHK_BASE}/nhkworld/en/news/ataglance/index.json",
-    
-    'news_video_url':
-    "https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5",
-    
-    'ataglance_video_url':
-    "https://nhkworld-vh.akamaihd.net/i/nhkworld/english/news/ataglance/{0}/master.m3u8?set-akamai-hls-revision=5",
-    
-    # Player and video endpoints
-    'player_url':
-    f"{NHK_BASE}/nhkworld/common/player/tv/vod/world/player/js/movie-content-player.js",
-    
-    'video_url':
-    "https://movie-s.nhk.or.jp/ws/ws_program/api/67f5b750-b419-11e9-8a16-0e45e8988f42/apiv/5/mode/json?v={0}",
+    "homepage_news": f"{NHK_BASE}/nhkworld/data/en/news/all.json",
+    "news_detail": f"{NHK_BASE}/nhkworld/data/en/news/{{0}}.json",
+    "get_news_ataglance": f"{NHK_BASE}/nhkworld/en/news/ataglance/index.json",
+    "news_video_url": (
+        "https://nhkworld-vh.akamaihd.net/i/nhkworld/upld/medias/en/news/"
+        "{0},L,H,Q.mp4.csmil/master.m3u8?set-akamai-hls-revision=5"
+    ),
+    "ataglance_video_url": (
+        "https://nhkworld-vh.akamaihd.net/i/nhkworld/english/news/"
+        "ataglance/{0}/master.m3u8?set-akamai-hls-revision=5"
+    ),
 }

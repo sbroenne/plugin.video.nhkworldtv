@@ -1,7 +1,7 @@
 {
-  "launchOptions": {
-    "args": [
-      "--disable-http2"
-    ]
-  }
+    "launchOptions": {
+        "args": [
+            "--disable-http2"
+        ]
+    }
 }
