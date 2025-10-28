@@ -30,6 +30,30 @@ This is a **Kodi addon** for streaming NHK World TV content (live TV, on-demand 
 - Cache API responses to minimize network requests (60 minutes minimum)
 - Always check if URLs exist before attempting to play media
 
+### Dependency Version Management
+
+**CRITICAL RULE**: The Kodi repository (https://mirrors.kodi.tv/addons/omega/) is the single source of truth for all addon dependency versions.
+
+**Workflow for dependency updates:**
+
+1. **Check Kodi Repository First**: Navigate to https://mirrors.kodi.tv/addons/omega/ and verify the latest available version for each dependency
+2. **Update addon.xml**: Update the version numbers in `plugin.video.nhkworldtv/addon.xml` to match the Kodi repository
+3. **Update Pipfile**: Update the version numbers in `Pipfile` to match the versions in `addon.xml`
+
+**Important Notes:**
+
+- Never assume a version exists in the Kodi repository - always verify
+- Binary addons (like `inputstream.adaptive`) use platform-specific naming in the repository (e.g., `inputstream.adaptive+windows-x86_64/`) but are referenced without the platform suffix in `addon.xml`
+- Script modules use the `script.module.*` prefix in the repository
+- The Pipfile comment should always state: `# Match versions from addon.xml`
+
+**Direction of version synchronization:**
+
+```
+Kodi Repository → addon.xml → Pipfile
+(authoritative)   (runtime)    (development)
+```
+
 ### Error Handling
 
 ```python

@@ -3,11 +3,11 @@
     <requires>
         <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" version="2.31.0" />
-        <import addon="script.module.requests-cache" version="1.0.0" />
+        <import addon="script.module.requests-cache" version="0.5.2" />
         <import addon="script.module.routing" version="0.2.3" />
         <import addon="script.module.pytz" version="2023.3.0" />
         <import addon="script.module.tzlocal" version="5.0.1" />
-        <import addon="inputstream.adaptive" version="20.3.0" />
+        <import addon="inputstream.adaptive" version="21.5.16" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
@@ -33,23 +33,11 @@ Content is retrieved and played directly from the NHK World web site using HLS s
         <email>stefan_broenner@yahoo.com</email>
         <source>https://github.com/sbroenne/plugin.video.nhkworldtv</source>
         <forum>https://forum.kodi.tv/showthread.php?tid=353215</forum>
-        <news>v1.4.0
-- Simplified codebase: Removed dynamic API parser in favor of hardcoded URL constants (easier to maintain)
-- Removed Azure cloud cache dependency - episodes now resolve directly from NHK
-- Removed first-run wizard (no longer needed)
-- Removed 720p/1080p toggle - NHK only supports 720p for on-demand content
-- Removed deprecated News Programs section (no longer supported by NHK)
-- Added HLS streaming support via inputstream.adaptive
-- Updated dependencies for Kodi Omega compatibility
-- Enhanced error handling with user-friendly messages throughout
-- Cleaned up obsolete settings and code
-- Overall: Removed 2,500+ lines of code for better maintainability
-
-v1.2.0
-- Removed Playlists section
-- Changed Live stream to 720P as well
-- Support for the new NHK streaming infrastructure
-- Unfortunately, On-demand episodes now only play in 720p instead of 1080p
+        <news>
+        v1.4.0
+        - Updated to support the new NHK World website
+        - Now requires inputstream.adaptive for HLS streaming
+        - Requires Kodi Omega (v21) or later
         </news>
         <assets>
             <icon>resources/icon.png</icon>
