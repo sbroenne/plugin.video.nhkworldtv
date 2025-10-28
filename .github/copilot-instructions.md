@@ -10,7 +10,6 @@ This is a **Kodi addon** for streaming NHK World TV content (live TV, on-demand 
 - **Kodi API** (xbmc, xbmcgui, xbmcplugin, xbmcaddon) via kodistubs
 - **Requests** library with caching for API calls
 - **Pytest** for unit testing
-- **Playwright** for analyzing NHK website and API extraction
 
 ## Code Style & Best Practices
 
@@ -217,72 +216,6 @@ pipenv run pytest plugin.video.nhkworldtv/tests/test_lib_url.py -v
 
 ### Test Requirements
 
-- All new functions should have corresponding unit tests
-- Tests should use mocked Kodi API calls (xbmc, xbmcgui, etc.)
-- API tests should handle both successful and failed responses
-- Test for null safety and error conditions
-
-### Playwright for Website Analysis
-
-```bash
-# Analyze NHK website and extract API information
-npx playwright test tests/analyze_nhk_api.spec.ts
-```
-
-**IMPORTANT - NHK HTTP/1.1 Requirement**:
-NHK does not support HTTP/2. The Playwright configuration forces HTTP/1.1:
-
-- `playwright.config.ts` - Uses `--disable-http2` flag in launch args
-- `playwright-mcp-config.json` - MCP server config with HTTP/1.1 enforcement
-- `.vscode/mcp.json` - MCP server uses the config file
-
-**Verified Working** (October 28, 2025):
-
-- ✅ Playwright MCP server successfully accesses NHK website with HTTP/1.1
-- ✅ Can navigate to `https://www3.nhk.or.jp/nhkworld/`
-- ✅ Page snapshots work correctly
-- ✅ No HTTP/2 errors when properly configured
-
-Use Playwright MCP server tools to:
-
-- `mcp_playwright_browser_navigate` - Navigate to NHK website pages
-- `mcp_playwright_browser_snapshot` - Get accessibility snapshot of current page
-- `mcp_playwright_browser_network_requests` - Monitor API calls made by the page
-- `mcp_playwright_browser_take_screenshot` - Screenshot pages for documentation
-- `mcp_playwright_browser_evaluate` - Execute JavaScript to extract data from page
-
-## MCP Servers Available
-
-### GitHub MCP Server
-
-Use for:
-
-- Creating issues
-- Managing pull requests
-- Searching code across repositories
-- Reviewing commits and branches
-
-### Playwright MCP Server
-
-**Configured with HTTP/1.1** (NHK requirement) - **VERIFIED WORKING**
-
-Use for:
-
-- `mcp_playwright_browser_navigate` - Navigate to NHK website (HTTP/1.1 working)
-- `mcp_playwright_browser_snapshot` - Extract accessible page structure
-- `mcp_playwright_browser_evaluate` - Execute JavaScript to extract API data
-- `mcp_playwright_browser_network_requests` - Monitor API calls
-- `mcp_playwright_browser_console_messages` - Capture browser console output
-- `mcp_playwright_browser_take_screenshot` - Screenshot pages
-
-**Installation**: Chrome browser must be installed first:
-
-```bash
-npx playwright install chrome
-```
-
-## Common Tasks
-
 ### Adding a New API Endpoint
 
 1. Add endpoint URL to `nhk_api.rest_url` dictionary in `nhk_api.py`
@@ -292,11 +225,11 @@ npx playwright install chrome
 
 ### Debugging API Issues
 
-1. Use Playwright MCP to navigate to NHK website
-2. Monitor network requests for working API calls with `mcp_playwright_browser_network_requests`
-3. Extract headers or cookies if needed
-4. Verify endpoint URLs match those in `nhk_api.py`
-5. Check for null responses and empty data arrays
+1. Check API endpoints defined in `nhk_api.py`
+2. Verify endpoint URLs are correct
+3. Check for null responses and empty data arrays
+4. Add proper error handling for null responses
+5. Test with integration tests in `test_integration_nhk_api.py`
 
 ### Fixing Test Failures
 
