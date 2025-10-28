@@ -87,7 +87,7 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
 
         episode.title = episode_name
         episode.plot = row.get("description", "")
-        
+
         # Get images from new API structure
         images_obj = row.get("images", {})
         if isinstance(images_obj, dict):
@@ -95,9 +95,7 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
             if images:
                 episode.thumb = images[0].get("url", "")
                 episode.fanart = (
-                    images[-1].get("url", "")
-                    if len(images) > 1
-                    else episode.thumb
+                    images[-1].get("url", "") if len(images) > 1 else episode.thumb
                 )
             else:
                 episode.thumb = ""
@@ -106,9 +104,7 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
             # Some endpoints return images as array directly
             episode.thumb = images_obj[0].get("url", "") if images_obj[0] else ""
             episode.fanart = (
-                images_obj[-1].get("url", "")
-                if len(images_obj) > 1
-                else episode.thumb
+                images_obj[-1].get("url", "") if len(images_obj) > 1 else episode.thumb
             )
         else:
             episode.thumb = ""
@@ -150,9 +146,7 @@ def resolve_vod_episode(vod_id):
     )
 
     # Get episode detail with null safety
-    episode_result = url.get_json(
-        nhk_api.rest_url["get_episode_detail"].format(vod_id)
-    )
+    episode_result = url.get_json(nhk_api.rest_url["get_episode_detail"].format(vod_id))
 
     if episode_result is None:
         xbmc.log(
@@ -190,7 +184,7 @@ def resolve_vod_episode(vod_id):
 
     episode.plot = episode_detail.get("description", "")
     episode.pgm_no = episode_detail.get("pgm_no", "")
-    
+
     # Get duration from video info or movie_duration field
     video_info = episode_detail.get("video", {})
     episode.duration = episode_detail.get("movie_duration") or video_info.get(
@@ -202,9 +196,7 @@ def resolve_vod_episode(vod_id):
         video_url = video_info.get("url")
         if video_url:
             episode.url = video_url
-            xbmc.log(
-                f"vod.resolve_vod_episode: Got video URL for {vod_id}"
-            )
+            xbmc.log(f"vod.resolve_vod_episode: Got video URL for {vod_id}")
             episode.video_info = kodiutils.get_video_info()
             episode.is_playable = True
             return episode
@@ -213,16 +205,12 @@ def resolve_vod_episode(vod_id):
                 f"vod.resolve_vod_episode: Empty video URL for {vod_id}",
                 xbmc.LOGERROR,
             )
-            kodiutils.show_notification(
-                "NHK World TV", "Video is not available."
-            )
+            kodiutils.show_notification("NHK World TV", "Video is not available.")
             return None
     else:
         xbmc.log(
             f"vod.resolve_vod_episode: No video URL in API response for {vod_id}",
             xbmc.LOGERROR,
         )
-        kodiutils.show_notification(
-            "NHK World TV", "Video is not available."
-        )
+        kodiutils.show_notification("NHK World TV", "Video is not available.")
         return None

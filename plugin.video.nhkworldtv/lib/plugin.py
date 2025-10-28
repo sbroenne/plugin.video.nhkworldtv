@@ -271,13 +271,9 @@ def add_on_demand_menu_item():
                 episode.fanart = ""
         elif isinstance(images_obj, list) and images_obj:
             # Some endpoints return images as array directly
-            episode.thumb = (
-                images_obj[0].get("url", "") if images_obj[0] else ""
-            )
+            episode.thumb = images_obj[0].get("url", "") if images_obj[0] else ""
             episode.fanart = (
-                images_obj[-1].get("url", "")
-                if len(images_obj) > 1
-                else episode.thumb
+                images_obj[-1].get("url", "") if len(images_obj) > 1 else episode.thumb
             )
         else:
             episode.thumb = ""
@@ -777,9 +773,7 @@ def vod_categories():
 
         category_id = row["id"]
         total_episodes = row.get("video_episodes", {}).get("total", 0)
-        episode.title = kodiutils.get_episodelist_title(
-            row["name"], total_episodes
-        )
+        episode.title = kodiutils.get_episodelist_title(row["name"], total_episodes)
         # No icon in API, use empty string
         episode.absolute_image_url = True
         episode.thumb = ""
