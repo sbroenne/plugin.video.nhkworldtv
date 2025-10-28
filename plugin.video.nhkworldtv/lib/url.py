@@ -1,6 +1,7 @@
 """
 URL / Request handling
 """
+
 import sqlite3
 import time
 
@@ -10,36 +11,34 @@ import xbmc
 import xbmcaddon
 from requests.models import Response
 
-from . import api_keys
+from . import nhk_api
 
 # Get Plug-In path
 ADDON = xbmcaddon.Addon()
-PLUGIN_PATH = ADDON.getAddonInfo('path')
+PLUGIN_PATH = ADDON.getAddonInfo("path")
+
+# Cache configuration (60 minutes minimum)
+URL_CACHE_MINUTES = 60
+
 # Running within Kodi - use that path
 # Get Plug-In information
 DB_NAME = f"{PLUGIN_PATH}/nhk_world_cache"
-URL_CACHE_MINUTES = ADDON.getSettingInt('url_cache_minutes')
 if len(PLUGIN_PATH) == 0:
     # Running under unit test - overwrite location of DB
     DB_NAME = "nhk_world_cache"
-    URL_CACHE_MINUTES = 60
-
-# Enforce minimum 60 minutes caching
-if URL_CACHE_MINUTES < 60:
-    URL_CACHE_MINUTES = 60
 
 # Install the cache for requests
-requests_cache.install_cache(DB_NAME,
-                             backend="sqlite",
-                             expire_after=URL_CACHE_MINUTES * 60)
-requests_cache.remove_expired_responses()
+requests_cache.install_cache(
+    DB_NAME, backend="sqlite", expire_after=URL_CACHE_MINUTES * 60
+)
+# Note: remove_expired_responses() was removed in newer versions of requests-cache
+# The cache automatically handles expiration with the expire_after parameter
 
 # Instantiate request session
 session = requests.Session()
 # Act like a browser
 headers = {
-    'User-Agent':
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182"
 }
 session.headers = headers
 
@@ -59,7 +58,7 @@ def check_url_exists(url):
 
 
 def get_json(url, cached=True):
-    """ Get JSON object from a URL with improved error handling
+    """Get JSON object from a URL with improved error handling
 
     Args:
         url ([str]): URL to retrieve
@@ -83,17 +82,18 @@ def get_json(url, cached=True):
 
 
 def get_api_request_params(url):
-    """ Returns the API request parameters for the NHK and the Cache API
+    """Returns the API request parameters for the NHK API
 
     Args:
         url ([str]): Url
     Returns:
-        [str]: JSON string with the API key
+        [dict]: Empty dict for API URLs (no auth needed), None for others
     """
 
-    # Populate request_params if needed
-    if api_keys.NHK_API_BASE_URL in url:
-        request_params = {'apikey': api_keys.NHK_API_KEY}
+    # Check if this is an NHK API URL
+    if nhk_api.NHK_API_BASE in url or nhk_api.NHK_BASE in url:
+        # API key is no longer required per commit 05d1548
+        request_params = {}
     else:
         request_params = None
 
@@ -101,7 +101,7 @@ def get_api_request_params(url):
 
 
 def request_url(url, cached=True):
-    """ HELPER: Request URL with handling basic error conditions
+    """HELPER: Request URL with handling basic error conditions
 
     Args:
         url ([str]): URL to retrieve
@@ -170,11 +170,13 @@ def get_url(url, cached=True):
 
         if status_code == 200:
             # Call was successful
-            xbmc.log(f"Successfully fetched URL: {url} - Status {status_code} \
-                    - Retrieved from cache {request.from_cache}")
+            xbmc.log(
+                f"Successfully fetched URL: {url} - Status {status_code} \
+                    - Retrieved from cache {request.from_cache}"
+            )
             break
 
-        elif (status_code == 502 or status_code == 10002):
+        elif status_code == 502 or status_code == 10002:
             # Bad Gateway or SQL Lite Operational exception - can be retried
             if current_try == max_retries:
                 # Max retries reached - still could not get url
@@ -182,14 +184,16 @@ def get_url(url, cached=True):
                 # with the NHK Website
                 xbmc.log(
                     f"FATAL: Could not get URL {url} after {current_try} retries",
-                    xbmc.LOGDEBUG)
+                    xbmc.LOGDEBUG,
+                )
                 break
             else:
                 # Try again - this usually fixes the error with
                 # the next request
                 xbmc.log(
                     f"Temporary failure fetching URL: {url} with Status {status_code})",
-                    xbmc.LOGDEBUG)
+                    xbmc.LOGDEBUG,
+                )
 
                 # Wait for 1s before the next call
                 time.sleep(1)
@@ -197,7 +201,8 @@ def get_url(url, cached=True):
             # Other HTTP error - FATAL, do not retry
             xbmc.log(
                 f"FATAL: Could not get URL: {url} - HTTP Status Code {status_code}",
-                xbmc.LOGDEBUG)
+                xbmc.LOGDEBUG,
+            )
             break
 
         current_try = current_try + 1
@@ -206,6 +211,6 @@ def get_url(url, cached=True):
 
 
 def get_nhk_website_url(path):
-    """ Return a full URL from the partial URLs in the JSON results """
-    nhk_website = api_keys.NHK_BASE_URL
+    """Return a full URL from the partial URLs in the JSON results"""
+    nhk_website = nhk_api.NHK_BASE
     return nhk_website + path

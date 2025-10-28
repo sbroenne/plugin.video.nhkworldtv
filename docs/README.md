@@ -32,8 +32,6 @@ Content is retrieved and played directly from the NHK World web site or their co
 
 NHK used to support 1080P but now (February 2024) only supports 720P.
 
-The plug-in uses a [companion cloud cache service](https://github.com/sbroenne/nhkworldtv-backend) to speed up video play-back because these NHK APIs are very slow.
-
 ## 1.3. How-to Install
 
 I submitted the plugin to the official Kodi repo but unfortunately this request was declined. The reason is that the they only accept one plugin per content provider.
@@ -52,15 +50,9 @@ If you like to add the other content that can be found in Best Of NHK, please fe
 
 ### 1.4.2. Performance
 
-"Snappiness" was one of my design goals when developing this plug-in. For example, most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to two hours)
+"Snappiness" was one of my design goals when developing this plug-in. Most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to 240 minutes).
 
-The plug-in uses a companion cloud service to speed up video play-back because these NHK APIs are very slow.
-
-You can disable this in Settings if you do not want to use this - the only downside is that starting playback of video will take a bit longer and that you will loose a bit of UI functionality (e.g. Kodi will not store how much of a program you have already watched)
-
-You can find the source code for the cloud service at [NHK World TV Azure Backend](https://github.com/sbroenne/nhkworldtv-backend).
-
-The cache runs on Azure and is implemented as Azure Functions backed by Cosmos DB. It gets updated with new episodes multiple times per day.
+Episodes are resolved dynamically when you select them for playback.
 
 ## 1.5. Known Issues
 
@@ -70,9 +62,9 @@ If you have a problem **after an update**, simply exit Kodi and start it again -
 
 The plug-in is feature complete and stable.
 
-Most of the NHK API is parsed and **not** hard-coded so this should make the plug-in more resilient to changes on the NHK web site. I also run scheduled unit tests on Github to alert me on breaking changes.
+API endpoints are now hardcoded constants (v7b API version) which makes the plug-in more maintainable. Scheduled unit tests run on Github to alert on breaking changes.
 
-The plug-in is localized but translation only exists for English (GB). It only runs on Kodi Nexus.
+The plug-in is localized but translation only exists for English (GB). It only runs on Kodi Nexus and later.
 
 ## 1.7. Future development roadmap
 
@@ -80,7 +72,7 @@ There are no main open topics.
 
 ## 1.8. Local development environment
 
-You will find scripts to build the plugin in locally in the [build](./build/) folder. [More Information](./build/readme.md)
+You will find scripts to build the plugin in locally in the [build](../build/) folder. [More Information](build.md)
 
 ## 1.9. Bugs & Issues
 

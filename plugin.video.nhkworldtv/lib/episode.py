@@ -1,6 +1,7 @@
 """
 Encapsulates all information of an individual NHK Episode
 """
+
 from builtins import object
 from datetime import datetime
 
@@ -86,14 +87,22 @@ class Episode(object):
 
     @broadcast_start_date.setter
     def broadcast_start_date(self, value):
-        """Sets the current broadcast start date from the timestamp value"""
+        """Sets broadcast start date from timestamp or ISO 8601 string"""
         if value is None:
             self._broadcast_start_date = None
             self._date = None
             self._aired = None
         else:
-            timestamp = int(value) // 1000
-            local_date = utils.to_local_time(timestamp)
+            # Handle both Unix timestamp (int) and ISO 8601 string formats
+            if isinstance(value, str):
+                # ISO 8601 format (e.g., "2025-10-28T20:00:00+09:00")
+                from datetime import datetime
+
+                local_date = datetime.fromisoformat(value)
+            else:
+                # Unix timestamp (milliseconds)
+                timestamp = int(value) // 1000
+                local_date = utils.to_local_time(timestamp)
             self._broadcast_start_date = local_date
             self._date = local_date
             self._aired = local_date
@@ -105,12 +114,20 @@ class Episode(object):
 
     @broadcast_end_date.setter
     def broadcast_end_date(self, value):
-        """Sets the current broadcast end date from the timestamp value"""
+        """Sets broadcast end date from timestamp or ISO 8601 string"""
         if value is None:
             self._broadcast_end_date = None
         else:
-            timestamp = int(value) // 1000
-            local_date = utils.to_local_time(timestamp)
+            # Handle both Unix timestamp (int) and ISO 8601 string formats
+            if isinstance(value, str):
+                # ISO 8601 format (e.g., "2025-10-28T20:28:00+09:00")
+                from datetime import datetime
+
+                local_date = datetime.fromisoformat(value)
+            else:
+                # Unix timestamp (milliseconds)
+                timestamp = int(value) // 1000
+                local_date = utils.to_local_time(timestamp)
             self._broadcast_end_date = local_date
 
     @property
@@ -121,7 +138,10 @@ class Episode(object):
     @thumb.setter
     def thumb(self, value):
         """Sets thumbnail URL"""
-        if "/nhkworld/" in value and not self.absolute_image_url:
+        # Check if already a full URL (starts with http:// or https://)
+        if value and (value.startswith("http://") or value.startswith("https://")):
+            self._thumb = value
+        elif "/nhkworld/" in value and not self.absolute_image_url:
             self._thumb = url.get_nhk_website_url(value)
         else:
             self._thumb = value
@@ -133,8 +153,11 @@ class Episode(object):
 
     @fanart.setter
     def fanart(self, value):
-        """Sets thumbnail URL"""
-        if "/nhkworld/" in value and not self.absolute_image_url:
+        """Sets fanart URL"""
+        # Check if already a full URL (starts with http:// or https://)
+        if value and (value.startswith("http://") or value.startswith("https://")):
+            self._fanart = value
+        elif "/nhkworld/" in value and not self.absolute_image_url:
             self._fanart = url.get_nhk_website_url(value)
         else:
             self._fanart = value
@@ -205,6 +228,10 @@ class Episode(object):
             list_item = xbmcgui.ListItem(self.title, offscreen=True)
 
         list_item.setArt({"thumb": self.thumb, "fanart": self.fanart})
+        xbmc.log(
+            f"Episode art - thumb: {self.thumb}, fanart: {self.fanart}",
+            xbmc.LOGINFO,
+        )
         list_item.setLabel(self.title)
 
         # Get info label
@@ -216,6 +243,10 @@ class Episode(object):
             info_label["mediatype"] = "episode"
             list_item.setMimeType("application/x-mpegURL")
             list_item.setContentLookup(False)
+
+            # Enable inputstream.adaptive for HLS streams
+            list_item.setProperty("inputstream", "inputstream.adaptive")
+            list_item.setProperty("inputstream.adaptive.manifest_type", "hls")
 
         # Only add Stream Info if the the video_info property is not none
         if self.video_info is not None:
