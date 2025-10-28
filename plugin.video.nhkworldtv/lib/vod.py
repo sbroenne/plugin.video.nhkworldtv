@@ -35,7 +35,10 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
     # Get API result with null safety
     api_result = url.get_json(api_url)
     if api_result is None:
-        xbmc.log("vod.get_episode_list: API call failed - no response", xbmc.LOGERROR)
+        xbmc.log(
+            "vod.get_episode_list: API call failed - no response",
+            xbmc.LOGERROR,
+        )
         kodiutils.show_notification(
             "NHK World TV", "Unable to load episodes. Please try again later."
         )
@@ -95,16 +98,22 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
             if images:
                 episode.thumb = images[0].get("url", "")
                 episode.fanart = (
-                    images[-1].get("url", "") if len(images) > 1 else episode.thumb
+                    images[-1].get("url", "")
+                    if len(images) > 1
+                    else episode.thumb
                 )
             else:
                 episode.thumb = ""
                 episode.fanart = ""
         elif isinstance(images_obj, list) and images_obj:
             # Some endpoints return images as array directly
-            episode.thumb = images_obj[0].get("url", "") if images_obj[0] else ""
+            episode.thumb = (
+                images_obj[0].get("url", "") if images_obj[0] else ""
+            )
             episode.fanart = (
-                images_obj[-1].get("url", "") if len(images_obj) > 1 else episode.thumb
+                images_obj[-1].get("url", "")
+                if len(images_obj) > 1
+                else episode.thumb
             )
         else:
             episode.thumb = ""
@@ -138,19 +147,23 @@ def resolve_vod_episode(vod_id):
 
     # Handle empty vod_id
     if not vod_id or vod_id == "":
-        xbmc.log("vod.resolve_vod_episode: Empty vod_id provided", xbmc.LOGERROR)
+        xbmc.log(
+            "vod.resolve_vod_episode: Empty vod_id provided", xbmc.LOGERROR
+        )
         return None
 
     xbmc.log(
-        f"vod.resolve_vod_episode: Getting episode information for vod_id: {vod_id}"
+        f"vod.resolve_vod_episode: Getting episode info for {vod_id}"
     )
 
     # Get episode detail with null safety
-    episode_result = url.get_json(nhk_api.rest_url["get_episode_detail"].format(vod_id))
+    episode_result = url.get_json(
+        nhk_api.rest_url["get_episode_detail"].format(vod_id)
+    )
 
     if episode_result is None:
         xbmc.log(
-            f"vod.resolve_vod_episode: Failed to get episode details for {vod_id}",
+            f"vod.resolve_vod_episode: Failed to get details for {vod_id}",
             xbmc.LOGERROR,
         )
         kodiutils.show_notification(
@@ -205,12 +218,16 @@ def resolve_vod_episode(vod_id):
                 f"vod.resolve_vod_episode: Empty video URL for {vod_id}",
                 xbmc.LOGERROR,
             )
-            kodiutils.show_notification("NHK World TV", "Video is not available.")
+            kodiutils.show_notification(
+                "NHK World TV", "Video is not available."
+            )
             return None
     else:
         xbmc.log(
-            f"vod.resolve_vod_episode: No video URL in API response for {vod_id}",
+            f"vod.resolve_vod_episode: No video URL for {vod_id}",
             xbmc.LOGERROR,
         )
-        kodiutils.show_notification("NHK World TV", "Video is not available.")
+        kodiutils.show_notification(
+            "NHK World TV", "Video is not available."
+        )
         return None

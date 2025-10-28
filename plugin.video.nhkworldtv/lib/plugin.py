@@ -224,14 +224,19 @@ def add_on_demand_menu_item():
             "plugin.add_on_demand_menu_item: Failed to load on-demand data",
             xbmc.LOGERROR,
         )
-        kodiutils.show_notification("NHK World TV", "Unable to load on-demand menu.")
+        kodiutils.show_notification(
+            "NHK World TV", "Unable to load on-demand menu."
+        )
         return None
 
     featured_episodes = api_result["items"]
     no_of_episodes = len(featured_episodes)
 
     if no_of_episodes == 0:
-        xbmc.log("plugin.add_on_demand_menu_item: No episodes available", xbmc.LOGERROR)
+        xbmc.log(
+            "plugin.add_on_demand_menu_item: No episodes available",
+            xbmc.LOGERROR,
+        )
         return None
 
     pgm_title = None
@@ -242,7 +247,9 @@ def add_on_demand_menu_item():
     # Find a valid random episode to highlight
     while pgm_title is None and try_count < 10:  # Prevent infinite loop
         try_count = try_count + 1
-        xbmc.log(f"Check if random episode has a valid title. Try count: {try_count}")
+        xbmc.log(
+            f"Check random episode title. Try count: {try_count}"
+        )
         featured_episode = random.randint(0, no_of_episodes - 1)
         program_json = featured_episodes[featured_episode]
 

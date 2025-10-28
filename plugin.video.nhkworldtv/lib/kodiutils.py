@@ -32,8 +32,10 @@ def show_notification(title, message, time_ms=5000):
         time_ms (int): Display time in milliseconds (default 5000)
     """
     try:
-        xbmcgui.Dialog().notification(title, message, xbmcgui.NOTIFICATION_INFO, time_ms)
-    except Exception as e:
+        xbmcgui.Dialog().notification(
+            title, message, xbmcgui.NOTIFICATION_INFO, time_ms
+        )
+    except Exception:
         # Fallback to log if notification fails (e.g., during unit tests)
         xbmc.log(f"Notification: {title} - {message}", xbmc.LOGINFO)
 
@@ -56,7 +58,9 @@ def get_sd_video_info():
     return video_info
 
 
-def set_video_directory_information(plugin_handle, sort_method, content_type="videos"):
+def set_video_directory_information(
+    plugin_handle, sort_method, content_type="videos"
+):
     """Sets the metadata like SORT_METHOD on the
     current Kodi directory
 
