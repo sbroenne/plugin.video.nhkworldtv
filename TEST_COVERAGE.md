@@ -7,7 +7,7 @@ Unit tests are only used for pure logic/utility functions with no external depen
 
 ## Integration Tests (23 tests - Real API calls)
 
-File: `tests/integration_test_nhk_api.py`
+File: `tests/test_integration_nhk_api.py`
 
 ### VOD Endpoints (10 tests)
 - ✅ Homepage on-demand episodes
@@ -78,7 +78,7 @@ File: `tests/integration_test_nhk_api.py`
 pipenv run pytest plugin.video.nhkworldtv/tests/ -v
 
 # Integration tests only (slower, requires network)
-pipenv run pytest plugin.video.nhkworldtv/tests/integration_test_nhk_api.py -v
+pipenv run pytest plugin.video.nhkworldtv/tests/test_integration_nhk_api.py -v
 
 # Unit tests only (fast, no network)
 pipenv run pytest plugin.video.nhkworldtv/tests/test_lib*.py -v
