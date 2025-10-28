@@ -224,19 +224,14 @@ def add_on_demand_menu_item():
             "plugin.add_on_demand_menu_item: Failed to load on-demand data",
             xbmc.LOGERROR,
         )
-        kodiutils.show_notification(
-            "NHK World TV", "Unable to load on-demand menu."
-        )
+        kodiutils.show_notification("NHK World TV", "Unable to load on-demand menu.")
         return None
 
     featured_episodes = api_result["items"]
     no_of_episodes = len(featured_episodes)
 
     if no_of_episodes == 0:
-        xbmc.log(
-            "plugin.add_on_demand_menu_item: No episodes available",
-            xbmc.LOGERROR,
-        )
+        xbmc.log("plugin.add_on_demand_menu_item: No episodes available", xbmc.LOGERROR)
         return None
 
     pgm_title = None
@@ -247,9 +242,7 @@ def add_on_demand_menu_item():
     # Find a valid random episode to highlight
     while pgm_title is None and try_count < 10:  # Prevent infinite loop
         try_count = try_count + 1
-        xbmc.log(
-            f"Check random episode title. Try count: {try_count}"
-        )
+        xbmc.log(f"Check if random episode has a valid title. Try count: {try_count}")
         featured_episode = random.randint(0, no_of_episodes - 1)
         program_json = featured_episodes[featured_episode]
 
@@ -320,27 +313,30 @@ def add_live_stream_menu_item():
 
     # Try to get currently playing program info (optional - non-critical)
     try:
-        api_result = url.get_json(nhk_api.rest_url["get_livestream"], False)
+        # EPG URL requires current date in YYYYMMDD format
+        from datetime import datetime
 
-        if (
-            api_result
-            and "channel" in api_result
-            and "item" in api_result["channel"]
-            and len(api_result["channel"]["item"]) > 0
-        ):
-            # Currently playing program found
-            row = api_result["channel"]["item"][0]
-            episode.thumb = row.get("thumbnail_s", "")
+        today = datetime.now().strftime("%Y%m%d")
+        epg_url = f"{nhk_api.rest_url['get_livestream']}{today}.json"
+        api_result = url.get_json(epg_url, False)
+
+        if api_result and "data" in api_result and len(api_result["data"]) > 0:
+            # Currently playing program found (first in list is current)
+            row = api_result["data"][0]
+            episode.thumb = row.get("episodeThumbnailURL") or row.get("thumbnail", "")
             episode.fanart = row.get("thumbnail", "")
 
             # Enhanced plot with current program info
             title = row.get("title", "")
+            episode_title = row.get("episodeTitle", "")
             description = row.get("description", "")
-            if title or description:
+
+            program_name = f"{title}: {episode_title}" if episode_title else title
+            if program_name or description:
                 episode.plot = (
-                    f"{title}\n\n{description}"
-                    if title and description
-                    else (title or description)
+                    f"{program_name}\n\n{description}"
+                    if program_name and description
+                    else (program_name or description)
                 )
     except Exception as e:
         # Schedule info is optional, log but continue
@@ -442,21 +438,21 @@ def _get_schedule_episodes(time_filter="all"):
     """
     from datetime import datetime, timezone
 
-    api_result = url.get_json(nhk_api.rest_url["get_livestream"], False)
+    # EPG URL requires current date in YYYYMMDD format
+    today_str = datetime.now().strftime("%Y%m%d")
+    epg_url = f"{nhk_api.rest_url['get_livestream']}{today_str}.json"
 
-    if (
-        api_result is None
-        or "channel" not in api_result
-        or "item" not in api_result["channel"]
-    ):
+    api_result = url.get_json(epg_url, False)
+
+    if api_result is None or "data" not in api_result:
         xbmc.log(
-            f"plugin._get_schedule_episodes: Failed to load schedule data ({time_filter})",
+            f"plugin._get_schedule_episodes: Failed to load EPG ({time_filter})",
             xbmc.LOGERROR,
         )
         kodiutils.show_notification("NHK World TV", "Unable to load schedule.")
         return []
 
-    program_json = api_result["channel"]["item"]
+    program_json = api_result["data"]
     episodes = []
     now = datetime.now(timezone.utc)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -464,14 +460,12 @@ def _get_schedule_episodes(time_filter="all"):
 
     for row in program_json:
         try:
-            pub_date_str = row.get("pubDate")
-            if not pub_date_str:
+            start_time_str = row.get("startTime")
+            if not start_time_str:
                 continue
 
-            # Parse the broadcast start time
-            broadcast_start = datetime.fromisoformat(
-                pub_date_str.replace("Z", "+00:00")
-            )
+            # Parse the broadcast start time (ISO 8601 with timezone)
+            broadcast_start = datetime.fromisoformat(start_time_str)
 
             # Apply time filter
             if time_filter == "past" and broadcast_start >= now:
@@ -484,23 +478,29 @@ def _get_schedule_episodes(time_filter="all"):
 
             episode = Episode()
             # Schedule Information
-            episode.broadcast_start_date = row.get("pubDate")
-            episode.broadcast_end_date = row.get("endDate")
+            episode.broadcast_start_date = row.get("startTime")
+            episode.broadcast_end_date = row.get("endTime")
 
             # Program information
-            episode.thumb = row.get("thumbnail_s", "")
+            # EPG uses different field names than VOD API
+            episode.thumb = row.get("episodeThumbnailURL") or row.get("thumbnail", "")
             episode.fanart = row.get("thumbnail", "")
-            episode_name = utils.get_episode_name(
-                row.get("title", ""), row.get("subtitle", "")
-            )
+
+            # Combine title and episodeTitle
+            title = row.get("title", "")
+            episode_title = row.get("episodeTitle", "")
+            episode_name = utils.get_episode_name(title, episode_title)
+
             title = utils.get_schedule_title(
                 episode.broadcast_start_date, episode.broadcast_end_date, episode_name
             )
 
-            vod_id = row.get("vod_id", "")
-            episode.vod_id = vod_id
-            if len(vod_id) > 0:
-                # Can play on-demand -> Add "PLAY:" before the title and make it playable
+            # Check if VOD is available
+            vod_flag = row.get("vodFlag", 0)
+            episode_id = row.get("episodeId", "")
+            episode.vod_id = episode_id
+            if vod_flag == 1 and len(episode_id) > 0:
+                # Can play on-demand -> Add "PLAY:" and make playable
                 episode.is_playable = True
                 episode.title = kodiutils.get_string(30063).format(title)
             else:

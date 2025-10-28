@@ -28,7 +28,11 @@ rest_url = {
     "get_all_episodes": f"{NHK_API_BASE}{LANG}/video_episodes",
     "get_episode_detail": f"{NHK_API_BASE}{LANG}/video_episodes/{{0}}",
     # TV - Live stream and EPG (HLS streaming)
-    "get_livestream": f"{NHK_BASE}/nhkworld/en/live/",
+    # EPG endpoint - uses current date in YYYYMMDD format
+    # Format: https://masterpl.hls.nhkworld.jp/epg/w/{date}.json
+    # Example: https://masterpl.hls.nhkworld.jp/epg/w/20251028.json
+    # Note: Date must be dynamically generated at runtime
+    "get_livestream": "https://masterpl.hls.nhkworld.jp/epg/w/",
     "live_stream_url": "https://masterpl.hls.nhkworld.jp/hls/w/live/master.m3u8",
     # News endpoints
     "homepage_news": f"{NHK_BASE}/nhkworld/data/en/news/all.json",
