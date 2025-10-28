@@ -31,13 +31,24 @@ echo "2. Copying resources from $SOURCE_DIR to $DEST_DIR"
 cp $SOURCE_DIR/addon.xml $DEST_DIR
 cp $SOURCE_DIR/LICENSE $DEST_DIR
 cp $SOURCE_DIR/main.py $DEST_DIR
+# Copy lib files but exclude tests and __pycache__
 cp $SOURCE_DIR/lib/*.py $DEST_DIR/lib
+# Copy resources but exclude tests
 cp -r $SOURCE_DIR/resources $DEST_DIR
+
+echo "3. Cleaning up test files and cache"
+# Remove test directories and cache files
+rm -rf $DEST_DIR/tests
+rm -rf $DEST_DIR/lib/__pycache__
+rm -rf $DEST_DIR/lib/tests
+find $DEST_DIR -name "*.pyc" -delete
+find $DEST_DIR -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 
 # Set the local path (you need to adjust this)
 local_kodi=/mnt/c/Users/stefa/AppData/Roaming/Kodi
 # Change the <reuselanguageinvoker> to false - only needed for debugging
 sed -i "s/>true</>false</g" dist/plugin.video.nhkworldtv/addon.xml
+echo "4. Installing to Kodi"
 # Delete existing add on folder
 rm -rf $local_kodi/addons/plugin.video.nhkworldtv
 # Copy the new build
