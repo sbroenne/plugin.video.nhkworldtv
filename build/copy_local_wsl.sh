@@ -35,7 +35,7 @@ cp $SOURCE_DIR/lib/*.py $DEST_DIR/lib
 cp -r $SOURCE_DIR/resources $DEST_DIR
 
 # Set the local path (you need to adjust this)
-local_kodi=/c/Users/stefa/AppData/Roaming/Kodi
+local_kodi=/mnt/c/Users/stefa/AppData/Roaming/Kodi
 # Change the <reuselanguageinvoker> to false - only needed for debugging
 sed -i "s/>true</>false</g" dist/plugin.video.nhkworldtv/addon.xml
 # Delete existing add on folder
