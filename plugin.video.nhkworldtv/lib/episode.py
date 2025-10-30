@@ -95,10 +95,16 @@ class Episode(object):
         else:
             # Handle both Unix timestamp (int) and ISO 8601 string formats
             if isinstance(value, str):
-                # ISO 8601 format (e.g., "2025-10-28T20:00:00+09:00")
-                from datetime import datetime
+                # Check if string is a numeric timestamp
+                if value.isdigit():
+                    # Unix timestamp in milliseconds as a string
+                    timestamp = int(value) // 1000
+                    local_date = utils.to_local_time(timestamp)
+                else:
+                    # ISO 8601 format (e.g., "2025-10-28T20:00:00+09:00")
+                    from datetime import datetime
 
-                local_date = datetime.fromisoformat(value)
+                    local_date = datetime.fromisoformat(value)
             else:
                 # Unix timestamp (milliseconds)
                 timestamp = int(value) // 1000
@@ -120,10 +126,16 @@ class Episode(object):
         else:
             # Handle both Unix timestamp (int) and ISO 8601 string formats
             if isinstance(value, str):
-                # ISO 8601 format (e.g., "2025-10-28T20:28:00+09:00")
-                from datetime import datetime
+                # Check if string is a numeric timestamp
+                if value.isdigit():
+                    # Unix timestamp in milliseconds as a string
+                    timestamp = int(value) // 1000
+                    local_date = utils.to_local_time(timestamp)
+                else:
+                    # ISO 8601 format (e.g., "2025-10-28T20:28:00+09:00")
+                    from datetime import datetime
 
-                local_date = datetime.fromisoformat(value)
+                    local_date = datetime.fromisoformat(value)
             else:
                 # Unix timestamp (milliseconds)
                 timestamp = int(value) // 1000
@@ -217,8 +229,11 @@ class Episode(object):
 
     @property
     def kodi_list_item(self):
-        """Gets the current Kodi List Item"""
+        """Creates a Kodi List Item from Episode properties
 
+        Returns:
+            ListItem -- Kodi ListItem
+        """
         if self.url is not None:
             # Path was provided - created the ListItem with path
             list_item = xbmcgui.ListItem(path=self.url, offscreen=True)
@@ -247,6 +262,14 @@ class Episode(object):
             # Enable inputstream.adaptive for HLS streams
             list_item.setProperty("inputstream", "inputstream.adaptive")
             list_item.setProperty("inputstream.adaptive.manifest_type", "hls")
+
+            # Force highest quality streams (Kodi 20+)
+            # Use adaptive mode with unlimited bandwidth (0 = no limit)
+            # Based on inputstream.adaptive best practices
+            list_item.setProperty(
+                "inputstream.adaptive.stream_selection_type", "adaptive"
+            )
+            list_item.setProperty("inputstream.adaptive.chooser_bandwidth_max", "0")
 
         # Only add Stream Info if the the video_info property is not none
         if self.video_info is not None:

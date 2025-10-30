@@ -255,9 +255,11 @@ class TestImageAvailability:
             if program.get("thumbnail") or program.get("episodeThumbnailURL"):
                 programs_with_thumbnails += 1
 
-        # Many programs should have thumbnails (but not all - some are INFO/fillers)
-        assert programs_with_thumbnails >= 10, (
-            "Many schedule programs should have thumbnails"
+        # At least some programs should have thumbnails
+        # (but not all - some are INFO/fillers depending on time of day)
+        assert programs_with_thumbnails >= 5, (
+            f"Some schedule programs should have thumbnails, "
+            f"got {programs_with_thumbnails}/20"
         )
 
 
@@ -505,6 +507,174 @@ class TestEpisodeDataProcessing:
                 # Should handle ISO format from VOD too
                 episode.broadcast_start_date = schedules[0].get("start_at")
                 assert episode.broadcast_start_date is not None
+
+    def test_episode_handles_ataglance_timestamps(self):
+        """Verify Episode class handles string timestamps from At a Glance API"""
+        from lib.episode import Episode
+
+        # Get At a Glance data (uses string Unix timestamps)
+        ataglance_url = nhk_api.rest_url["get_news_ataglance"]
+        response = requests.get(ataglance_url, timeout=10)
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "data" in data and len(data["data"]) > 0
+
+        # Get first At a Glance item
+        item = data["data"][0]
+
+        # Create Episode and set posted_at timestamp
+        episode = Episode()
+
+        # The API returns timestamps as strings like "1761727200000"
+        # This should not crash!
+        posted_at = item.get("posted_at")
+        assert posted_at is not None, "At a Glance item should have posted_at"
+        assert isinstance(posted_at, str), "At a Glance posted_at should be a string"
+        assert posted_at.isdigit(), "At a Glance posted_at should be numeric string"
+
+        # This was throwing ValueError before the fix
+        episode.broadcast_start_date = posted_at
+
+        # Verify the timestamp was correctly parsed
+        assert episode.broadcast_start_date is not None, (
+            "Episode should handle numeric string timestamp from At a Glance"
+        )
+
+        # Verify it's a valid datetime
+        from datetime import datetime
+
+        assert isinstance(episode.broadcast_start_date, datetime), (
+            "broadcast_start_date should be a datetime object"
+        )
+
+        episode.broadcast_start_date = posted_at
+
+        # Verify date was set correctly
+        assert episode.broadcast_start_date is not None, (
+            "Episode should handle string Unix timestamp from At a Glance"
+        )
+
+
+class TestVODEpisodeResolution:
+    """Test VOD episode resolution with real API data"""
+
+    def test_resolve_vod_episode_extracts_fanart(self):
+        """Verify resolve_vod_episode extracts thumb and fanart from images"""
+        from lib import vod
+
+        # Get an episode ID from latest episodes
+        latest_url = nhk_api.rest_url["get_latest_episodes"]
+        response = requests.get(latest_url, timeout=10)
+        assert response.status_code == 200
+
+        data = response.json()
+        assert len(data["items"]) > 0
+
+        episode_id = data["items"][0]["id"]
+
+        # Resolve the episode (this tests the actual vod.resolve_vod_episode)
+        episode = vod.resolve_vod_episode(episode_id)
+
+        # Episode should be resolved successfully
+        assert episode is not None, f"Episode {episode_id} should be resolved"
+
+        # Episode should have video URL
+        assert episode.url is not None, "Episode should have video URL"
+        assert episode.url.startswith("https://"), "Video URL should be valid HTTPS URL"
+
+        # CRITICAL: Episode should have thumb and fanart set
+        assert episode.thumb is not None, (
+            "Episode should have thumbnail extracted from images"
+        )
+        assert episode.fanart is not None, (
+            "Episode should have fanart extracted from images"
+        )
+
+        # Both should be valid URLs
+        assert episode.thumb.startswith("http"), "Thumbnail should be valid HTTP URL"
+        assert episode.fanart.startswith("http"), "Fanart should be valid HTTP URL"
+
+    def test_resolve_vod_episode_handles_multiple_images(self):
+        """Verify resolve_vod_episode correctly uses first/last images"""
+        from lib import vod
+
+        # Get episode detail directly to check image structure
+        latest_url = nhk_api.rest_url["get_latest_episodes"]
+        response = requests.get(latest_url, timeout=10)
+        assert response.status_code == 200
+
+        episode_id = response.json()["items"][0]["id"]
+
+        # Get episode detail to check images array
+        detail_url = nhk_api.rest_url["get_episode_detail"].format(episode_id)
+        response = requests.get(detail_url, timeout=10)
+        assert response.status_code == 200
+
+        episode_detail = response.json()
+        assert "images" in episode_detail
+        images = episode_detail["images"]
+
+        # Resolve the episode
+        episode = vod.resolve_vod_episode(episode_id)
+        assert episode is not None
+
+        # If multiple images exist, fanart should be last image
+        if len(images) > 1:
+            # Images are dicts with 'url' key
+            expected_thumb_path = images[0].get("url", "")
+            expected_fanart_path = images[-1].get("url", "")
+
+            # Episode class converts relative URLs to absolute
+            # Check that the path is contained in the full URL
+            assert expected_thumb_path in episode.thumb, (
+                f"Thumb should contain image path: {expected_thumb_path}"
+            )
+
+            # Check that fanart matches last image
+            assert expected_fanart_path in episode.fanart, (
+                f"Fanart should contain image path: {expected_fanart_path}"
+            )
+        # If only one image, both should be the same
+        elif len(images) == 1:
+            expected_image_path = images[0].get("url", "")
+            assert expected_image_path in episode.thumb
+            assert expected_image_path in episode.fanart
+
+    def test_resolve_vod_episode_handles_missing_images(self):
+        """Verify resolve_vod_episode handles episodes with no images"""
+        from lib import vod
+
+        # Get multiple episodes to find one potentially without images
+        latest_url = nhk_api.rest_url["get_latest_episodes"]
+        response = requests.get(latest_url, timeout=10)
+        assert response.status_code == 200
+
+        episodes = response.json()["items"]
+
+        # Find episode with minimal or no images
+        for ep_data in episodes[:10]:  # Check first 10
+            episode_id = ep_data["id"]
+
+            # Get detail
+            detail_url = nhk_api.rest_url["get_episode_detail"].format(episode_id)
+            response = requests.get(detail_url, timeout=10)
+
+            if response.status_code == 200:
+                detail = response.json()
+                images = detail.get("images", [])
+
+                # Test resolution - should not crash even with no images
+                episode = vod.resolve_vod_episode(episode_id)
+
+                if episode:
+                    # If no images, thumb/fanart should be None or empty
+                    if not images or len(images) == 0:
+                        # Episode should still resolve (has video)
+                        assert episode.url is not None
+                        # Thumb/fanart may be None if no images
+                        # This is acceptable - we just shouldn't crash
+                        break
 
 
 if __name__ == "__main__":

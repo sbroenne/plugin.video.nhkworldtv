@@ -185,6 +185,28 @@ def resolve_vod_episode(vod_id):
     episode.plot = episode_detail.get("description", "")
     episode.pgm_no = episode_detail.get("pgm_no", "")
 
+    # Get images from episode detail
+    images_obj = episode_detail.get("images", {})
+    if isinstance(images_obj, dict):
+        images = images_obj.get("landscape", [])
+        if images:
+            episode.thumb = images[0].get("url", "")
+            episode.fanart = (
+                images[-1].get("url", "") if len(images) > 1 else episode.thumb
+            )
+        else:
+            episode.thumb = ""
+            episode.fanart = ""
+    elif isinstance(images_obj, list) and images_obj:
+        # Some endpoints return images as array directly
+        episode.thumb = images_obj[0].get("url", "") if images_obj[0] else ""
+        episode.fanart = (
+            images_obj[-1].get("url", "") if len(images_obj) > 1 else episode.thumb
+        )
+    else:
+        episode.thumb = ""
+        episode.fanart = ""
+
     # Get duration from video info or movie_duration field
     video_info = episode_detail.get("video", {})
     episode.duration = episode_detail.get("movie_duration") or video_info.get(
@@ -209,7 +231,7 @@ def resolve_vod_episode(vod_id):
             return None
     else:
         xbmc.log(
-            f"vod.resolve_vod_episode: No video URL in API response for {vod_id}",
+            f"vod.resolve_vod_episode: No video URL in response for {vod_id}",
             xbmc.LOGERROR,
         )
         kodiutils.show_notification("NHK World TV", "Video is not available.")
