@@ -508,6 +508,53 @@ class TestEpisodeDataProcessing:
                 episode.broadcast_start_date = schedules[0].get("start_at")
                 assert episode.broadcast_start_date is not None
 
+    def test_episode_handles_ataglance_timestamps(self):
+        """Verify Episode class handles string timestamps from At a Glance API"""
+        from lib.episode import Episode
+
+        # Get At a Glance data (uses string Unix timestamps)
+        ataglance_url = nhk_api.rest_url["get_news_ataglance"]
+        response = requests.get(ataglance_url, timeout=10)
+        assert response.status_code == 200
+
+        data = response.json()
+        assert "data" in data and len(data["data"]) > 0
+
+        # Get first At a Glance item
+        item = data["data"][0]
+
+        # Create Episode and set posted_at timestamp
+        episode = Episode()
+
+        # The API returns timestamps as strings like "1761727200000"
+        # This should not crash!
+        posted_at = item.get("posted_at")
+        assert posted_at is not None, "At a Glance item should have posted_at"
+        assert isinstance(posted_at, str), "At a Glance posted_at should be a string"
+        assert posted_at.isdigit(), "At a Glance posted_at should be numeric string"
+
+        # This was throwing ValueError before the fix
+        episode.broadcast_start_date = posted_at
+
+        # Verify the timestamp was correctly parsed
+        assert episode.broadcast_start_date is not None, (
+            "Episode should handle numeric string timestamp from At a Glance"
+        )
+
+        # Verify it's a valid datetime
+        from datetime import datetime
+
+        assert isinstance(episode.broadcast_start_date, datetime), (
+            "broadcast_start_date should be a datetime object"
+        )
+
+        episode.broadcast_start_date = posted_at
+
+        # Verify date was set correctly
+        assert episode.broadcast_start_date is not None, (
+            "Episode should handle string Unix timestamp from At a Glance"
+        )
+
 
 class TestVODEpisodeResolution:
     """Test VOD episode resolution with real API data"""
