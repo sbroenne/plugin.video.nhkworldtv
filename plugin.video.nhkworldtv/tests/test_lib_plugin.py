@@ -45,9 +45,7 @@ class TestAddPlayableEpisode:
 
         result = plugin.add_playable_episode(episode)
 
-        assert (
-            result[2] is False
-        ), "Third element should be False (not a folder)"
+        assert result[2] is False, "Third element should be False (not a folder)"
 
     def test_not_double_wrapped_in_tuple(self):
         """
@@ -77,12 +75,8 @@ class TestAddPlayableEpisode:
 
         # Demonstrate the bug: wrapping in tuple creates wrong structure
         wrong_structure = (result,)  # This is what the bug did
-        assert (
-            len(wrong_structure) == 1
-        ), "Bug creates single-element tuple"
-        assert isinstance(
-            wrong_structure[0], list
-        ), "Bug nests list in tuple"
+        assert len(wrong_structure) == 1, "Bug creates single-element tuple"
+        assert isinstance(wrong_structure[0], list), "Bug nests list in tuple"
 
         # The correct structure should unpack properly
         url, listitem, is_folder = result  # No ValueError = correct

@@ -61,6 +61,24 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
         title = row.get("title") or ""
         subtitle = row.get("subtitle") or ""
 
+        # If episode has no title, try to use the parent program title
+        if not title and not subtitle:
+            video_program = row.get("video_program", {})
+            program_title = video_program.get("title", "") if video_program else ""
+            if program_title:
+                title = program_title
+                xbmc.log(
+                    f"vod.get_episode_list: Using program title for episode id={row.get('id', 'unknown')}",
+                    xbmc.LOGDEBUG,
+                )
+            else:
+                # No title, subtitle, or program title - skip this episode
+                xbmc.log(
+                    f"vod.get_episode_list: Skipping episode with no title/subtitle/program, id={row.get('id', 'unknown')}",
+                    xbmc.LOGWARNING,
+                )
+                continue
+
         # Convert show_only_subtitle to int safely
         try:
             show_subtitle_only = int(show_only_subtitle) == 1

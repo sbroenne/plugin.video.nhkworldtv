@@ -748,14 +748,14 @@ def vod_programs():
         if not program_id:
             continue
 
-        row_count += 1
         total_episodes = row.get("video_episodes", {}).get("total", 0)
+        title = row.get("title", "").strip()
 
-        if total_episodes > 0:
+        # Skip programs with no episodes or no title
+        if total_episodes > 0 and title:
+            row_count += 1
             episode = Episode()
-            episode.title = kodiutils.get_episodelist_title(
-                row.get("title", "Unknown"), total_episodes
-            )
+            episode.title = kodiutils.get_episodelist_title(title, total_episodes)
             episode.plot = row.get("description", "")
 
             # Get image from API structure
