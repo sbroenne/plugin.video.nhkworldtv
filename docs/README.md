@@ -22,28 +22,27 @@ This plug-in is a fan project and not related in any way to NHK! I built this pl
 
 NHK World TV is a plug-in that displays most of the content from [NHK World Japan](https://www3.nhk.or.jp/nhkworld/en/live/) in Kodi.
 
-- **Live Stream in Full HD (1080p)** - Direct quality selection for best performance (automatic 720p fallback)
-- **On demand programs in 1080p** - Direct stream URLs for highest quality (automatic 720p fallback)
+- **Full HD (1080p) streaming** - Live TV and on-demand content with automatic 720p fallback
 - Browse and search through all programs
-- Live schedule / "EPG"
-- Top Stories and At a Glance
-- News programs like NEWSLINE, NEWSLINE IN DEPTH and NEWSROOM TOKYO
+- Live schedule / EPG
+- Top Stories and At a Glance news
+- Uses new NHK World API (`api.nhkworld.jp/showsapi/v1/`)
 
-Content is retrieved and played directly from the NHK World web site or their content delivery network.
+Content is retrieved and played directly from the NHK World web site or their content delivery network using the new NHK World API (`api.nhkworld.jp/showsapi/v1/`).
 
 ## 1.3. How-to Install
 
-I submitted the plugin to the official Kodi repo but unfortunately this request was declined. The reason is that the they only accept one plugin per content provider.
+The plugin is available through the [NHK World TV Development Repository](https://github.com/sbroenne/kodirepo). Install the [repository ZIP file](https://github.com/sbroenne/kodirepo/raw/main/repository.sbroenne/repository.sbroenne-0.0.16.zip) first, then install the plugin from the repository. The plug-in will **auto-update** itself regularly.
 
-For NHK World that is the **NHK Live** plugin.
-
-You can install the plugin by **first** installing the [NHK World TV Development Repository ZIP file](https://github.com/sbroenne/kodirepo/raw/main/repository.sbroenne/repository.sbroenne-0.0.16.zip). The plug-in will **auto-update** itself regularly from this repo.
+**Official Kodi Repository Status**: ✅ **PR submitted** - [PR #4718](https://github.com/xbmc/repo-plugins/pull/4718) is under review for inclusion in the official Kodi repository (Omega v21 and Piers v22).
 
 ## 1.4. Design Goals
 
 ### 1.4.1. Inclusion in the official Kodi Repo
 
-The design goal for the NHK World TV plug-in is to be included in the official Kodi repo and to include **only** content from the NHK World web site with the focus on the video-on-demand section - in hest best possible quality.
+The design goal for the NHK World TV plug-in is to be included in the official Kodi repo and to include **only** content from the NHK World web site with the focus on the video-on-demand section - in the best possible quality.
+
+**Current Status**: ✅ Submitted - [PR #4718](https://github.com/xbmc/repo-plugins/pull/4718) is under review for Kodi Omega (v21) and Piers (v22). See [SUBMISSION.md](SUBMISSION.md) for the submission process.
 
 If you like to add the other content that can be found in Best Of NHK, please feel free to clone - I will **not** accept PRs for adding content sources outside of NHK World itself.
 
@@ -61,13 +60,26 @@ If you have a problem **after an update**, simply exit Kodi and start it again -
 
 The plug-in is feature complete and stable.
 
-API endpoints are now hardcoded constants (v7b API version) which makes the plug-in more maintainable. Scheduled unit tests run on Github to alert on breaking changes.
+**Recent Updates (October 2025):**
 
-The plug-in is localized but translation only exists for English (GB). It only runs on Kodi Nexus and later.
+- Migrated to new NHK World API (`api.nhkworld.jp/showsapi/v1/`)
+- Removed authentication requirements (API now public)
+- Simplified video URL resolution (URLs provided directly by API)
+- API endpoints are hardcoded constants which makes the plug-in more maintainable
+- Scheduled unit tests run on Github to alert on breaking changes
+
+The plug-in is localized but translation only exists for English (GB). It runs on Kodi Omega (v21) and Piers (v22).
 
 ## 1.7. Future development roadmap
 
-There are no main open topics.
+Current priorities:
+
+- Monitor PR #4718 for official Kodi repository inclusion
+- Respond to any feedback from Kodi team review
+- Monitor for NHK API changes
+- Improve test coverage
+
+No major feature work planned - the plugin is feature complete.
 
 ## 1.8. Local development environment
 

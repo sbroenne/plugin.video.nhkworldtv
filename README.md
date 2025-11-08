@@ -1,6 +1,6 @@
 # NHK World TV Kodi Plugin
 
-A Kodi add-on for streaming NHK World TV content in Full HD (1080p)(live TV, on-demand videos & more).
+A Kodi add-on for streaming NHK World TV content in Full HD (1080p) with automatic 720p fallback.
 
 ## Documentation
 
@@ -16,12 +16,11 @@ A Kodi add-on for streaming NHK World TV content in Full HD (1080p)(live TV, on-
 
 ## Features
 
-- **Live Stream in Full HD (1080p)** - Direct quality selection for best performance (automatic 720p fallback)
-- **On-demand programs in 1080p** - Direct stream URLs for highest quality (automatic 720p fallback)
+- **Full HD (1080p) streaming** - Live TV and on-demand content with automatic 720p fallback
 - Browse and search through all programs
 - Live schedule / EPG
 - Top Stories and At a Glance news
-- Intelligent M3U8 playlist parsing for optimal quality selection
+- Uses new NHK World API (`api.nhkworld.jp/showsapi/v1/`)
 
 ## License
 

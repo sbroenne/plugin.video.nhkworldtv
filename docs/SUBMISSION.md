@@ -199,6 +199,7 @@ Common reasons for rejection:
 
 As of November 2025:
 
+- **Submission Status**: ✅ **PR submitted** - [PR #4718](https://github.com/xbmc/repo-plugins/pull/4718) to official Kodi repository
 - **Current Kodi Versions**: Omega (v21), Piers (v22)
 - **Plugin Version**: Check `addon.xml` for current version
 - **Python Version**: Python 3.12
