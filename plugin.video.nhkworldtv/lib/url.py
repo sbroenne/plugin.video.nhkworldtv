@@ -57,6 +57,148 @@ def check_url_exists(url):
             return True
 
 
+def check_stream_available(url, timeout=5):
+    """Check if a stream URL is available with a quick HEAD/GET request
+
+    Args:
+        url (str): Stream URL to check
+        timeout (int): Request timeout in seconds (default 5)
+
+    Returns:
+        bool: True if URL returns 200 or 206 (partial content), False otherwise
+    """
+    try:
+        with session.cache_disabled():
+            # Use stream=True to avoid downloading the entire file
+            request = session.get(url, timeout=timeout, stream=True)
+            return request.status_code in (200, 206)
+    except Exception as e:
+        xbmc.log(f"check_stream_available: Failed to check {url}: {e}", xbmc.LOGDEBUG)
+        return False
+
+
+def upgrade_to_1080p(url):
+    """Upgrade a video URL to highest quality available
+
+    Fetches the master playlist and parses it to find the highest
+    bitrate stream. Falls back to o-master.m3u8 pattern if parsing
+    fails.
+
+    Args:
+        url (str): Original video URL (master.m3u8)
+
+    Returns:
+        str: Highest quality stream URL, or original if parsing fails
+    """
+    if not url or "/master.m3u8" not in url:
+        xbmc.log(
+            "upgrade_to_1080p: URL doesn't contain /master.m3u8, returning original",
+            xbmc.LOGDEBUG,
+        )
+        return url
+
+    # Try o-master.m3u8 pattern first (contains 1080p variants)
+    url_1080p_master = url.replace("/master.m3u8", "/o-master.m3u8")
+
+    xbmc.log(
+        f"upgrade_to_1080p: Fetching playlist: {url_1080p_master}",
+        xbmc.LOGINFO,
+    )
+
+    try:
+        # Fetch the master playlist (disable cache for live content)
+        with session.cache_disabled():
+            response = session.get(url_1080p_master, timeout=10)
+            if response.status_code != 200:
+                xbmc.log(
+                    "upgrade_to_1080p: Failed to fetch o-master, trying regular",
+                    xbmc.LOGINFO,
+                )
+                response = session.get(url, timeout=10)
+                if response.status_code != 200:
+                    return url
+
+        playlist_content = response.text
+        base = url_1080p_master if response.url == url_1080p_master else url
+        highest_bitrate_url = _parse_highest_bitrate_stream(playlist_content, base)
+
+        if highest_bitrate_url:
+            xbmc.log(
+                f"upgrade_to_1080p: Selected highest quality: {highest_bitrate_url}",
+                xbmc.LOGINFO,
+            )
+            return highest_bitrate_url
+        else:
+            xbmc.log(
+                "upgrade_to_1080p: Could not parse playlist, using master",
+                xbmc.LOGINFO,
+            )
+            if check_stream_available(url_1080p_master):
+                return url_1080p_master
+            else:
+                return url
+
+    except Exception as e:
+        xbmc.log(
+            f"upgrade_to_1080p: Error parsing playlist: {e}, using fallback",
+            xbmc.LOGWARNING,
+        )
+        # Fallback to checking o-master.m3u8 availability
+        if check_stream_available(url_1080p_master):
+            return url_1080p_master
+        return url
+
+
+def _parse_highest_bitrate_stream(playlist_content, base_url):
+    """Parse HLS master playlist and return URL of highest bitrate stream
+
+    Args:
+        playlist_content (str): Content of the master playlist
+        base_url (str): Base URL to resolve relative paths
+
+    Returns:
+        str: URL of highest bitrate stream, or None if parsing fails
+    """
+    import re
+    from urllib.parse import urljoin
+
+    highest_bitrate = 0
+    highest_url = None
+
+    lines = playlist_content.split("\n")
+    for i, line in enumerate(lines):
+        # Look for EXT-X-STREAM-INF lines with BANDWIDTH
+        if line.startswith("#EXT-X-STREAM-INF:"):
+            # Extract BANDWIDTH value
+            match = re.search(r"BANDWIDTH=(\d+)", line)
+            if match:
+                bitrate = int(match.group(1))
+                # Next line should contain the stream URL
+                if i + 1 < len(lines):
+                    stream_url = lines[i + 1].strip()
+                    if stream_url and not stream_url.startswith("#"):
+                        # Convert relative URL to absolute
+                        if not stream_url.startswith("http"):
+                            # Get base path from master URL
+                            base_path = base_url.rsplit("/", 1)[0]
+                            stream_url = f"{base_path}/{stream_url}"
+                        else:
+                            stream_url = urljoin(base_url, stream_url)
+
+                        if bitrate > highest_bitrate:
+                            highest_bitrate = bitrate
+                            highest_url = stream_url
+
+    if highest_url:
+        xbmc.log(
+            f"_parse_highest_bitrate_stream: Found stream with "
+            f"bitrate {highest_bitrate}: {highest_url}",
+            xbmc.LOGINFO,
+        )
+
+    return highest_url
+
+
 def get_json(url, cached=True):
     """Get JSON object from a URL with improved error handling
 

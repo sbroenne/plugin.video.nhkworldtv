@@ -217,9 +217,13 @@ def resolve_vod_episode(vod_id):
     if video_info and "url" in video_info:
         video_url = video_info.get("url")
         if video_url:
-            episode.url = video_url
-            xbmc.log(f"vod.resolve_vod_episode: Got video URL for {vod_id}")
-            episode.video_info = kodiutils.get_video_info()
+            # Try to upgrade to 1080p if available
+            video_url_1080p = url.upgrade_to_1080p(video_url)
+            episode.url = video_url_1080p
+            xbmc.log(
+                f"vod.resolve_vod_episode: Got video URL for {vod_id}: {video_url_1080p}"
+            )
+            episode.video_info = kodiutils.get_video_info(video_url_1080p)
             episode.is_playable = True
             return episode
         else:

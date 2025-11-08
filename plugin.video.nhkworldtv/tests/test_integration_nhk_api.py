@@ -583,6 +583,20 @@ class TestVODEpisodeResolution:
         assert episode.url is not None, "Episode should have video URL"
         assert episode.url.startswith("https://"), "Video URL should be valid HTTPS URL"
 
+        # CRITICAL: Video URL should be upgraded to highest quality
+        # Check if URL has been processed by upgrade_to_1080p
+        # It should either be a direct variant URL (v1.m3u8, v2.m3u8, etc)
+        # or an o-master.m3u8 URL for 1080p
+        assert (
+            "/v1.m3u8" in episode.url
+            or "/v2.m3u8" in episode.url
+            or "/v3.m3u8" in episode.url
+            or "/o-master.m3u8" in episode.url
+        ), (
+            "Video URL should be upgraded to highest quality "
+            "variant or 1080p master"
+        )
+
         # CRITICAL: Episode should have thumb and fanart set
         assert episode.thumb is not None, (
             "Episode should have thumbnail extracted from images"
@@ -592,8 +606,12 @@ class TestVODEpisodeResolution:
         )
 
         # Both should be valid URLs
-        assert episode.thumb.startswith("http"), "Thumbnail should be valid HTTP URL"
-        assert episode.fanart.startswith("http"), "Fanart should be valid HTTP URL"
+        assert episode.thumb.startswith("http"), (
+            "Thumbnail should be valid HTTP URL"
+        )
+        assert episode.fanart.startswith("http"), (
+            "Fanart should be valid HTTP URL"
+        )
 
     def test_resolve_vod_episode_handles_multiple_images(self):
         """Verify resolve_vod_episode correctly uses first/last images"""
@@ -677,125 +695,39 @@ class TestVODEpisodeResolution:
                         break
 
 
-class TestVODEpisodeResolution:
-    """Test VOD episode resolution with real API data"""
+class TestLiveStreamQuality:
+    """Test live stream quality upgrade functionality"""
 
-    def test_resolve_vod_episode_extracts_fanart(self):
-        """Verify resolve_vod_episode extracts thumb and fanart from images"""
-        from lib import vod
+    def test_live_stream_upgrades_to_highest_quality(self):
+        """Verify live stream URL is upgraded to highest quality variant"""
+        from lib import url
 
-        # Get an episode ID from latest episodes
-        latest_url = nhk_api.rest_url["get_latest_episodes"]
-        response = requests.get(latest_url, timeout=10)
-        assert response.status_code == 200
+        # Start with base 720p live stream URL
+        base_url = nhk_api.rest_url["live_stream_url"]
+        upgraded_url = url.upgrade_to_1080p(base_url)
 
-        data = response.json()
-        assert len(data["items"]) > 0
-
-        episode_id = data["items"][0]["id"]
-
-        # Resolve the episode (this tests the actual vod.resolve_vod_episode)
-        episode = vod.resolve_vod_episode(episode_id)
-
-        # Episode should be resolved successfully
-        assert episode is not None, f"Episode {episode_id} should be resolved"
-
-        # Episode should have video URL
-        assert episode.url is not None, "Episode should have video URL"
-        assert episode.url.startswith("https://"), "Video URL should be valid HTTPS URL"
-
-        # CRITICAL: Episode should have thumb and fanart set
-        assert episode.thumb is not None, (
-            "Episode should have thumbnail extracted from images"
-        )
-        assert episode.fanart is not None, (
-            "Episode should have fanart extracted from images"
+        # Upgraded URL should be different from base
+        # (either direct variant or o-master.m3u8)
+        assert upgraded_url != base_url, (
+            "Live stream should be upgraded from base URL"
         )
 
-        # Both should be valid URLs
-        assert episode.thumb.startswith("http"), "Thumbnail should be valid HTTP URL"
-        assert episode.fanart.startswith("http"), "Fanart should be valid HTTP URL"
+        # Should contain either variant stream or 1080p master
+        assert (
+            "/v1.m3u8" in upgraded_url
+            or "/v2.m3u8" in upgraded_url
+            or "/v3.m3u8" in upgraded_url
+            or "/o-master.m3u8" in upgraded_url
+        ), (
+            "Live stream should be upgraded to direct variant "
+            "or 1080p master playlist"
+        )
 
-    def test_resolve_vod_episode_handles_multiple_images(self):
-        """Verify resolve_vod_episode correctly uses first/last images"""
-        from lib import vod
-
-        # Get episode detail directly to check image structure
-        latest_url = nhk_api.rest_url["get_latest_episodes"]
-        response = requests.get(latest_url, timeout=10)
-        assert response.status_code == 200
-
-        episode_id = response.json()["items"][0]["id"]
-
-        # Get episode detail to check images array
-        detail_url = nhk_api.rest_url["get_episode_detail"].format(episode_id)
-        response = requests.get(detail_url, timeout=10)
-        assert response.status_code == 200
-
-        episode_detail = response.json()
-        assert "images" in episode_detail
-        images = episode_detail["images"]
-
-        # Resolve the episode
-        episode = vod.resolve_vod_episode(episode_id)
-        assert episode is not None
-
-        # If multiple images exist, fanart should be last image
-        if len(images) > 1:
-            # Images are dicts with 'url' key
-            expected_thumb_path = images[0].get("url", "")
-            expected_fanart_path = images[-1].get("url", "")
-
-            # Episode class converts relative URLs to absolute
-            # Check that the path is contained in the full URL
-            assert expected_thumb_path in episode.thumb, (
-                f"Thumb should contain image path: {expected_thumb_path}"
-            )
-
-            # Check that fanart matches last image
-            assert expected_fanart_path in episode.fanart, (
-                f"Fanart should contain image path: {expected_fanart_path}"
-            )
-        # If only one image, both should be the same
-        elif len(images) == 1:
-            expected_image_path = images[0].get("url", "")
-            assert expected_image_path in episode.thumb
-            assert expected_image_path in episode.fanart
-
-    def test_resolve_vod_episode_handles_missing_images(self):
-        """Verify resolve_vod_episode handles episodes with no images"""
-        from lib import vod
-
-        # Get multiple episodes to find one potentially without images
-        latest_url = nhk_api.rest_url["get_latest_episodes"]
-        response = requests.get(latest_url, timeout=10)
-        assert response.status_code == 200
-
-        episodes = response.json()["items"]
-
-        # Find episode with minimal or no images
-        for ep_data in episodes[:10]:  # Check first 10
-            episode_id = ep_data["id"]
-
-            # Get detail
-            detail_url = nhk_api.rest_url["get_episode_detail"].format(episode_id)
-            response = requests.get(detail_url, timeout=10)
-
-            if response.status_code == 200:
-                detail = response.json()
-                images = detail.get("images", [])
-
-                # Test resolution - should not crash even with no images
-                episode = vod.resolve_vod_episode(episode_id)
-
-                if episode:
-                    # If no images, thumb/fanart should be None or empty
-                    if not images or len(images) == 0:
-                        # Episode should still resolve (has video)
-                        assert episode.url is not None
-                        # Thumb/fanart may be None if no images
-                        # This is acceptable - we just shouldn't crash
-                        break
+        # Verify upgraded URL is accessible
+        response = requests.head(upgraded_url, timeout=10)
+        assert response.status_code in (200, 206), (
+            f"Upgraded live stream should be accessible: {upgraded_url}"
+        )
 
 
 if __name__ == "__main__":

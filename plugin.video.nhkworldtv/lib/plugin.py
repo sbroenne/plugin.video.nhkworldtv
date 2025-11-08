@@ -320,7 +320,11 @@ def add_live_stream_menu_item():
     episode.plot = "Watch NHK World TV live stream"
     episode.is_playable = True
     episode.playcount = 0
-    episode.url = nhk_api.rest_url["live_stream_url"]
+
+    # Get live stream URL with automatic quality upgrade to 1080p
+    base_url = nhk_api.rest_url["live_stream_url"]
+    episode.url = url.upgrade_to_1080p(base_url)
+    xbmc.log(f"Live stream URL: {episode.url}", xbmc.LOGINFO)
 
     # Try to get currently playing program info (optional - non-critical)
     try:
@@ -377,7 +381,7 @@ def add_live_stream_menu_item():
             xbmc.LOGINFO,
         )
 
-    episode.video_info = kodiutils.get_video_info()
+    episode.video_info = kodiutils.get_video_info(episode.url)
     xbmcplugin.addDirectoryItem(
         plugin.handle, episode.url, episode.kodi_list_item, False
     )
