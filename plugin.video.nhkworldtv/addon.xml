@@ -26,7 +26,6 @@ Watch NHK World Japan in Full HD (1080p)
 - Top Stories and At a Glance news
 - Automatic quality selection (1080p/720p)
 
-
 Content is retrieved and played directly from the NHK World web site using HLS streaming with adaptive bitrate selection.
         </description>
         <disclaimer lang="en_GB">This plugin is a fan project and not related in any way to NHK!</disclaimer>
