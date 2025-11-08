@@ -113,18 +113,13 @@ def test_parse_highest_bitrate_stream_empty_playlist():
 
 
 def test_upgrade_to_1080p_with_live_stream():
-    """Test that live stream URL gets upgraded to highest quality variant"""
+    """Test that live stream URL attempts to upgrade to o-master"""
     # Test with actual live stream base URL structure
     base_url = "https://masterpl.hls.nhkworld.jp/hls/w/live/master.m3u8"
     result = url.upgrade_to_1080p(base_url)
 
-    # Result should be upgraded (either direct variant or o-master)
-    assert result != base_url, "URL should be upgraded from base"
-
-    # Should contain quality indicator
-    assert (
-        "/v1.m3u8" in result
-        or "/v2.m3u8" in result
-        or "/v3.m3u8" in result
-        or "/o-master.m3u8" in result
-    ), "Should upgrade to variant or 1080p master"
+    # Result should either be upgraded to o-master.m3u8 or stay at master.m3u8
+    # (depending on availability check)
+    expected_1080p = "https://masterpl.hls.nhkworld.jp/hls/w/live/o-master.m3u8"
+    assert result in [base_url, expected_1080p], \
+        f"Expected either {base_url} or {expected_1080p}, got {result}"

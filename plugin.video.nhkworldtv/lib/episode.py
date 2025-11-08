@@ -262,14 +262,9 @@ class Episode(object):
             # Enable inputstream.adaptive for HLS streams
             list_item.setProperty("inputstream", "inputstream.adaptive")
             list_item.setProperty("inputstream.adaptive.manifest_type", "hls")
-
-            # Force highest quality streams (Kodi 20+)
-            # Use adaptive mode with unlimited bandwidth (0 = no limit)
-            # Based on inputstream.adaptive best practices
-            list_item.setProperty(
-                "inputstream.adaptive.stream_selection_type", "adaptive"
-            )
-            list_item.setProperty("inputstream.adaptive.chooser_bandwidth_max", "0")
+            
+            # Let inputstream.adaptive handle stream selection automatically
+            # Remove stream_selection_type to allow proper audio/video multiplexing
 
         # Only add Stream Info if the the video_info property is not none
         if self.video_info is not None:
