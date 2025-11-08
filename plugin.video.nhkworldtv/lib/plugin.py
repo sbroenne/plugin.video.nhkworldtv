@@ -901,7 +901,7 @@ def vod_episode_list(
             xbmc.log(f"vod_episode_list: {len(episodes)} episodes")
             for episode in episodes:
                 # Add the current episode directory item
-                playable_episodes.append((add_playable_episode(episode)))
+                playable_episodes.append(add_playable_episode(episode))
 
             xbmcplugin.addDirectoryItems(
                 plugin.handle, playable_episodes, len(playable_episodes)

@@ -3,7 +3,7 @@ URL / Request handling
 """
 
 import time
-from typing import Optional, Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import requests
 import xbmc
@@ -33,9 +33,7 @@ def _get_cache_key(url: str, params: Optional[dict] = None) -> str:
     return url
 
 
-def _get_cached_response(
-    url: str, params: Optional[dict] = None
-) -> Optional[str]:
+def _get_cached_response(url: str, params: Optional[dict] = None) -> Optional[str]:
     """Get cached response if available and not expired"""
     cache_key = _get_cache_key(url, params)
     if cache_key in _response_cache:
@@ -340,16 +338,14 @@ def get_url(url, cached=True):
             if current_try == max_retries:
                 # Max retries reached - still could not get url
                 xbmc.log(
-                    f"FATAL: Could not get URL {url} "
-                    f"after {current_try} retries",
+                    f"FATAL: Could not get URL {url} after {current_try} retries",
                     xbmc.LOGDEBUG,
                 )
                 break
             else:
                 # Try again - this usually fixes the error
                 xbmc.log(
-                    f"Temporary failure fetching URL: {url} "
-                    f"with Status {status_code})",
+                    f"Temporary failure fetching URL: {url} with Status {status_code})",
                     xbmc.LOGDEBUG,
                 )
 
@@ -358,8 +354,7 @@ def get_url(url, cached=True):
         else:
             # Other HTTP error - FATAL, do not retry
             xbmc.log(
-                f"FATAL: Could not get URL: {url} - "
-                f"HTTP Status Code {status_code}",
+                f"FATAL: Could not get URL: {url} - HTTP Status Code {status_code}",
                 xbmc.LOGDEBUG,
             )
             break
