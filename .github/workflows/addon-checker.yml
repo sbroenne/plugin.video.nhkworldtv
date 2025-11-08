@@ -1,0 +1,54 @@
+name: Kodi Addon Validation
+
+on:
+    pull_request:
+        branches: [main, master]
+    push:
+        branches: [main, master]
+
+jobs:
+    validate-omega:
+        name: Validate for Kodi Omega (v21)
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Install kodi-addon-checker
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install kodi-addon-checker
+
+            - name: Run addon validation for Omega
+              run: |
+                  kodi-addon-checker --branch=omega plugin.video.nhkworldtv
+
+    validate-piers:
+        name: Validate for Kodi Piers (v22)
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Install kodi-addon-checker
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install kodi-addon-checker
+
+            - name: Run addon validation for Piers
+              run: |
+                  kodi-addon-checker --branch=piers plugin.video.nhkworldtv

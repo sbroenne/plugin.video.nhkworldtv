@@ -1,41 +1,71 @@
 name: Create NHK World TV Release for Kodi
 
 on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - "v*.*.*" # Push events to matching v*, i.e. v1.0, v20.15.10
+    push:
+        # Sequence of patterns matched against refs/tags
+        tags:
+            - "v*.*.*" # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  build:
-    name: Check, build and release plugin
-    runs-on: ubuntu-24.04
-  
-    steps:
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12' 
+    validate:
+        name: Validate addon
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
 
-      - name: Checkout code
-        uses: actions/checkout@v5
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
 
-      - name: Install dependencies with pipenv
-        run: |
-          sudo apt install pipenv
-          pipenv install --dev
+            - name: Install kodi-addon-checker
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install kodi-addon-checker
 
-      # - name: Run kodi-addon-checker for Matrix branch
-      #   id: kodi-addon-checker
-      #   run: |
-      #     pipenv run kodi-addon-checker --branch nexus plugin.video.nhkworldtv
+            - name: Run addon validation for Omega
+              run: |
+                  kodi-addon-checker --branch=omega plugin.video.nhkworldtv
 
-      - name: Build plugin for Nexus # ZIP archives
-        id: build_plugin
-        run: |
-          pipenv run submit-addon -z -s plugin.video.nhkworldtv
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: plugin.video.nhkworldtv-*.zip
+    build:
+        name: Build and release plugin
+        runs-on: ubuntu-24.04
+        needs: validate
+        steps:
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - name: Install dependencies with pipenv
+              run: |
+                  sudo apt install pipenv
+                  pipenv install --dev
+
+            - name: Build plugin ZIP archive
+              id: build_plugin
+              run: |
+                  pipenv run submit-addon -z plugin.video.nhkworldtv
+
+            - name: Create Release
+              id: create_release
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: plugin.video.nhkworldtv-*.zip
+                  body: |
+                      ## Installation
+                      Download the ZIP file and install via Kodi's "Install from zip file" option.
+
+                      ## Changelog
+                      See addon.xml for detailed changes.
+
+                      ## Compatibility
+                      - Kodi Omega (v21) and later

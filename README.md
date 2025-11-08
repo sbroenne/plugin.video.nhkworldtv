@@ -6,6 +6,7 @@ A Kodi add-on for streaming NHK World TV content in Full HD (1080p)(live TV, on-
 
 - [Main Documentation](docs/README.md) - Complete plugin documentation
 - [Build Instructions](docs/build.md) - Local development and build setup
+- [Submission Guide](docs/SUBMISSION.md) - How to submit to official Kodi repository
 
 ## Quick Links
 
