@@ -48,7 +48,7 @@ If you like to add the other content that can be found in Best Of NHK, please fe
 
 ### 1.4.2. Performance
 
-"Snappiness" was one of my design goals when developing this plug-in. Most calls to NHK are cached (requests-cache) for a while so that navigation is faster (defaults to 240 minutes).
+"Snappiness" was one of my design goals when developing this plug-in. API calls to NHK are cached in memory for a while so that navigation is faster (defaults to 60 minutes).
 
 Episodes are resolved dynamically when you select them for playback.
 
@@ -74,12 +74,9 @@ The plug-in is localized but translation only exists for English (GB). It runs o
 
 Current priorities:
 
-- Monitor PR #4718 for official Kodi repository inclusion
-- Respond to any feedback from Kodi team review
-- Monitor for NHK API changes
-- Improve test coverage
+#- Monitor for NHK API changes
 
-No major feature work planned - the plugin is feature complete.
+No major feature work planned - the plugin is feature complete. If you have an idea, simply create an issue.
 
 ## 1.8. Local development environment
 

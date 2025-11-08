@@ -3,7 +3,7 @@
 ## Project Context
 
 **What**: Kodi addon for streaming NHK World TV (live TV, on-demand videos, news)
-**Tech Stack**: Python 3.12, Kodi API (xbmc/xbmcgui/xbmcplugin), Requests with caching, Pytest
+**Tech Stack**: Python 3.12, Kodi API (xbmc/xbmcgui/xbmcplugin), Requests with in-memory caching, Pytest
 **Current Status**: Submitted to official Kodi repo - [PR #4718](https://github.com/xbmc/repo-plugins/pull/4718)
 **Kodi Versions**: Omega (v21), Piers (v22)
 
