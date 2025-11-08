@@ -53,13 +53,14 @@ jobs:
             - name: Build plugin ZIP archive
               id: build_plugin
               run: |
-                  pipenv run submit-addon -z plugin.video.nhkworldtv
+                  cd plugin.video.nhkworldtv
+                  pipenv run submit-addon -z .
 
             - name: Create Release
               id: create_release
               uses: softprops/action-gh-release@v2
               with:
-                  files: plugin.video.nhkworldtv-*.zip
+                  files: plugin.video.nhkworldtv/plugin.video.nhkworldtv-*.zip
                   body: |
                       ## Installation
                       Download the ZIP file and install via Kodi's "Install from zip file" option.
