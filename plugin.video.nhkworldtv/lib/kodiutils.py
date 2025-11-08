@@ -1,6 +1,7 @@
 """
 Kodi specific utils
 """
+
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -25,15 +26,17 @@ def get_string(string_id):
 
 def show_notification(title, message, time_ms=5000):
     """Show a Kodi notification to the user
-    
+
     Args:
         title (str): Notification title
         message (str): Notification message
         time_ms (int): Display time in milliseconds (default 5000)
     """
     try:
-        xbmcgui.Dialog().notification(title, message, xbmcgui.NOTIFICATION_INFO, time_ms)
-    except Exception as e:
+        xbmcgui.Dialog().notification(
+            title, message, xbmcgui.NOTIFICATION_INFO, time_ms
+        )
+    except Exception:
         # Fallback to log if notification fails (e.g., during unit tests)
         xbmc.log(f"Notification: {title} - {message}", xbmc.LOGINFO)
 

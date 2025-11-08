@@ -592,10 +592,7 @@ class TestVODEpisodeResolution:
             or "/v2.m3u8" in episode.url
             or "/v3.m3u8" in episode.url
             or "/o-master.m3u8" in episode.url
-        ), (
-            "Video URL should be upgraded to highest quality "
-            "variant or 1080p master"
-        )
+        ), "Video URL should be upgraded to highest quality variant or 1080p master"
 
         # CRITICAL: Episode should have thumb and fanart set
         assert episode.thumb is not None, (
@@ -606,12 +603,8 @@ class TestVODEpisodeResolution:
         )
 
         # Both should be valid URLs
-        assert episode.thumb.startswith("http"), (
-            "Thumbnail should be valid HTTP URL"
-        )
-        assert episode.fanart.startswith("http"), (
-            "Fanart should be valid HTTP URL"
-        )
+        assert episode.thumb.startswith("http"), "Thumbnail should be valid HTTP URL"
+        assert episode.fanart.startswith("http"), "Fanart should be valid HTTP URL"
 
     def test_resolve_vod_episode_handles_multiple_images(self):
         """Verify resolve_vod_episode correctly uses first/last images"""
@@ -708,9 +701,7 @@ class TestLiveStreamQuality:
 
         # Upgraded URL should be different from base
         # (either direct variant or o-master.m3u8)
-        assert upgraded_url != base_url, (
-            "Live stream should be upgraded from base URL"
-        )
+        assert upgraded_url != base_url, "Live stream should be upgraded from base URL"
 
         # Should contain either variant stream or 1080p master
         assert (
@@ -718,10 +709,7 @@ class TestLiveStreamQuality:
             or "/v2.m3u8" in upgraded_url
             or "/v3.m3u8" in upgraded_url
             or "/o-master.m3u8" in upgraded_url
-        ), (
-            "Live stream should be upgraded to direct variant "
-            "or 1080p master playlist"
-        )
+        ), "Live stream should be upgraded to direct variant or 1080p master playlist"
 
         # Verify upgraded URL is accessible
         response = requests.head(upgraded_url, timeout=10)

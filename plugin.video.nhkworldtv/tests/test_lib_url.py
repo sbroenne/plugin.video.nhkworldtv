@@ -103,9 +103,7 @@ def test_parse_highest_bitrate_stream_empty_playlist():
     """Test parser handles empty or invalid playlist gracefully"""
     from lib.url import _parse_highest_bitrate_stream
 
-    result = _parse_highest_bitrate_stream(
-        "", "https://example.com/master.m3u8"
-    )
+    result = _parse_highest_bitrate_stream("", "https://example.com/master.m3u8")
     assert result is None
 
     result = _parse_highest_bitrate_stream(
