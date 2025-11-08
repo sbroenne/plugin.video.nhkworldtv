@@ -261,10 +261,6 @@ class Episode(object):
 
             # Enable inputstream.adaptive for HLS streams
             list_item.setProperty("inputstream", "inputstream.adaptive")
-            list_item.setProperty("inputstream.adaptive.manifest_type", "hls")
-            
-            # Let inputstream.adaptive handle stream selection automatically
-            # Remove stream_selection_type to allow proper audio/video multiplexing
 
         # Only add Stream Info if the the video_info property is not none
         if self.video_info is not None:

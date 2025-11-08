@@ -3,6 +3,7 @@ Main plugin code
 """
 
 import random
+import sys
 
 import routing
 import xbmc
@@ -321,19 +322,8 @@ def add_live_stream_menu_item():
     episode.is_playable = True
     episode.playcount = 0
 
-    # Get live stream URL - try 1080p first, fallback to 720p
-    # Use direct URL without availability check for live streams
-    url_1080p = nhk_api.rest_url["live_stream_url_1080p"]
-    url_720p = nhk_api.rest_url["live_stream_url"]
-    
-    # Try 1080p stream first
-    if url.check_stream_available(url_1080p, timeout=3):
-        episode.url = url_1080p
-        xbmc.log("Live stream: Using 1080p (o-master.m3u8)", xbmc.LOGINFO)
-    else:
-        episode.url = url_720p
-        xbmc.log("Live stream: Using 720p (master.m3u8)", xbmc.LOGINFO)
-    
+    # Use play route instead of direct URL for proper resolution
+    episode.url = plugin.url_for(play_live_stream)
     xbmc.log(f"Live stream URL: {episode.url}", xbmc.LOGINFO)
 
     # Try to get currently playing program info (optional - non-critical)
@@ -929,19 +919,73 @@ def vod_episode_list(
 # Video On Demand - Resolve episode
 @plugin.route("/vod/resolve_episode/<vod_id>/")
 def resolve_vod_episode(vod_id):
-    """Resolve a VOD episode directly from NHK (720p only)
-
-    Args:
-        vod_id ([str]): The VOD Id
-
-    Returns:
-        [Episode]: The resolved Episode - only used for unit testing
-    """
-
+    """Resolve a VOD episode with 1080p/720p handling like live stream"""
+    import requests
+    
     episode = vod.resolve_vod_episode(vod_id)
-    if episode is not None and episode.is_playable:
-        xbmcplugin.setResolvedUrl(plugin.handle, True, episode.kodi_list_item)
-        return episode
+    if episode is None or not episode.is_playable:
+        xbmcplugin.setResolvedUrl(plugin.handle, False, xbmcgui.ListItem())
+        return None
+    
+    # Get the URL (already upgraded to 1080p by vod.resolve_vod_episode)
+    video_url = episode.url
+    
+    # Check if 1080p is available, fallback to 720p
+    def check_url(u):
+        try:
+            r = requests.get(u, timeout=5, stream=True)
+            return r.status_code in (200, 206)
+        except Exception:
+            return False
+    
+    # If 1080p check fails, try 720p version
+    if not check_url(video_url):
+        # Downgrade from o-master.m3u8 to master.m3u8
+        video_url_720 = video_url.replace("/o-master.m3u8", "/master.m3u8")
+        if check_url(video_url_720):
+            video_url = video_url_720
+            xbmc.log(f"VOD: Using 720p for {vod_id}", xbmc.LOGINFO)
+        else:
+            xbmc.log(f"VOD: Stream unavailable for {vod_id}", xbmc.LOGERROR)
+            xbmcplugin.setResolvedUrl(plugin.handle, False, xbmcgui.ListItem())
+            return None
+    
+    xbmc.log(f"VOD: Playing {video_url}", xbmc.LOGINFO)
+    
+    # Create ListItem exactly like live stream
+    liz = xbmcgui.ListItem(path=video_url, offscreen=True)
+    liz.setProperty("inputstream", "inputstream.adaptive")
+    liz.setMimeType("application/x-mpegURL")
+    xbmcplugin.setResolvedUrl(plugin.handle, True, liz)
+    return episode
+
+
+@plugin.route("/live/play")
+def play_live_stream():
+    """Play live stream with 1080p/720p fallback"""
+    import requests
+
+    # Try 1080p URL first
+    url_1080 = nhk_api.rest_url["live_stream_url_1080p"]
+    url_720 = nhk_api.rest_url["live_stream_url"]
+    
+    def check_url(u):
+        try:
+            r = requests.get(u, timeout=5, stream=True)
+            return r.status_code in (200, 206)
+        except Exception:
+            return False
+    
+    # Try 1080p first
+    stream_url = url_1080 if check_url(url_1080) else url_720
+    
+    xbmc.log(f"Playing live stream: {stream_url}", xbmc.LOGINFO)
+    
+    # Create ListItem exactly like the other addon
+    liz = xbmcgui.ListItem(path=stream_url, offscreen=True)
+    liz.setProperty("inputstream", "inputstream.adaptive")
+    liz.setMimeType("application/x-mpegURL")
+    xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
 
 
 #  Play News or At A Glance Item
