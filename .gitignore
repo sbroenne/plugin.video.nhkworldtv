@@ -132,3 +132,7 @@ dmypy.json
 
 plugin.video.nhkworldtv/cov.xml
 plugin.video.nhkworldtv-*.zip
+
+# IDE and development
+.vscode/
+test-results/
