@@ -9,7 +9,7 @@ pytest = "*"
 coverage = "*"
 pytest-cov = "*"
 setuptools = "*"
-addon-submitter = {git = "https://github.com/romanvm/kodi-addon-submitter.git"}
+addon-submitter = {git = "https://github.com/xbmc/kodi-addon-submitter.git"}
 kodi-addon-checker = "*"
 
 [packages]
