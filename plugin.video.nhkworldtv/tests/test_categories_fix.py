@@ -25,15 +25,12 @@ def test_categories_url_includes_category_id():
     # Format it with the category ID
     formatted_url = url_template.format(category_id)
     
-    # Verify the URL includes the category parameter
-    assert "category=" in formatted_url, (
-        "Category URL should include 'category=' query parameter"
-    )
-    assert f"category={category_id}" in formatted_url, (
-        f"Category URL should include 'category={category_id}'"
+    # Verify the URL includes the category ID in the path
+    assert f"/categories/{category_id}/" in formatted_url, (
+        f"Category URL should include '/categories/{category_id}/' in path"
     )
     assert formatted_url == (
-        "https://api.nhkworld.jp/showsapi/v1/en/video_episodes?category=15"
+        f"https://api.nhkworld.jp/showsapi/v1/en/categories/{category_id}/video_episodes"
     ), "Category URL format is incorrect"
 
 
@@ -47,15 +44,12 @@ def test_programs_url_includes_program_id():
     # Format it with the program ID
     formatted_url = url_template.format(program_id)
     
-    # Verify the URL includes the program parameter
-    assert "program=" in formatted_url, (
-        "Program URL should include 'program=' query parameter"
-    )
-    assert f"program={program_id}" in formatted_url, (
-        f"Program URL should include 'program={program_id}'"
+    # Verify the URL includes the program ID in the path
+    assert f"/video_programs/{program_id}/" in formatted_url, (
+        f"Program URL should include '/video_programs/{program_id}/' in path"
     )
     assert formatted_url == (
-        "https://api.nhkworld.jp/showsapi/v1/en/video_episodes?program=world-prime"
+        f"https://api.nhkworld.jp/showsapi/v1/en/video_programs/{program_id}/video_episodes"
     ), "Program URL format is incorrect"
 
 
@@ -73,8 +67,8 @@ def test_different_categories_generate_different_urls():
     assert url_1 != url_2, (
         "Different category IDs should generate different URLs"
     )
-    assert "category=15" in url_1, "First URL should have category=15"
-    assert "category=20" in url_2, "Second URL should have category=20"
+    assert f"/categories/{category_id_1}/" in url_1, "First URL should have /categories/15/"
+    assert f"/categories/{category_id_2}/" in url_2, "Second URL should have /categories/20/"
 
 
 def test_different_programs_generate_different_urls():
@@ -91,8 +85,8 @@ def test_different_programs_generate_different_urls():
     assert url_1 != url_2, (
         "Different program IDs should generate different URLs"
     )
-    assert "program=world-prime" in url_1, "First URL should have program=world-prime"
-    assert "program=newsline" in url_2, "Second URL should have program=newsline"
+    assert f"/video_programs/{program_id_1}/" in url_1, "First URL should have /video_programs/world-prime/"
+    assert f"/video_programs/{program_id_2}/" in url_2, "Second URL should have /video_programs/newsline/"
 
 
 def test_url_base_structure_is_correct():
@@ -100,16 +94,12 @@ def test_url_base_structure_is_correct():
     categories_url = nhk_api.rest_url["get_categories_episode_list"]
     programs_url = nhk_api.rest_url["get_programs_episode_list"]
     
-    # Both should start with the same base URL
-    expected_base = "https://api.nhkworld.jp/showsapi/v1/en/video_episodes?"
-    
-    assert categories_url.startswith(expected_base), (
-        f"Categories URL should start with {expected_base}"
-    )
-    assert programs_url.startswith(expected_base), (
-        f"Programs URL should start with {expected_base}"
+    # Categories should use path structure /categories/{0}/video_episodes
+    assert "/categories/{0}/video_episodes" in categories_url, (
+        "Categories URL should use path parameter structure /categories/{0}/video_episodes"
     )
     
-    # But they should have different query parameters
-    assert "category=" in categories_url, "Categories URL should have 'category=' parameter"
-    assert "program=" in programs_url, "Programs URL should have 'program=' parameter"
+    # Programs should use path structure /video_programs/{0}/video_episodes
+    assert "/video_programs/{0}/video_episodes" in programs_url, (
+        "Programs URL should use path parameter structure /video_programs/{0}/video_episodes"
+    )
