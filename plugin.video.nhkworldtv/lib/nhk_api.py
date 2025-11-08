@@ -20,9 +20,9 @@ rest_url = {
     # VOD - On Demand endpoints (new showsapi v1)
     "homepage_ondemand": f"{NHK_API_BASE}{LANG}/video_episodes?limit=20",
     "get_programs": f"{NHK_API_BASE}{LANG}/video_programs",
-    "get_programs_episode_list": f"{NHK_API_BASE}{LANG}/video_episodes",
+    "get_programs_episode_list": f"{NHK_API_BASE}{LANG}/video_programs/{{0}}/video_episodes",
     "get_categories": f"{NHK_API_BASE}{LANG}/categories",
-    "get_categories_episode_list": f"{NHK_API_BASE}{LANG}/video_episodes",
+    "get_categories_episode_list": f"{NHK_API_BASE}{LANG}/categories/{{0}}/video_episodes",
     "get_latest_episodes": f"{NHK_API_BASE}{LANG}/video_episodes?limit=23",
     "get_most_watched_episodes": f"{NHK_API_BASE}{LANG}/video_episodes?limit=20",
     "get_all_episodes": f"{NHK_API_BASE}{LANG}/video_episodes",
