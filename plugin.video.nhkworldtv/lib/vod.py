@@ -61,6 +61,24 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
         title = row.get("title") or ""
         subtitle = row.get("subtitle") or ""
 
+        # If episode has no title, try to use the parent program title
+        if not title and not subtitle:
+            video_program = row.get("video_program", {})
+            program_title = video_program.get("title", "") if video_program else ""
+            if program_title:
+                title = program_title
+                xbmc.log(
+                    f"vod.get_episode_list: Using program title for episode id={row.get('id', 'unknown')}",
+                    xbmc.LOGDEBUG,
+                )
+            else:
+                # No title, subtitle, or program title - skip this episode
+                xbmc.log(
+                    f"vod.get_episode_list: Skipping episode with no title/subtitle/program, id={row.get('id', 'unknown')}",
+                    xbmc.LOGWARNING,
+                )
+                continue
+
         # Convert show_only_subtitle to int safely
         try:
             show_subtitle_only = int(show_only_subtitle) == 1
@@ -217,9 +235,13 @@ def resolve_vod_episode(vod_id):
     if video_info and "url" in video_info:
         video_url = video_info.get("url")
         if video_url:
-            episode.url = video_url
-            xbmc.log(f"vod.resolve_vod_episode: Got video URL for {vod_id}")
-            episode.video_info = kodiutils.get_video_info()
+            # Try to upgrade to 1080p if available
+            video_url_1080p = url.upgrade_to_1080p(video_url)
+            episode.url = video_url_1080p
+            xbmc.log(
+                f"vod.resolve_vod_episode: Got video URL for {vod_id}: {video_url_1080p}"
+            )
+            episode.video_info = kodiutils.get_video_info(video_url_1080p)
             episode.is_playable = True
             return episode
         else:

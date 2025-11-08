@@ -583,6 +583,17 @@ class TestVODEpisodeResolution:
         assert episode.url is not None, "Episode should have video URL"
         assert episode.url.startswith("https://"), "Video URL should be valid HTTPS URL"
 
+        # CRITICAL: Video URL should be upgraded to highest quality
+        # Check if URL has been processed by upgrade_to_1080p
+        # It should either be a direct variant URL (v1.m3u8, v2.m3u8, etc)
+        # or an o-master.m3u8 URL for 1080p
+        assert (
+            "/v1.m3u8" in episode.url
+            or "/v2.m3u8" in episode.url
+            or "/v3.m3u8" in episode.url
+            or "/o-master.m3u8" in episode.url
+        ), "Video URL should be upgraded to highest quality variant or 1080p master"
+
         # CRITICAL: Episode should have thumb and fanart set
         assert episode.thumb is not None, (
             "Episode should have thumbnail extracted from images"
@@ -675,6 +686,36 @@ class TestVODEpisodeResolution:
                         # Thumb/fanart may be None if no images
                         # This is acceptable - we just shouldn't crash
                         break
+
+
+class TestLiveStreamQuality:
+    """Test live stream quality upgrade functionality"""
+
+    def test_live_stream_upgrades_to_highest_quality(self):
+        """Verify live stream URL is upgraded to highest quality variant"""
+        from lib import url
+
+        # Start with base 720p live stream URL
+        base_url = nhk_api.rest_url["live_stream_url"]
+        upgraded_url = url.upgrade_to_1080p(base_url)
+
+        # Upgraded URL should be different from base
+        # (either direct variant or o-master.m3u8)
+        assert upgraded_url != base_url, "Live stream should be upgraded from base URL"
+
+        # Should contain either variant stream or 1080p master
+        assert (
+            "/v1.m3u8" in upgraded_url
+            or "/v2.m3u8" in upgraded_url
+            or "/v3.m3u8" in upgraded_url
+            or "/o-master.m3u8" in upgraded_url
+        ), "Live stream should be upgraded to direct variant or 1080p master playlist"
+
+        # Verify upgraded URL is accessible
+        response = requests.head(upgraded_url, timeout=10)
+        assert response.status_code in (200, 206), (
+            f"Upgraded live stream should be accessible: {upgraded_url}"
+        )
 
 
 if __name__ == "__main__":

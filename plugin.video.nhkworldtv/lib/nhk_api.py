@@ -33,6 +33,10 @@ rest_url = {
     # Example: https://masterpl.hls.nhkworld.jp/epg/w/20251028.json
     # Note: Date must be dynamically generated at runtime
     "get_livestream": "https://masterpl.hls.nhkworld.jp/epg/w/",
+    # Live stream - 1080p primary URL with 720p fallback
+    # 1080p: media-tyo.hls.nhkworld.jp with o-master.m3u8
+    # 720p: masterpl.hls.nhkworld.jp with master.m3u8
+    "live_stream_url_1080p": "https://media-tyo.hls.nhkworld.jp/hls/w/live/o-master.m3u8",
     "live_stream_url": "https://masterpl.hls.nhkworld.jp/hls/w/live/master.m3u8",
     # News endpoints
     "homepage_news": f"{NHK_BASE}/nhkworld/data/en/news/all.json",

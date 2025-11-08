@@ -1,6 +1,7 @@
 """
 Kodi specific utils
 """
+
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -25,26 +26,66 @@ def get_string(string_id):
 
 def show_notification(title, message, time_ms=5000):
     """Show a Kodi notification to the user
-    
+
     Args:
         title (str): Notification title
         message (str): Notification message
         time_ms (int): Display time in milliseconds (default 5000)
     """
     try:
-        xbmcgui.Dialog().notification(title, message, xbmcgui.NOTIFICATION_INFO, time_ms)
-    except Exception as e:
+        xbmcgui.Dialog().notification(
+            title, message, xbmcgui.NOTIFICATION_INFO, time_ms
+        )
+    except Exception:
         # Fallback to log if notification fails (e.g., during unit tests)
         xbmc.log(f"Notification: {title} - {message}", xbmc.LOGINFO)
 
 
-def get_video_info():
-    """Returns a list item video info for HD streams
+def get_video_info(stream_url=None):
+    """Returns video info dict with resolution based on stream URL
+
+    For playback, detects resolution from URL.
+    For menu items, defaults to 1080p.
+
+    Args:
+        stream_url (str, optional): Stream URL to analyze for resolution.
+                                   Only needed for actual playback items.
 
     Returns:
-        [dict]: A video_info dict
+        dict: A video_info dict with detected resolution
     """
-    video_info = {"aspect": "1.78", "width": "1280", "height": "720"}
+    # Default to 1080p for menu items and upgraded streams
+    width = "1920"
+    height = "1080"
+
+    if stream_url:
+        # Only detect resolution for actual playback URLs
+        if "/v1.m3u8" in stream_url:
+            # 1080p variant
+            width = "1920"
+            height = "1080"
+        elif "/v2.m3u8" in stream_url or "/v3.m3u8" in stream_url:
+            # 720p variants
+            width = "1280"
+            height = "720"
+        elif "/v4.m3u8" in stream_url:
+            # 360p variant
+            width = "640"
+            height = "360"
+        elif "/v5.m3u8" in stream_url:
+            # 180p variant
+            width = "320"
+            height = "180"
+        elif "o-master.m3u8" in stream_url:
+            # 1080p master playlist
+            width = "1920"
+            height = "1080"
+        elif "master.m3u8" in stream_url:
+            # 720p master playlist (fallback)
+            width = "1280"
+            height = "720"
+
+    video_info = {"aspect": "1.78", "width": width, "height": height}
     return video_info
 
 
