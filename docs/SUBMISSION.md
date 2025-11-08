@@ -16,8 +16,52 @@ Before submitting, ensure:
 
 Set up these secrets in your GitHub repository (Settings → Secrets and variables → Actions):
 
-- `GH_TOKEN`: Personal Access Token with `repo` scope
-- `EMAIL`: Your email address for git commits
+### `GH_TOKEN` - Personal Access Token
+
+Create a GitHub Personal Access Token with the following permissions:
+
+**For Classic Token:**
+
+1. Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Click "Generate new token" → "Generate new token (classic)"
+3. Give it a name (e.g., "Kodi Addon Submitter")
+4. Set expiration (recommended: 90 days)
+5. Select these scopes:
+   - ✅ `public_repo` (under repo section) - Required to create PRs
+   - ✅ `workflow` - Required for forking and creating PRs to other repos
+6. Generate token and copy it immediately
+
+**For Fine-Grained Token (More Secure):**
+
+1. Go to GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
+2. Click "Generate new token"
+3. Configure:
+   - Token name: "Kodi Addon Submitter"
+   - Expiration: 90 days or custom
+   - Repository access: "Public Repositories (read-only)"
+4. Set permissions under "Repository permissions":
+   - Contents: **Read and write**
+   - Pull requests: **Read and write**
+   - Metadata: **Read-only** (automatic)
+5. Generate token and copy it
+
+**Add to GitHub Secrets:**
+
+1. Go to your repository → Settings → Secrets and variables → Actions
+2. Click "New repository secret"
+3. Name: `GH_TOKEN`
+4. Value: Paste your token
+5. Click "Add secret"
+
+### `EMAIL` - Your Email Address
+
+Your email address for git commits:
+
+1. Go to Settings → Secrets and variables → Actions
+2. Click "New repository secret"
+3. Name: `EMAIL`
+4. Value: Your email (e.g., `your.email@example.com`)
+5. Click "Add secret"
 
 ## Validation Process
 
@@ -116,6 +160,19 @@ submit-addon -r repo-plugins -b piers --pull-request plugin.video.nhkworldtv
 4. **Wait for merge**: Once approved, your addon will be merged and available in the official repository
 
 ## Common Issues
+
+### Token Permission Errors
+
+**Error: `Resource not accessible by personal access token` (403)**
+
+Your GitHub token doesn't have the required permissions to create pull requests.
+
+**Solution:**
+
+1. Create a new token with correct permissions (see [GitHub Secrets Required](#github-secrets-required) above)
+2. Must include `public_repo` and `workflow` scopes for classic tokens
+3. Must include Contents and Pull requests **Read and write** for fine-grained tokens
+4. Update the `GH_TOKEN` secret in your repository settings
 
 ### Validation Errors
 
