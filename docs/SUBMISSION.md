@@ -16,42 +16,29 @@ Before submitting, ensure:
 
 Set up these secrets in your GitHub repository (Settings → Secrets and variables → Actions):
 
-### `GH_TOKEN` - Personal Access Token
+### `GH_TOKEN` - Personal Access Token (Classic)
 
-Create a GitHub Personal Access Token with the following permissions:
+**Create the token:**
 
-**For Classic Token:**
-
-1. Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
-2. Click "Generate new token" → "Generate new token (classic)"
-3. Give it a name (e.g., "Kodi Addon Submitter")
-4. Set expiration (recommended: 90 days)
+1. Go to GitHub → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
+2. Click **"Generate new token"** → **"Generate new token (classic)"**
+3. Give it a name: **"Kodi Addon Submitter"**
+4. Set expiration: **90 days** (recommended) or custom
 5. Select these scopes:
-   - ✅ `public_repo` (under repo section) - Required to create PRs
-   - ✅ `workflow` - Required for forking and creating PRs to other repos
-6. Generate token and copy it immediately
-
-**For Fine-Grained Token (More Secure):**
-
-1. Go to GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens
-2. Click "Generate new token"
-3. Configure:
-   - Token name: "Kodi Addon Submitter"
-   - Expiration: 90 days or custom
-   - Repository access: "Public Repositories (read-only)"
-4. Set permissions under "Repository permissions":
-   - Contents: **Read and write**
-   - Pull requests: **Read and write**
-   - Metadata: **Read-only** (automatic)
-5. Generate token and copy it
+   - ✅ **`public_repo`** (under "repo" section) - Required to create PRs in public repos
+   - ✅ **`workflow`** - Required for forking and creating PRs
+6. Click **"Generate token"**
+7. **Copy the token immediately** (you won't see it again!)
 
 **Add to GitHub Secrets:**
 
-1. Go to your repository → Settings → Secrets and variables → Actions
-2. Click "New repository secret"
+1. Go to your repository → **Settings** → **Secrets and variables** → **Actions**
+2. Click **"New repository secret"**
 3. Name: `GH_TOKEN`
 4. Value: Paste your token
-5. Click "Add secret"
+5. Click **"Add secret"**
+
+> ⚠️ **Note**: Classic tokens are required for this workflow. Fine-grained tokens have limitations when creating PRs in repositories you don't own.
 
 ### `EMAIL` - Your Email Address
 
@@ -169,10 +156,10 @@ Your GitHub token doesn't have the required permissions to create pull requests.
 
 **Solution:**
 
-1. Create a new token with correct permissions (see [GitHub Secrets Required](#github-secrets-required) above)
-2. Must include `public_repo` and `workflow` scopes for classic tokens
-3. Must include Contents and Pull requests **Read and write** for fine-grained tokens
-4. Update the `GH_TOKEN` secret in your repository settings
+1. Create a **classic token** (not fine-grained) with the correct scopes
+2. Required scopes: `public_repo` and `workflow`
+3. See [GitHub Secrets Required](#github-secrets-required) above for step-by-step instructions
+4. Update the `GH_TOKEN` secret in your repository settings with the new token
 
 ### Validation Errors
 
