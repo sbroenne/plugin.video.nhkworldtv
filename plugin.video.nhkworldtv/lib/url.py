@@ -115,21 +115,27 @@ def upgrade_to_1080p(url):
     """
     if not url or "/master.m3u8" not in url:
         xbmc.log(
-            "upgrade_to_1080p: URL doesn't contain /master.m3u8, returning original",
+            "upgrade_to_1080p: URL doesn't contain /master.m3u8, "
+            "returning original",
             xbmc.LOGDEBUG,
         )
+        return url
+
+    # Already 1080p (o-master.m3u8)
+    if "/o-master.m3u8" in url:
+        xbmc.log("upgrade_to_1080p: Already 1080p", xbmc.LOGDEBUG)
         return url
 
     # Try o-master.m3u8 pattern (contains 1080p variants)
     url_1080p_master = url.replace("/master.m3u8", "/o-master.m3u8")
 
     xbmc.log(
-        f"upgrade_to_1080p: Checking 1080p master: {url_1080p_master}",
+        f"upgrade_to_1080p: Checking 1080p: {url_1080p_master}",
         xbmc.LOGINFO,
     )
 
-    # Check if 1080p master playlist exists
-    if check_stream_available(url_1080p_master):
+    # Check if 1080p master playlist exists (short timeout for VOD)
+    if check_stream_available(url_1080p_master, timeout=3):
         xbmc.log(
             "upgrade_to_1080p: Using 1080p master playlist",
             xbmc.LOGINFO,
@@ -137,7 +143,7 @@ def upgrade_to_1080p(url):
         return url_1080p_master
     else:
         xbmc.log(
-            "upgrade_to_1080p: 1080p not available, using 720p master",
+            "upgrade_to_1080p: 1080p not available, using 720p",
             xbmc.LOGINFO,
         )
         return url

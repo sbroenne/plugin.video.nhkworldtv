@@ -321,9 +321,19 @@ def add_live_stream_menu_item():
     episode.is_playable = True
     episode.playcount = 0
 
-    # Get live stream URL with automatic quality upgrade to 1080p
-    base_url = nhk_api.rest_url["live_stream_url"]
-    episode.url = url.upgrade_to_1080p(base_url)
+    # Get live stream URL - try 1080p first, fallback to 720p
+    # Use direct URL without availability check for live streams
+    url_1080p = nhk_api.rest_url["live_stream_url_1080p"]
+    url_720p = nhk_api.rest_url["live_stream_url"]
+    
+    # Try 1080p stream first
+    if url.check_stream_available(url_1080p, timeout=3):
+        episode.url = url_1080p
+        xbmc.log("Live stream: Using 1080p (o-master.m3u8)", xbmc.LOGINFO)
+    else:
+        episode.url = url_720p
+        xbmc.log("Live stream: Using 720p (master.m3u8)", xbmc.LOGINFO)
+    
     xbmc.log(f"Live stream URL: {episode.url}", xbmc.LOGINFO)
 
     # Try to get currently playing program info (optional - non-critical)
