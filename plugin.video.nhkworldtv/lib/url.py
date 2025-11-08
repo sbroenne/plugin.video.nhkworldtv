@@ -2,11 +2,10 @@
 URL / Request handling
 """
 
-import sqlite3
 import time
+from typing import Optional, Dict, Tuple
 
 import requests
-import requests_cache
 import xbmc
 import xbmcaddon
 from requests.models import Response
@@ -17,30 +16,53 @@ from . import nhk_api
 ADDON = xbmcaddon.Addon()
 PLUGIN_PATH = ADDON.getAddonInfo("path")
 
-# Cache configuration (60 minutes minimum)
+# Cache configuration (60 minutes)
 URL_CACHE_MINUTES = 60
 
-# Running within Kodi - use that path
-# Get Plug-In information
-DB_NAME = f"{PLUGIN_PATH}/nhk_world_cache"
-if len(PLUGIN_PATH) == 0:
-    # Running under unit test - overwrite location of DB
-    DB_NAME = "nhk_world_cache"
+# Simple in-memory cache
+# Format: {url: (response_text, expiry_timestamp)}
+_response_cache: Dict[str, Tuple[str, float]] = {}
 
-# Install the cache for requests
-requests_cache.install_cache(
-    DB_NAME, backend="sqlite", expire_after=URL_CACHE_MINUTES * 60
-)
-# Note: remove_expired_responses() was removed in newer versions of requests-cache
-# The cache automatically handles expiration with the expire_after parameter
+
+def _get_cache_key(url: str, params: Optional[dict] = None) -> str:
+    """Generate cache key from URL and parameters"""
+    if params:
+        # Sort params for consistent cache keys
+        param_str = "&".join(f"{k}={v}" for k, v in sorted(params.items()))
+        return f"{url}?{param_str}"
+    return url
+
+
+def _get_cached_response(
+    url: str, params: Optional[dict] = None
+) -> Optional[str]:
+    """Get cached response if available and not expired"""
+    cache_key = _get_cache_key(url, params)
+    if cache_key in _response_cache:
+        content, expiry = _response_cache[cache_key]
+        if time.time() < expiry:
+            xbmc.log(f"Cache hit for: {url}", xbmc.LOGDEBUG)
+            return content
+        else:
+            # Expired, remove from cache
+            del _response_cache[cache_key]
+            xbmc.log(f"Cache expired for: {url}", xbmc.LOGDEBUG)
+    return None
+
+
+def _cache_response(url: str, content: str, params: Optional[dict] = None):
+    """Cache response with expiration time"""
+    cache_key = _get_cache_key(url, params)
+    expiry = time.time() + (URL_CACHE_MINUTES * 60)
+    _response_cache[cache_key] = (content, expiry)
+    xbmc.log(f"Cached response for: {url}", xbmc.LOGDEBUG)
+
 
 # Instantiate request session
 session = requests.Session()
 # Act like a browser
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182"
-}
-session.headers = headers
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182"
+session.headers.update({"User-Agent": user_agent})
 
 
 def check_url_exists(url):
@@ -49,12 +71,12 @@ def check_url_exists(url):
     Arguments:
         url {str} -- URL to check
     """
-    with session.cache_disabled():
-        request = session.get(url)
-        if request.status_code == 404:
-            return False
-        else:
-            return True
+    # Don't cache existence checks
+    request = session.get(url)
+    if request.status_code == 404:
+        return False
+    else:
+        return True
 
 
 def check_stream_available(url, timeout=5):
@@ -68,12 +90,15 @@ def check_stream_available(url, timeout=5):
         bool: True if URL returns 200 or 206 (partial content), False otherwise
     """
     try:
-        with session.cache_disabled():
-            # Use stream=True to avoid downloading the entire file
-            request = session.get(url, timeout=timeout, stream=True)
-            return request.status_code in (200, 206)
+        # Don't cache stream availability checks
+        # Use stream=True to avoid downloading the entire file
+        request = session.get(url, timeout=timeout, stream=True)
+        return request.status_code in (200, 206)
     except Exception as e:
-        xbmc.log(f"check_stream_available: Failed to check {url}: {e}", xbmc.LOGDEBUG)
+        xbmc.log(
+            f"check_stream_available: Failed to check {url}: {e}",
+            xbmc.LOGDEBUG,
+        )
         return False
 
 
@@ -106,17 +131,16 @@ def upgrade_to_1080p(url):
     )
 
     try:
-        # Fetch the master playlist (disable cache for live content)
-        with session.cache_disabled():
-            response = session.get(url_1080p_master, timeout=10)
+        # Fetch the master playlist (don't cache live content)
+        response = session.get(url_1080p_master, timeout=10)
+        if response.status_code != 200:
+            xbmc.log(
+                "upgrade_to_1080p: Failed to fetch o-master, trying regular",
+                xbmc.LOGINFO,
+            )
+            response = session.get(url, timeout=10)
             if response.status_code != 200:
-                xbmc.log(
-                    "upgrade_to_1080p: Failed to fetch o-master, trying regular",
-                    xbmc.LOGINFO,
-                )
-                response = session.get(url, timeout=10)
-                if response.status_code != 200:
-                    return url
+                return url
 
         playlist_content = response.text
         base = url_1080p_master if response.url == url_1080p_master else url
@@ -247,7 +271,7 @@ def request_url(url, cached=True):
 
     Args:
         url ([str]): URL to retrieve
-        cached (bool, optional): Use request_cache. Defaults to True.
+        cached (bool, optional): Use in-memory cache. Defaults to True.
 
     Returns:
         [response]: Response object - can be None
@@ -257,33 +281,29 @@ def request_url(url, cached=True):
     request = Response()
 
     try:
-        # Use cached or non-cached result
+        # Check cache first if caching is enabled
         if cached:
-            # Use session cache
-            if request_params is not None:
-                request = session.get(url, params=request_params)
-            else:
-                request = session.get(url)
+            cached_content = _get_cached_response(url, request_params)
+            if cached_content:
+                # Create a fake response object from cached content
+                request.status_code = 200
+                request._content = cached_content.encode("utf-8")
+                return request
+
+        # Make actual request
+        if request_params is not None:
+            request = session.get(url, params=request_params)
         else:
-            with session.cache_disabled():
-                if request_params is not None:
-                    request = session.get(url, params=request_params)
-                else:
-                    request = session.get(url)
+            request = session.get(url)
+
+        # Cache successful responses
+        if cached and request.status_code == 200:
+            _cache_response(url, request.text, request_params)
+
         return request
     except requests.ConnectionError:
         # Could not establish connection at all
         request.status_code = 10001
-    except sqlite3.OperationalError:
-        # Catch transient requests-cache SQL Lite error
-        # This is a race condition I think, it takes time for
-        # requests-cache to create the response table
-        # but it doesn't wait for this internally
-        # so sometimes a call can be made
-        # before the the table has been created
-        # This will fix itself shortly (on the next call)
-        xbmc.log("url.request_url: Swallowing sqlite3.OperationalError")
-        request.status_code = 10002
     return request
 
 
@@ -293,7 +313,7 @@ def get_url(url, cached=True):
 
     Args:
         url ([str]): URL to retrieve
-        cached (bool, optional): Use request_cache. Defaults to True.
+        cached (bool, optional): Use in-memory cache. Defaults to True.
 
     Returns:
         [response]: Response object
@@ -312,28 +332,24 @@ def get_url(url, cached=True):
 
         if status_code == 200:
             # Call was successful
-            xbmc.log(
-                f"Successfully fetched URL: {url} - Status {status_code} \
-                    - Retrieved from cache {request.from_cache}"
-            )
+            xbmc.log(f"Successfully fetched URL: {url} - Status {status_code}")
             break
 
-        elif status_code == 502 or status_code == 10002:
-            # Bad Gateway or SQL Lite Operational exception - can be retried
+        elif status_code == 502:
+            # Bad Gateway - can be retried
             if current_try == max_retries:
                 # Max retries reached - still could not get url
-                # Failure - no way to handle - probably an issue
-                # with the NHK Website
                 xbmc.log(
-                    f"FATAL: Could not get URL {url} after {current_try} retries",
+                    f"FATAL: Could not get URL {url} "
+                    f"after {current_try} retries",
                     xbmc.LOGDEBUG,
                 )
                 break
             else:
-                # Try again - this usually fixes the error with
-                # the next request
+                # Try again - this usually fixes the error
                 xbmc.log(
-                    f"Temporary failure fetching URL: {url} with Status {status_code})",
+                    f"Temporary failure fetching URL: {url} "
+                    f"with Status {status_code})",
                     xbmc.LOGDEBUG,
                 )
 
@@ -342,7 +358,8 @@ def get_url(url, cached=True):
         else:
             # Other HTTP error - FATAL, do not retry
             xbmc.log(
-                f"FATAL: Could not get URL: {url} - HTTP Status Code {status_code}",
+                f"FATAL: Could not get URL: {url} - "
+                f"HTTP Status Code {status_code}",
                 xbmc.LOGDEBUG,
             )
             break
