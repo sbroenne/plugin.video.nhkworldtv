@@ -1,25 +1,69 @@
-name: Submit Matrix addon to Kodi repo
+name: Submit addon to Kodi repo
 
 on:
-  workflow_dispatch:
+    workflow_dispatch:
+        inputs:
+            branch:
+                description: "Kodi branch to submit to"
+                required: true
+                default: "omega"
+                type: choice
+                options:
+                    - omega
+                    - piers
 
 jobs:
-  build:
-    name: Push to Kodi plugin repo and create PR
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-      - name: Deploy pre-requisites
-        id: pre_req
-        run: |
-          sudo -H pip3 install setuptools
-          sudo -H pip3 install git+https://github.com/romanvm/kodi-addon-submitter.git
-      - name: Push to Kodi repo and create PR
-        id: kodi-push
-        env:
-          GH_USERNAME: ${{ github.actor }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-          EMAIL: ${{secrets.EMAIL}}
-        run: |
-          submit-addon -r repo-plugins -b nexus --pull-request -s plugin.video.nhkworldtv
+    validate:
+        name: Validate addon with kodi-addon-checker
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Install kodi-addon-checker
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install kodi-addon-checker
+
+            - name: Run addon validation
+              run: |
+                  kodi-addon-checker --branch=${{ github.event.inputs.branch }} plugin.video.nhkworldtv
+
+    submit:
+        name: Create PR to Kodi repo
+        runs-on: ubuntu-24.04
+        needs: validate
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Python 3.12
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.12"
+
+            - name: Install kodi-addon-submitter
+              run: |
+                  pip install git+https://github.com/xbmc/kodi-addon-submitter.git
+
+            - name: Configure git
+              run: |
+                  git config --global user.name "${{ github.actor }}"
+                  git config --global user.email "${{ secrets.EMAIL }}"
+
+            - name: Submit addon to Kodi repo
+              env:
+                  GH_USERNAME: ${{ github.actor }}
+                  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                  EMAIL: ${{ secrets.EMAIL }}
+              run: |
+                  submit-addon -r repo-plugins -b ${{ github.event.inputs.branch }} --pull-request plugin.video.nhkworldtv
