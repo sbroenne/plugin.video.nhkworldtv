@@ -130,9 +130,6 @@ rest_url = {
     # VOD endpoints (new showsapi v1)
     'homepage_ondemand': f"{NHK_API_BASE}{LANG}/video_episodes?limit=20",
     'get_programs': f"{NHK_API_BASE}{LANG}/video_programs",
-    'get_programs_episode_list': f"{NHK_API_BASE}{LANG}/video_programs/{{0}}/video_episodes",
-    'get_categories': f"{NHK_API_BASE}{LANG}/categories",
-    'get_categories_episode_list': f"{NHK_API_BASE}{LANG}/categories/{{0}}/video_episodes",
     'get_latest_episodes': f"{NHK_API_BASE}{LANG}/video_episodes?limit=23",
     'get_episode_detail': f"{NHK_API_BASE}{LANG}/video_episodes/{{0}}",
 
@@ -183,26 +180,6 @@ Now it's just one API call with the video URL included directly.
 ### Authentication Status
 
 **API keys are NO LONGER REQUIRED**. The new NHK API works without authentication for all public endpoints.
-
-### API Filtering with Path Parameters
-
-**IMPORTANT**: The NHK API uses **path parameters**, not query parameters, for filtering by category or program:
-
-```python
-# CORRECT - Path parameters
-categories_url = f"{NHK_API_BASE}{LANG}/categories/15/video_episodes"
-programs_url = f"{NHK_API_BASE}{LANG}/video_programs/world-prime/video_episodes"
-
-# WRONG - Query parameters (API ignores these)
-wrong_url = f"{NHK_API_BASE}{LANG}/video_episodes?category=15"  # Returns all episodes!
-```
-
-The `{0}` placeholder in endpoint URLs is replaced by `vod.py` when calling the API:
-
-```python
-# In vod.py, line 31
-api_url = nhk_api.rest_url[api_method].format(episode_list_id)
-```
 
 ### Making API Requests
 
@@ -347,15 +324,6 @@ The project has optimized VS Code settings in `.vscode/`:
    - **Live Stream**: H.264 Main Profile, 720p, AAC-LC audio, HLS adaptive streaming
    - **VOD Streams**: H.264 Main Profile Level 3.1, 720p @ 29.97fps, AAC-LC audio
    - **Kodi Compatibility**: ✅ Excellent - all codecs fully supported
-
-6. ✅ **Category and Program Filtering** (November 8, 2025)
-   - **Fixed**: Categories (Drama, Documentaries, Sport, etc.) now display unique content
-   - **Issue**: API endpoints were using incorrect URL structure, causing all categories to show identical content
-   - **Solution**: Updated to use path parameters instead of query parameters
-     - Categories: `/categories/{category_id}/video_episodes` (not `?category=id`)
-     - Programs: `/video_programs/{program_id}/video_episodes` (not `?program=id`)
-   - **Verification**: Live API testing confirmed each category returns unique content
-   - **Version**: Bumped to 1.4.2 with release notes in `addon.xml`
 
 **Test Results**: All 57 tests passing (up from 0 at start of session)
 
