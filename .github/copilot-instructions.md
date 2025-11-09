@@ -9,21 +9,32 @@
 
 ## Critical Rules (Always Follow)
 
-### 1. Dependency Version Management
+### 1. ⚠️ MANDATORY: Check Kodi Repository for Dependency Versions FIRST
 
-**The Kodi repository is the ONLY source of truth for dependency versions.**
+**🔴 BEFORE making ANY dependency changes, ALWAYS verify versions against the Kodi repository.**
 
-Workflow: `Kodi Repository → addon.xml → Pipfile`
+The Kodi addon repository at https://mirrors.kodi.tv/addons/omega/ is the **ONLY** source of truth for dependency versions.
 
-1. Check https://mirrors.kodi.tv/addons/omega/ for available versions
-2. Update `plugin.video.nhkworldtv/addon.xml` to match Kodi repository
-3. Update `Pipfile` to match `addon.xml`
+**Mandatory Workflow**: `Kodi Repository → addon.xml → Pipfile`
 
-**Notes**:
+**Step-by-step process**:
+1. **FIRST**: Check https://mirrors.kodi.tv/addons/omega/ for available versions
+2. **THEN**: Update `plugin.video.nhkworldtv/addon.xml` to match Kodi repository
+3. **FINALLY**: Update `Pipfile` to match `addon.xml`
 
-- Binary addons (e.g., `inputstream.adaptive`) have platform-specific names in repo but are referenced without suffix in `addon.xml`
-- Script modules use `script.module.*` prefix in repository
-- Never assume a version exists - always verify first
+**Critical Notes**:
+- Binary addons (e.g., `inputstream.adaptive`) have platform-specific directories in repo (e.g., `inputstream.adaptive+android-aarch64/`) but are referenced without platform suffix in `addon.xml`
+- Script modules use `script.module.*` prefix in repository (e.g., `script.module.requests/`)
+- **NEVER** assume a version exists without verification
+- **NEVER** update dependencies based on Dependabot/security alerts without checking Kodi repo first
+- If a version doesn't exist in Kodi repo, it **cannot** be used
+
+**Current verified dependencies** (as of January 2025):
+- script.module.requests: 2.31.0 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.requests/))
+- script.module.pytz: 2023.3.0 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.pytz/))
+- script.module.routing: 0.2.3 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.routing/))
+- script.module.tzlocal: 5.0.1 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.tzlocal/))
+- inputstream.adaptive: 21.5.16 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/inputstream.adaptive+android-aarch64/))
 
 ### 2. Error Handling Pattern
 

@@ -328,7 +328,7 @@ pipenv run pytest-watch plugin.video.nhkworldtv/tests/
 def test_format_date():
     """Test date formatting utility"""
     from lib import utils
-    
+
     result = utils.format_date("2025-11-09T10:00:00Z")
     assert result == "Nov 9, 2025"
 ```
@@ -340,7 +340,7 @@ from unittest.mock import patch
 def test_get_episodes_with_api_error():
     """Test episode list handles API errors gracefully"""
     from lib import vod
-    
+
     with patch('lib.url.get_json', return_value=None):
         result = vod.get_episode_list("program_id")
         assert result == []  # Should return empty list, not crash
@@ -509,7 +509,7 @@ def test_something():
 2. **Use in code**:
    ```python
    from lib import url, nhk_api
-   
+
    api_result = url.get_json(nhk_api.rest_url['new_endpoint'])
    if api_result and "items" in api_result:
        # Process data

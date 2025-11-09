@@ -4,14 +4,14 @@
   // ========================================
   "python.defaultInterpreterPath": "/home/sbroenne/.local/share/virtualenvs/plugin.video.nhkworldtv-KTQJf_aH/bin/python",
   "python.terminal.activateEnvironment": true,
-  
+
   // ========================================
   // Ruff - Modern Linter & Formatter (2025)
   // ========================================
   // Ruff replaces: Black, isort, flake8, pylint, autoflake
   "ruff.enable": true,
   "ruff.importStrategy": "fromEnvironment",
-  
+
   // Format on save with Ruff
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
@@ -21,7 +21,7 @@
       "source.organizeImports.ruff": "explicit"
     }
   },
-  
+
   // ========================================
   // Testing Configuration
   // ========================================
@@ -32,13 +32,13 @@
     "-v",
     "--tb=short"
   ],
-  
+
   // ========================================
   // Type Checking
   // ========================================
   "python.analysis.typeCheckingMode": "basic",
   "mypy-type-checker.importStrategy": "fromEnvironment",
-  
+
   // ========================================
   // Editor Settings
   // ========================================
@@ -48,7 +48,7 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
-  
+
   // ========================================
   // File Associations
   // ========================================
@@ -56,7 +56,7 @@
     "*.xml": "xml",
     "*.po": "plaintext"
   },
-  
+
   // ========================================
   // File Exclusions (for better performance)
   // ========================================
@@ -69,7 +69,7 @@
     ".coverage": true,
     "htmlcov": true
   },
-  
+
   "search.exclude": {
     "**/__pycache__": true,
     "**/.pytest_cache": true,
@@ -80,12 +80,12 @@
     "**/build": true,
     "**/*.pyc": true
   },
-  
+
   // ========================================
   // Auto-save
   // ========================================
   "files.autoSave": "onFocusChange",
-  
+
   // ========================================
   // IntelliSense
   // ========================================

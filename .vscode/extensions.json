@@ -3,25 +3,25 @@
     // Essential Python
     "ms-python.python",
     "ms-python.vscode-pylance",
-    
+
     // Ruff - Modern all-in-one linter & formatter (2025 standard)
     "charliermarsh.ruff",
-    
+
     // Type checking
     "ms-python.mypy-type-checker",
-    
+
     // Testing
     "littlefoxteam.vscode-python-test-adapter",
-    
+
     // Git
     "eamodio.gitlens",
-    
+
     // TOML support
     "tamasfe.even-better-toml",
-    
+
     // Markdown
     "yzhang.markdown-all-in-one",
-    
+
     // XML (for Kodi addon.xml)
     "redhat.vscode-xml"
   ]
