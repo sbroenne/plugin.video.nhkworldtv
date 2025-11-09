@@ -33,6 +33,18 @@ SCHEDULE_PAST_FANART = f"{ADDON_PATH}/resources/media/fanart_schedule_past.png"
 SCHEDULE_UPCOMING_THUMB = f"{ADDON_PATH}/resources/media/thumb_schedule_upcoming.png"
 SCHEDULE_UPCOMING_FANART = f"{ADDON_PATH}/resources/media/fanart_schedule_upcoming.png"
 
+# On-demand menu images
+ONDEMAND_THUMB = f"{ADDON_PATH}/resources/media/thumb_ondemand.png"
+ONDEMAND_FANART = f"{ADDON_PATH}/resources/media/fanart_ondemand.png"
+
+# VOD submenu images
+VOD_PROGRAMS_THUMB = f"{ADDON_PATH}/resources/media/thumb_vod_programs_512.png"
+VOD_LATEST_THUMB = f"{ADDON_PATH}/resources/media/thumb_vod_latest_512.png"
+VOD_MOST_WATCHED_THUMB = f"{ADDON_PATH}/resources/media/thumb_vod_most_watched_512.png"
+VOD_DOCUMENTARIES_THUMB = f"{ADDON_PATH}/resources/media/thumb_vod_documentaries_512.png"
+VOD_CATEGORIES_THUMB = f"{ADDON_PATH}/resources/media/thumb_vod_categories_512.png"
+VOD_ALL_THUMB = f"{ADDON_PATH}/resources/media/thumb_vod_all_512.png"
+
 # Default value - can be overwritten by settings
 MAX_NEWS_DISPLAY_ITEMS = 0
 MAX_ATAGLANCE_DISPLAY_ITEMS = 0
@@ -272,9 +284,9 @@ def add_on_demand_menu_item():
             utils.get_episode_name(pgm_title, sub_title)
         )
 
-        # Get images from API structure
-        images_obj = program_json.get("images", {})
-        episode.thumb, episode.fanart = vod.extract_images(images_obj)
+        # Use custom on-demand menu icons
+        episode.thumb = ONDEMAND_THUMB
+        episode.fanart = ONDEMAND_FANART
 
         # Create the directory item
 
@@ -632,16 +644,17 @@ def vod_index():
     Video On Demand - Menu item
     """
     xbmc.log("Creating Video On Demand Menu")
-    art = {"thumb": NHK_ICON, "fanart": NHK_FANART}
+
     # Programs
     list_item = xbmcgui.ListItem(kodiutils.get_string(30042), offscreen=True)
-    list_item.setArt(art)
+    list_item.setArt({"thumb": VOD_PROGRAMS_THUMB, "fanart": NHK_FANART})
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(vod_programs), list_item, True
     )
+
     # Latest Episodes
     list_item = xbmcgui.ListItem(kodiutils.get_string(30044), offscreen=True)
-    list_item.setArt(art)
+    list_item.setArt({"thumb": VOD_LATEST_THUMB, "fanart": NHK_FANART})
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(
@@ -657,7 +670,7 @@ def vod_index():
 
     # Most Watched
     list_item = xbmcgui.ListItem(kodiutils.get_string(30045), offscreen=True)
-    list_item.setArt(art)
+    list_item.setArt({"thumb": VOD_MOST_WATCHED_THUMB, "fanart": NHK_FANART})
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(
@@ -673,7 +686,7 @@ def vod_index():
 
     # Documentaries
     list_item = xbmcgui.ListItem(kodiutils.get_string(30047), offscreen=True)
-    list_item.setArt(art)
+    list_item.setArt({"thumb": VOD_DOCUMENTARIES_THUMB, "fanart": NHK_FANART})
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(
@@ -686,16 +699,17 @@ def vod_index():
         list_item,
         True,
     )
+
     # Categories
     list_item = xbmcgui.ListItem(kodiutils.get_string(30043), offscreen=True)
-    list_item.setArt(art)
+    list_item.setArt({"thumb": VOD_CATEGORIES_THUMB, "fanart": NHK_FANART})
     xbmcplugin.addDirectoryItem(
         plugin.handle, plugin.url_for(vod_categories), list_item, True
     )
 
     # All
     list_item = xbmcgui.ListItem(kodiutils.get_string(30046), offscreen=True)
-    list_item.setArt(art)
+    list_item.setArt({"thumb": VOD_ALL_THUMB, "fanart": NHK_FANART})
     xbmcplugin.addDirectoryItem(
         plugin.handle,
         plugin.url_for(
