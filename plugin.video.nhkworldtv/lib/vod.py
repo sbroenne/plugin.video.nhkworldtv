@@ -104,8 +104,8 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
     for row in program_json:
         episode = Episode()
         episode.is_playable = True
-        title = row.get("title") or ""
-        subtitle = row.get("subtitle") or ""
+        title: str = row.get("title") or ""
+        subtitle: str = row.get("subtitle") or ""
 
         # If episode has no title, try to use the parent program title
         if not title and not subtitle:
@@ -135,7 +135,7 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
             # Show only subtitle
             if len(subtitle) > 0:
                 # There is a subtitle, use it
-                episode_name = subtitle
+                episode_name: str = subtitle
             else:
                 # Use the title instead of the subtitle
                 episode_name = title

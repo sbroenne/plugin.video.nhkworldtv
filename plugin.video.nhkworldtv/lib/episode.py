@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 import xbmc
 import xbmcgui
@@ -62,30 +63,30 @@ class Episode:
 
     def __init__(self):
         """Creates an Episode instance"""
-        self.vod_id = None
-        self.pgm_no = None
-        self.title = None
-        self._plot = None
-        self.plot_include_time_difference = False
+        self.vod_id: str | None = None
+        self.pgm_no: str | None = None
+        self.title: str | None = None
+        self._plot: str | None = None
+        self.plot_include_time_difference: bool = False
         """ Optional: Include time difference (3 minutes ago) in the Plot
         """
-        self.plot_include_broadcast_detail = False
+        self.plot_include_broadcast_detail: bool = False
         """ Optional: Include broadcast detail (available until) in the Plot
         """
-        self._duration = None
-        self.url = None
-        self.is_playable = False
-        self.playcount = None
-        self._date = None
-        self._aired = None
-        self._year = None
-        self._broadcast_start_date = None
-        self._broadcast_end_date = None
-        self._thumb = None
-        self._fanart = None
-        self._video_info = None
+        self._duration: int | None = None
+        self.url: str | None = None
+        self.is_playable: bool = False
+        self.playcount: int | None = None
+        self._date: datetime | None = None
+        self._aired: datetime | None = None
+        self._year: str | None = None
+        self._broadcast_start_date: datetime | None = None
+        self._broadcast_end_date: datetime | None = None
+        self._thumb: str | None = None
+        self._fanart: str | None = None
+        self._video_info: dict | None = None
         self._kodi_list_item = xbmcgui.ListItem
-        self.absolute_image_url = False
+        self.absolute_image_url: bool = False
 
     #
     # Properties
@@ -211,17 +212,17 @@ class Episode:
         if self.url is not None:
             # Path was provided - created the ListItem with path
             list_item = xbmcgui.ListItem(path=self.url, offscreen=True)
-            list_item.setLabel(self.title)
+            list_item.setLabel(self.title or "")
         else:
             # Create ListItem with title
-            list_item = xbmcgui.ListItem(self.title, offscreen=True)
+            list_item = xbmcgui.ListItem(self.title or "", offscreen=True)
 
-        list_item.setArt({"thumb": self.thumb, "fanart": self.fanart})
+        list_item.setArt({"thumb": self.thumb or "", "fanart": self.fanart or ""})
         xbmc.log(
             f"Episode art - thumb: {self.thumb}, fanart: {self.fanart}",
             xbmc.LOGINFO,
         )
-        list_item.setLabel(self.title)
+        list_item.setLabel(self.title or "")
 
         # Get info label
         info_label = self.get_info_label()
@@ -257,7 +258,7 @@ class Episode:
             dict -- Dictionary with the Info Label properties
         """
 
-        info_label = {}
+        info_label: dict[str, Any] = {}
 
         if self.plot_include_time_difference is True:
             # Include time difference in plot
@@ -305,6 +306,9 @@ class Episode:
         Returns:
             {unicode} -- e.g 9 hours ago or 25.01.2020
         """
+        if self.broadcast_start_date is None:
+            return ""
+
         if compare_date is None:
             compare_date = datetime.now()
         date_delta = compare_date - self.broadcast_start_date
