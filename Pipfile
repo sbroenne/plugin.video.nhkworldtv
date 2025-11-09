@@ -23,7 +23,7 @@ types-pytz = "*"
 [packages]
 kodistubs = "*"
 # Match versions from addon.xml
-requests = "==2.31.0"
+requests = "==2.32.4"
 pytz = "==2023.3.0"
 tzlocal = "==5.0.1"
 
