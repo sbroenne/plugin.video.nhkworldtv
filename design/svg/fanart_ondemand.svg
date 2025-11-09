@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a2a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+
+  <!-- NHK Red Diagonal Stripe (top left) -->
+  <polygon points="0,0 600,0 0,400" fill="#C8102E" opacity="0.9"/>
+
+  <!-- NHK WORLD-JAPAN Logo -->
+  <text x="80" y="100" font-family="Arial, sans-serif" font-size="54" font-weight="bold" fill="white" letter-spacing="2">NHK WORLD</text>
+  <rect x="80" y="110" width="380" height="4" fill="#C8102E"/>
+  <text x="80" y="155" font-family="Arial, sans-serif" font-size="36" font-weight="300" fill="#f5f5f5" letter-spacing="3">JAPAN</text>
+
+  <!-- Play button graphic (right side) -->
+  <circle cx="1500" cy="540" r="180" fill="none" stroke="#00a6d6" stroke-width="8" opacity="0.8"/>
+  <path d="M 1420,420 L 1420,660 L 1620,540 Z" fill="#00a6d6" opacity="0.9"/>
+
+  <!-- Main Title -->
+  <text x="120" y="580" font-family="Arial, sans-serif" font-size="140" font-weight="bold" fill="white" letter-spacing="8">VIDEO ON</text>
+  <text x="120" y="720" font-family="Arial, sans-serif" font-size="140" font-weight="bold" fill="white" letter-spacing="8">DEMAND</text>
+
+  <!-- Japanese text -->
+  <text x="120" y="820" font-family="Arial, sans-serif" font-size="48" font-weight="300" fill="#f5f5f5">ビデオオンデマンド</text>
+
+  <!-- Red accent bar -->
+  <rect x="120" y="860" width="500" height="6" fill="#C8102E"/>
+
+  <!-- Bottom subtle text -->
+  <text x="120" y="980" font-family="Arial, sans-serif" font-size="28" fill="#999">Browse and watch episodes on demand</text>
+</svg>

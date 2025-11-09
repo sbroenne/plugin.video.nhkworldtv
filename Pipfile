@@ -4,13 +4,21 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-rope = "*"
-pytest = "*"
-coverage = "*"
-pytest-cov = "*"
+# Modern linting & formatting (2025 standard - replaces Black, isort, flake8, pylint)
+ruff = "*"
+# Type checking
+mypy = "*"
+# Testing
+pytest = ">=8.0.0"
+pytest-cov = ">=4.1.0"
+coverage = ">=7.0.0"
+# Build tools
 setuptools = "*"
+# Kodi tools
 addon-submitter = {git = "https://github.com/xbmc/kodi-addon-submitter.git"}
 kodi-addon-checker = "*"
+types-requests = "*"
+types-pytz = "*"
 
 [packages]
 kodistubs = "*"
@@ -20,4 +28,4 @@ pytz = "==2023.3.0"
 tzlocal = "==5.0.1"
 
 [requires]
-python_version = "3.12"
+python_version = "3.11"

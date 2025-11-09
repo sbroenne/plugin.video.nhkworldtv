@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2a2a2a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+
+  <!-- Red diagonal accent - top left -->
+  <path d="M 0,0 L 180,0 L 0,180 Z" fill="#C8102E" opacity="0.9"/>
+
+  <!-- Film reel/Documentary icon -->
+  <rect x="200" y="180" width="112" height="80" fill="none" stroke="#00a6d6" stroke-width="6" rx="5" opacity="0.9"/>
+  <circle cx="220" cy="195" r="8" fill="#00a6d6" opacity="0.7"/>
+  <circle cx="292" cy="195" r="8" fill="#00a6d6" opacity="0.7"/>
+  <circle cx="220" cy="245" r="8" fill="#00a6d6" opacity="0.7"/>
+  <circle cx="292" cy="245" r="8" fill="#00a6d6" opacity="0.7"/>
+  <path d="M 230,210 L 240,220 L 250,205 L 260,230 L 275,215 L 285,225" 
+        fill="none" stroke="#00a6d6" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+
+  <!-- Title text -->
+  <text x="256" y="320" font-family="Arial, sans-serif" font-size="32" font-weight="bold"
+        fill="#ffffff" text-anchor="middle">DOCUMENTARIES</text>
+
+  <!-- NHK WORLD-JAPAN logo -->
+  <text x="256" y="420" font-family="Arial, sans-serif" font-size="24" font-weight="bold"
+        fill="#ffffff" text-anchor="middle">NHK WORLD-JAPAN</text>
+  <rect x="156" y="430" width="200" height="4" fill="#C8102E"/>
+
+  <!-- Japanese text -->
+  <text x="256" y="465" font-family="Arial, sans-serif" font-size="16"
+        fill="#cccccc" text-anchor="middle">ドキュメンタリー</text>
+</svg>

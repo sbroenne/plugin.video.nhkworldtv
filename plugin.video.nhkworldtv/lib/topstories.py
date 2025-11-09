@@ -1,7 +1,9 @@
 """
 Top stories menu item and list
 """
+
 import xbmc
+
 from . import kodiutils, nhk_api, url
 from .episode import Episode
 
@@ -15,12 +17,14 @@ def get_menu_item():
 
     # Getting top story
     api_result = url.get_json(nhk_api.rest_url["homepage_news"], False)
-    
+
     if api_result is None or "data" not in api_result or not api_result["data"]:
-        xbmc.log("topstories.get_menu_item: Failed to load top stories data", xbmc.LOGERROR)
+        xbmc.log(
+            "topstories.get_menu_item: Failed to load top stories data", xbmc.LOGERROR
+        )
         kodiutils.show_notification("NHK World TV", "Unable to load Top Stories news.")
         return None
-    
+
     featured_news = api_result["data"][0]
 
     menu_item = Episode()
@@ -56,16 +60,20 @@ def get_episodes(max_items, icon, fanart):
     """
 
     api_result_json = url.get_json(nhk_api.rest_url["homepage_news"], False)
-    
+
     if api_result_json is None or "data" not in api_result_json:
-        xbmc.log("topstories.get_episodes: Failed to load top stories data", xbmc.LOGERROR)
-        kodiutils.show_notification("NHK World TV", "Unable to load Top Stories episodes.")
+        xbmc.log(
+            "topstories.get_episodes: Failed to load top stories data", xbmc.LOGERROR
+        )
+        kodiutils.show_notification(
+            "NHK World TV", "Unable to load Top Stories episodes."
+        )
         return []
-    
+
     max_row_count = max_items
     result_row_count = len(api_result_json["data"])
     episodes = []
-    
+
     # Only display MAX ROWS
     if result_row_count < max_row_count:
         max_row_count = result_row_count
@@ -97,12 +105,15 @@ def get_episodes(max_items, icon, fanart):
             episode.plot = row.get("description", "")
             episode.video_info = kodiutils.get_sd_video_info()
             episode.is_playable = True
-            
+
             video_config = video.get("config", "")
             if video_config:
                 episode.url = url.get_nhk_website_url(video_config)
             else:
-                xbmc.log(f"topstories.get_episodes: No video config for {news_id}", xbmc.LOGWARNING)
+                xbmc.log(
+                    f"topstories.get_episodes: No video config for {news_id}",
+                    xbmc.LOGWARNING,
+                )
                 continue
         else:
             # No video attached to it
@@ -110,9 +121,12 @@ def get_episodes(max_items, icon, fanart):
             # Get detailed news information
             api_url = nhk_api.rest_url["news_detail"].format(news_id)
             news_detail_result = url.get_json(api_url)
-            
+
             if news_detail_result is None or "data" not in news_detail_result:
-                xbmc.log(f"topstories.get_episodes: Failed to get detail for news {news_id}", xbmc.LOGWARNING)
+                xbmc.log(
+                    f"topstories.get_episodes: Failed to get detail for news {news_id}",
+                    xbmc.LOGWARNING,
+                )
                 # Still add the episode with basic info
                 episode.plot = row.get("description", "")
                 episode.is_playable = False

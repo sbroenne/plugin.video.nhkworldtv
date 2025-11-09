@@ -1,4 +1,11 @@
-# Set update schedule for GitHub Actions
+# Dependabot configuration for NHK World TV Kodi addon
+#
+# Python dependencies (pip) are DISABLED because:
+# - All Python dependencies MUST match versions in the official Kodi addon repository
+# - We cannot update to newer versions until they are published to Kodi repo
+# - See docs/DEPENDENCIES.md for dependency management process
+#
+# GitHub Actions updates are still enabled for CI/CD maintenance
 
 version: 2
 updates:
@@ -8,3 +15,10 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every week
       interval: "weekly"
+
+  # Python dependencies are disabled - see docs/DEPENDENCIES.md
+  # - package-ecosystem: "pip"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "monthly"
+  #   open-pull-requests-limit: 0

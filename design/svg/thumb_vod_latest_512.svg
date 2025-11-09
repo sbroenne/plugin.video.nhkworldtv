@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2a2a2a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+
+  <!-- Red diagonal accent - top left -->
+  <path d="M 0,0 L 180,0 L 0,180 Z" fill="#C8102E" opacity="0.9"/>
+
+  <!-- Star/New icon -->
+  <path d="M 256,140 L 280,200 L 345,210 L 300,250 L 310,315 L 256,285 L 202,315 L 212,250 L 167,210 L 232,200 Z" 
+        fill="#00a6d6" opacity="0.9" stroke="#00a6d6" stroke-width="2"/>
+
+  <!-- Title text -->
+  <text x="256" y="360" font-family="Arial, sans-serif" font-size="38" font-weight="bold"
+        fill="#ffffff" text-anchor="middle">LATEST</text>
+  <text x="256" y="400" font-family="Arial, sans-serif" font-size="38" font-weight="bold"
+        fill="#ffffff" text-anchor="middle">EPISODES</text>
+
+  <!-- NHK WORLD-JAPAN logo -->
+  <text x="256" y="460" font-family="Arial, sans-serif" font-size="20" font-weight="bold"
+        fill="#ffffff" text-anchor="middle">NHK WORLD-JAPAN</text>
+  <rect x="156" y="470" width="200" height="4" fill="#C8102E"/>
+</svg>

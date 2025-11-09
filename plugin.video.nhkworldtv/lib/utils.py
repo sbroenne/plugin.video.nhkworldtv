@@ -1,6 +1,9 @@
 """
 Commonly used utility functions
 """
+
+from __future__ import annotations
+
 import re
 import time
 from datetime import datetime
@@ -19,21 +22,34 @@ if len(PLUGIN_PATH) == 0:
     UNIT_TEST = True
 
 
-def to_local_time(timestamp):
-    """
-    Convert from a UNIX timestamp to a valid date time
+def to_local_time(timestamp: int) -> datetime:
+    """Convert from a UNIX timestamp to a valid datetime
+
+    Args:
+        timestamp: Unix timestamp in seconds
+
+    Returns:
+        datetime object in local timezone
     """
 
     try:
         local_time = datetime.fromtimestamp(timestamp)
-    except OverflowError:
+    except (OverflowError, ValueError):
         local_time = datetime.max
 
     return local_time
 
 
-def get_episode_name(title, subtitle):
-    """Construct an episode name from the title and the subtitle"""
+def get_episode_name(title: str, subtitle: str) -> str:
+    """Construct an episode name from the title and the subtitle
+
+    Args:
+        title: Episode title
+        subtitle: Episode subtitle
+
+    Returns:
+        Formatted episode name
+    """
     if len(subtitle) == 0:
         subtitle = subtitle.replace("<p></p>", "")
         episode_name = f"{title}"
@@ -43,63 +59,67 @@ def get_episode_name(title, subtitle):
     return episode_name
 
 
-def get_top_stories_play_path(xml_text):
-    """Extracts the play path from a top story XML file"""
+def get_topstories_play_path(xml_text: str) -> str | None:
+    """Extracts the play path from a Top Stories XML file
+
+    Args:
+        xml_text: XML content as string or direct RTMP URL
+
+    Returns:
+        Play path string or None if not found
+    """
     find = "rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/(.+?)HQ"
 
     matches = re.compile(find).findall(xml_text)
     if len(matches) == 1:
-        play_path = matches[0]
+        play_path: str | None = matches[0]
     else:
         play_path = None
     return play_path
 
 
-def get_ataglance_play_path(xml_text):
-    """Extracts the play path from a At a Glance XML file"""
+def get_ataglance_play_path(xml_text: str) -> str | None:
+    """Extracts the play path from a At a Glance XML file
+
+    Args:
+        xml_text: XML content as string
+
+    Returns:
+        Play path string or None if not found
+    """
     find = "<file.high>rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/english/news/ataglance/(.+?)</file.high>"
 
     matches = re.compile(find).findall(xml_text)
     if len(matches) == 1:
-        play_path = matches[0]
+        play_path: str | None = matches[0]
     else:
         play_path = None
     return play_path
 
 
-def get_news_program_play_path(xml_text):
-    """Extracts the play path from a news program file"""
-    find = "rtmp://flv.nhk.or.jp/ondemand/flv/nhkworld/upld/medias/en/news/programs/(.+?).mp4"
-
-    matches = re.compile(find).findall(xml_text)
-    if len(matches) == 1:
-        play_path = matches[0]
-    else:
-        play_path = None
-    return play_path
-
-
-def get_schedule_title(start_date, end_date, title):
+def get_schedule_title(start_date: datetime, end_date: datetime, title: str) -> str:
     """Returns a title formatted for a schedule (e.g. live stream, live)
 
     Arguments:
-        start_date {datetime} -- Start date
-        end_date {datetime} -- End date
-        title {unicode} -- Title
-     Returns:
-        {unicode} -- 11:30-12:30: Journeys in Japan
+        start_date: Start date
+        end_date: End date
+        title: Title
+
+    Returns:
+        Formatted title like "11:30-12:30: Journeys in Japan"
     """
     return f"{start_date.strftime('%H:%M')}-{end_date.strftime('%H:%M')}: {title}"
 
 
-def get_timestamp_from_datestring(datestring):
+def get_timestamp_from_datestring(datestring: str) -> int:
     """Converts a news item date string into a NHK timestamp
     NHK Timestamp = Unix Timestamp * 1000
 
     Arguments:
-        date_string {unicode} -- News item date string (e.g. '20200416130000')
-     Returns:
-        {unicode} -- NHK Timestamp (e.g. 1587008460000)
+        datestring: News item date string (e.g. '20200416130000')
+
+    Returns:
+        NHK Timestamp (e.g. 1587008460000)
     """
     # Convert news date string to a Tokyo date
     tokyo = pytz.timezone("Asia/Tokyo")
@@ -122,14 +142,14 @@ def get_timestamp_from_datestring(datestring):
     return timestamp
 
 
-def format_plot(line1, line2):
+def format_plot(line1: str, line2: str) -> str:
     """Format the plot field
 
     Args:
-        line1 (str): First line
-        line2 (str): Second line
+        line1: First line
+        line2: Second line
 
     Returns:
-        str: Formatted plot field
+        Formatted plot field
     """
     return f"{line1}\n\n{line2}"

@@ -1,9 +1,7 @@
-"""
-Encapsulates all information of an individual NHK Episode
-"""
+from __future__ import annotations
 
-from builtins import object
 from datetime import datetime
+from typing import Any
 
 import xbmc
 import xbmcgui
@@ -11,44 +9,86 @@ import xbmcgui
 from . import kodiutils, url, utils
 
 
-class Episode(object):
+def _parse_timestamp(value) -> datetime | None:
+    """Parse timestamp from various formats to datetime object
+
+    Args:
+        value: Unix timestamp (int/str) or ISO 8601 string
+
+    Returns:
+        datetime object in local timezone, or None if value is None
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, str):
+        if value.isdigit():
+            # Unix timestamp in milliseconds as a string
+            timestamp = int(value) // 1000
+            return utils.to_local_time(timestamp)
+        else:
+            # ISO 8601 format (e.g., "2025-10-28T20:00:00+09:00")
+            return datetime.fromisoformat(value)
+    else:
+        # Unix timestamp (milliseconds)
+        timestamp = int(value) // 1000
+        return utils.to_local_time(timestamp)
+
+
+def _normalize_url(value: str, absolute_image_url: bool = False) -> str:
+    """Normalize URL to full URL if needed
+
+    Args:
+        value: URL string (partial or full)
+        absolute_image_url: If True, don't modify partial URLs
+
+    Returns:
+        Full URL string
+    """
+    if not value:
+        return value
+
+    # Already a full URL
+    if value.startswith("http://") or value.startswith("https://"):
+        return value
+
+    # Convert partial NHK URL to full URL
+    if "/nhkworld/" in value and not absolute_image_url:
+        return url.get_nhk_website_url(value)
+
+    return value
+
+
+class Episode:
     """NHK Episode that contains all the necessary information
     to convert itself into a Kodi ListItem"""
 
     def __init__(self):
         """Creates an Episode instance"""
-        self.vod_id = None
-        self.pgm_no = None
-        self.title = None
-        self._plot = None
-        self.plot_include_time_difference = False
+        self.vod_id: str | None = None
+        self.pgm_no: str | None = None
+        self.title: str | None = None
+        self._plot: str | None = None
+        self.plot_include_time_difference: bool = False
         """ Optional: Include time difference (3 minutes ago) in the Plot
         """
-        self.plot_include_broadcast_detail = False
+        self.plot_include_broadcast_detail: bool = False
         """ Optional: Include broadcast detail (available until) in the Plot
         """
-        self._duration = None
-        self.aspect = None
-        self.width = None
-        self.height = None
-        self.url = None
-        self.is_playable = False
-        self.playcount = None
-        self._date = None
-        self._aired = None
-        self._year = None
-        self._broadcast_start_date = None
-        self._broadcast_end_date = None
-        self._thumb = None
-        self._fanart = None
-        self._video_info = None
-        self.bandwidth = 0
-        """ Optional: Set Internet Bandwidth Restriction
-        """
-        self._cast = None
+        self._duration: int | None = None
+        self.url: str | None = None
+        self.is_playable: bool = False
+        self.playcount: int | None = None
+        self._date: datetime | None = None
+        self._aired: datetime | None = None
+        self._year: str | None = None
+        self._broadcast_start_date: datetime | None = None
+        self._broadcast_end_date: datetime | None = None
+        self._thumb: str | None = None
+        self._fanart: str | None = None
+        self._video_info: dict | None = None
         self._kodi_list_item = xbmcgui.ListItem
-        self.absolute_image_url = False
-        self.from_cache = False
+        self.absolute_image_url: bool = False
 
     #
     # Properties
@@ -88,30 +128,10 @@ class Episode(object):
     @broadcast_start_date.setter
     def broadcast_start_date(self, value):
         """Sets broadcast start date from timestamp or ISO 8601 string"""
-        if value is None:
-            self._broadcast_start_date = None
-            self._date = None
-            self._aired = None
-        else:
-            # Handle both Unix timestamp (int) and ISO 8601 string formats
-            if isinstance(value, str):
-                # Check if string is a numeric timestamp
-                if value.isdigit():
-                    # Unix timestamp in milliseconds as a string
-                    timestamp = int(value) // 1000
-                    local_date = utils.to_local_time(timestamp)
-                else:
-                    # ISO 8601 format (e.g., "2025-10-28T20:00:00+09:00")
-                    from datetime import datetime
-
-                    local_date = datetime.fromisoformat(value)
-            else:
-                # Unix timestamp (milliseconds)
-                timestamp = int(value) // 1000
-                local_date = utils.to_local_time(timestamp)
-            self._broadcast_start_date = local_date
-            self._date = local_date
-            self._aired = local_date
+        local_date = _parse_timestamp(value)
+        self._broadcast_start_date = local_date
+        self._date = local_date
+        self._aired = local_date
 
     @property
     def broadcast_end_date(self):
@@ -121,26 +141,7 @@ class Episode(object):
     @broadcast_end_date.setter
     def broadcast_end_date(self, value):
         """Sets broadcast end date from timestamp or ISO 8601 string"""
-        if value is None:
-            self._broadcast_end_date = None
-        else:
-            # Handle both Unix timestamp (int) and ISO 8601 string formats
-            if isinstance(value, str):
-                # Check if string is a numeric timestamp
-                if value.isdigit():
-                    # Unix timestamp in milliseconds as a string
-                    timestamp = int(value) // 1000
-                    local_date = utils.to_local_time(timestamp)
-                else:
-                    # ISO 8601 format (e.g., "2025-10-28T20:28:00+09:00")
-                    from datetime import datetime
-
-                    local_date = datetime.fromisoformat(value)
-            else:
-                # Unix timestamp (milliseconds)
-                timestamp = int(value) // 1000
-                local_date = utils.to_local_time(timestamp)
-            self._broadcast_end_date = local_date
+        self._broadcast_end_date = _parse_timestamp(value)
 
     @property
     def thumb(self):
@@ -150,13 +151,7 @@ class Episode(object):
     @thumb.setter
     def thumb(self, value):
         """Sets thumbnail URL"""
-        # Check if already a full URL (starts with http:// or https://)
-        if value and (value.startswith("http://") or value.startswith("https://")):
-            self._thumb = value
-        elif "/nhkworld/" in value and not self.absolute_image_url:
-            self._thumb = url.get_nhk_website_url(value)
-        else:
-            self._thumb = value
+        self._thumb = _normalize_url(value, self.absolute_image_url)
 
     @property
     def fanart(self):
@@ -166,13 +161,7 @@ class Episode(object):
     @fanart.setter
     def fanart(self, value):
         """Sets fanart URL"""
-        # Check if already a full URL (starts with http:// or https://)
-        if value and (value.startswith("http://") or value.startswith("https://")):
-            self._fanart = value
-        elif "/nhkworld/" in value and not self.absolute_image_url:
-            self._fanart = url.get_nhk_website_url(value)
-        else:
-            self._fanart = value
+        self._fanart = _normalize_url(value, self.absolute_image_url)
 
     @property
     def date(self):
@@ -208,19 +197,7 @@ class Episode(object):
         """
         Returns the video info struct
         """
-        if self._video_info is not None:
-            return self._video_info
-        elif self.aspect is not None:
-            video_info = {
-                "aspect": self.aspect,
-                "width": self.width,
-                "height": self.height,
-            }
-            self._video_info = video_info
-            return video_info
-
-        else:
-            return None
+        return self._video_info
 
     @video_info.setter
     def video_info(self, value):
@@ -237,17 +214,17 @@ class Episode(object):
         if self.url is not None:
             # Path was provided - created the ListItem with path
             list_item = xbmcgui.ListItem(path=self.url, offscreen=True)
-            list_item.setLabel(self.title)
+            list_item.setLabel(self.title or "")
         else:
             # Create ListItem with title
-            list_item = xbmcgui.ListItem(self.title, offscreen=True)
+            list_item = xbmcgui.ListItem(self.title or "", offscreen=True)
 
-        list_item.setArt({"thumb": self.thumb, "fanart": self.fanart})
+        list_item.setArt({"thumb": self.thumb or "", "fanart": self.fanart or ""})
         xbmc.log(
             f"Episode art - thumb: {self.thumb}, fanart: {self.fanart}",
             xbmc.LOGINFO,
         )
-        list_item.setLabel(self.title)
+        list_item.setLabel(self.title or "")
 
         # Get info label
         info_label = self.get_info_label()
@@ -283,7 +260,7 @@ class Episode(object):
             dict -- Dictionary with the Info Label properties
         """
 
-        info_label = {}
+        info_label: dict[str, Any] = {}
 
         if self.plot_include_time_difference is True:
             # Include time difference in plot
@@ -296,7 +273,7 @@ class Episode(object):
         else:
             info_label["Plot"] = self.plot
 
-        info_label["Title"] = self.title
+        info_label["Title"] = self.title if self.title else ""
 
         if self.duration is not None:
             info_label["Duration"] = self.duration
@@ -318,7 +295,7 @@ class Episode(object):
 
         return info_label
 
-    def get_time_difference(self, compare_date=datetime.now()):
+    def get_time_difference(self, compare_date=None):
         """Get the time difference between the
         Start date and the compare_date
 
@@ -331,6 +308,11 @@ class Episode(object):
         Returns:
             {unicode} -- e.g 9 hours ago or 25.01.2020
         """
+        if self.broadcast_start_date is None:
+            return ""
+
+        if compare_date is None:
+            compare_date = datetime.now()
         date_delta = compare_date - self.broadcast_start_date
         date_delta_minutes = date_delta.seconds // 60
         date_delta_hours = date_delta_minutes // 60

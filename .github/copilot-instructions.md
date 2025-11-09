@@ -3,29 +3,76 @@
 ## Project Context
 
 **What**: Kodi addon for streaming NHK World TV (live TV, on-demand videos, news)
-**Tech Stack**: Python 3.12, Kodi API (xbmc/xbmcgui/xbmcplugin), Requests with in-memory caching, Pytest
+**Tech Stack**: Python 3.11 (Kodi Omega requirement), Kodi API (xbmc/xbmcgui/xbmcplugin), Requests with in-memory caching, Pytest
 **Current Status**: Submitted to official Kodi repo - [PR #4718](https://github.com/xbmc/repo-plugins/pull/4718)
 **Kodi Versions**: Omega (v21), Piers (v22)
+**Python Version**: 3.11 (matches Kodi Omega - do NOT use Python 3.12+ features)
 
 ## Critical Rules (Always Follow)
 
-### 1. Dependency Version Management
+### 1. ⚠️ MANDATORY: Check Kodi Repository for Dependency Versions FIRST
 
-**The Kodi repository is the ONLY source of truth for dependency versions.**
+**🔴 BEFORE making ANY dependency changes, ALWAYS verify versions against the Kodi repository.**
 
-Workflow: `Kodi Repository → addon.xml → Pipfile`
+The Kodi addon repository at https://mirrors.kodi.tv/addons/omega/ is the **ONLY** source of truth for dependency versions.
 
-1. Check https://mirrors.kodi.tv/addons/omega/ for available versions
-2. Update `plugin.video.nhkworldtv/addon.xml` to match Kodi repository
-3. Update `Pipfile` to match `addon.xml`
+**Mandatory Workflow**: `Kodi Repository → addon.xml → Pipfile`
 
-**Notes**:
+**Step-by-step process**:
+1. **FIRST**: Check https://mirrors.kodi.tv/addons/omega/ for available versions
+2. **THEN**: Update `plugin.video.nhkworldtv/addon.xml` to match Kodi repository
+3. **FINALLY**: Update `Pipfile` to match `addon.xml`
 
-- Binary addons (e.g., `inputstream.adaptive`) have platform-specific names in repo but are referenced without suffix in `addon.xml`
-- Script modules use `script.module.*` prefix in repository
-- Never assume a version exists - always verify first
+**Critical Notes**:
+- Binary addons (e.g., `inputstream.adaptive`) have platform-specific directories in repo (e.g., `inputstream.adaptive+android-aarch64/`) but are referenced without platform suffix in `addon.xml`
+- Script modules use `script.module.*` prefix in repository (e.g., `script.module.requests/`)
+- **NEVER** assume a version exists without verification
+- **NEVER** update dependencies based on Dependabot/security alerts without checking Kodi repo first
+- If a version doesn't exist in Kodi repo, it **cannot** be used
 
-### 2. Error Handling Pattern
+**Current verified dependencies** (as of November 2025):
+- script.module.requests: 2.31.0 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.requests/))
+- script.module.pytz: 2023.3.0 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.pytz/))
+- script.module.routing: 0.2.3 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.routing/))
+- script.module.tzlocal: 5.0.1 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.tzlocal/))
+- inputstream.adaptive: 21.5.16 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/inputstream.adaptive+android-aarch64/))
+
+### 2. Python 3.11 Compatibility
+
+**CRITICAL**: Kodi Omega uses Python 3.11 - do NOT use Python 3.12+ features!
+
+**Development Environment Note**: Local dev uses Python 3.12.3 but target is 3.11 - always test compatibility!
+
+**Forbidden Python 3.12+ features**:
+- `datetime.UTC` (use `datetime.timezone.utc` instead - available since Python 3.2)
+  - Suppress ruff UP017 warning with `# noqa: UP017` when using `timezone.utc`
+- Type parameter syntax (`def func[T](x: T)`)
+- `@override` decorator
+- PEP 701 f-string improvements
+
+**Required for Python 3.11**:
+- Add `from __future__ import annotations` at top of files using modern type hints
+- Modern type hints requiring this: `dict[str, int]`, `str | None`, `list[dict]`, etc.
+- Without this import, you'll get `TypeError: 'type' object is not subscriptable`
+
+**Always test with Python 3.11** to catch compatibility issues before deploying to Kodi.
+
+### 3. Commit Workflow (MANDATORY)
+
+⚠️ **NEVER COMMIT WITHOUT USER APPROVAL**
+
+**Pre-commit checklist**:
+1. Fix ALL linter errors (mypy, ruff, Pylance must be clean)
+2. Run full test suite (all 178 tests must pass)
+3. Test in Kodi if functionality changed
+4. Ask user for approval before committing
+5. Use conventional commit format
+
+**Deployment to Kodi**:
+- Run from `build/` directory: `cd build && ./copy_local_wsl.sh`
+- Script uses relative paths and must be run from that location
+
+### 4. Error Handling Pattern
 
 **ALWAYS use null-safe patterns:**
 
@@ -42,9 +89,9 @@ else:
 data = url.get_json(api_url)["items"]  # Can raise TypeError!
 ```
 
-### 3. NHK API Architecture
+### 5. NHK API Architecture
 
-**Current API**: `api.nhkworld.jp/showsapi/v1/` (October 2025 migration)
+**API Base**: `api.nhkworld.jp/showsapi/v1/`
 **Authentication**: None required (public endpoints)
 **Video URLs**: Provided directly in API responses (no scraping needed)
 
@@ -64,23 +111,32 @@ rest_url = {
 }
 ```
 
-**API Response Format (New vs Old)**:
-
-| Old API         | New API         | Notes                       |
-| --------------- | --------------- | --------------------------- |
-| `data.episodes` | `items`         | Top-level array             |
-| `vod_id`        | `id`            | Episode identifier          |
-| `title_clean`   | `title`         | Episode title               |
-| Unix timestamp  | ISO 8601 string | Date format                 |
-| N/A             | `video.url`     | Video URL included directly |
-
 ## Code Style
 
 **Python Standards**:
 
-- PEP 8 style, 4 spaces indentation, 88 char line length (Black)
+- PEP 8 style, 4 spaces indentation, 88 char line length
 - Type hints where possible
 - Docstrings for all public functions/classes
+- All configured in `pyproject.toml`
+
+**Development Tools (2025)**:
+
+- **Ruff**: Modern linter & formatter (replaces Black, isort, flake8, pylint)
+  - Run: `make format` or `pipenv run ruff format .`
+  - Auto-fix: `pipenv run ruff check --fix .`
+- **mypy**: Type checking
+  - Run: `make type-check` or `pipenv run mypy plugin.video.nhkworldtv/lib`
+- **pytest**: Testing with coverage
+  - Run: `make test` or `make test-cov`
+- **Makefile**: Quick commands for common tasks
+  - `make all` - Format, lint, type-check, and test in one command
+
+**VS Code Integration**:
+- Auto-format on save (Ruff)
+- Integrated testing (Test Explorer)
+- Type checking (mypy)
+- All configured in `.vscode/settings.json`
 
 **Kodi-Specific**:
 
@@ -115,8 +171,6 @@ plugin.video.nhkworldtv/
 ├── resources/          # Settings, translations, media
 └── main.py            # Entry point
 ```
-
-**Removed modules** (PR #140): `api_keys.py`, `nhk_api_parser.py`, `cache_api.py`, `news_programs.py`, `first_run_wizard.py`
 
 ## Common Tasks
 
@@ -168,17 +222,27 @@ xbmc.log(f"Error: {error_message}", xbmc.LOGERROR)
 **Run tests**:
 
 ```bash
+# Quick command
+make test
+
 # All tests with verbose output
 pipenv run pytest plugin.video.nhkworldtv/tests/ -v
 
 # With coverage
+make test-cov
+# or manually:
 pipenv run pytest plugin.video.nhkworldtv/tests/ --cov=plugin.video.nhkworldtv/lib --cov-report=html -v
 
 # Specific test file
 pipenv run pytest plugin.video.nhkworldtv/tests/test_lib_url.py -v
 ```
 
-**Current status**: All 57 tests passing (100%)
+**Current status**: All 178 tests passing, 76% coverage
+
+**Test organization**:
+- `test_lib_*.py` - Unit tests for each module
+- `test_integration_nhk_api.py` - Integration tests for API endpoints
+- All tests use mocking to avoid live API calls where appropriate
 
 **When debugging API issues**:
 
@@ -227,10 +291,25 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`
 
 **.vscode/** contains:
 
-- `settings.json` - Python, testing, formatting config
+- `settings.json` - Python, testing, formatting config (Ruff, mypy)
 - `launch.json` - Debug configurations
-- `tasks.json` - Common development tasks
-- `mcp.json` - MCP server configurations
+- `extensions.json` - Recommended VS Code extensions
+
+**pyproject.toml** contains:
+
+- Ruff configuration (linter & formatter rules)
+- pytest configuration
+- mypy type checking configuration
+- Coverage settings
+
+**Makefile** provides quick commands:
+
+- `make format` - Auto-format code with Ruff
+- `make lint` - Check code quality
+- `make type-check` - Run mypy type checking
+- `make test` - Run all 178 tests
+- `make test-cov` - Tests with HTML coverage report
+- `make all` - Run everything (format, lint, type-check, test)
 
 ## Quick Decision Guide
 
