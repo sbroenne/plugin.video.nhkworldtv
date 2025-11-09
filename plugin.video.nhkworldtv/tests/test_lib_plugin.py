@@ -79,7 +79,7 @@ class TestAddPlayableEpisode:
         assert isinstance(wrong_structure[0], list), "Bug nests list in tuple"
 
         # The correct structure should unpack properly
-        url, listitem, is_folder = result  # No ValueError = correct
+        _url, _listitem, is_folder = result  # No ValueError = correct
         assert is_folder is False
 
 
@@ -165,8 +165,8 @@ class TestEpisodeTupleStructure:
         # Wrong way (the bug we had)
         wrong_list = []
         # Note the extra parentheses around the function call
-        wrong_list.append((plugin.add_playable_episode(episode1)))
-        wrong_list.append((plugin.add_playable_episode(episode2)))
+        wrong_list.append(plugin.add_playable_episode(episode1))
+        wrong_list.append(plugin.add_playable_episode(episode2))
 
         # This actually creates the same structure in Python,
         # but in the original code context it was in a tuple literal

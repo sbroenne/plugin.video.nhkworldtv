@@ -1,7 +1,9 @@
 """
 At-a-glance episodes
 """
+
 import xbmc
+
 from . import kodiutils, nhk_api, url
 from .episode import Episode
 
@@ -18,12 +20,14 @@ def get_menu_item():
     menu_item = Episode()
     # Getting the first story
     api_result = url.get_json(nhk_api.rest_url["get_news_ataglance"])
-    
+
     if api_result is None or "data" not in api_result or not api_result["data"]:
-        xbmc.log("ataglance.get_menu_item: Failed to load at-a-glance data", xbmc.LOGERROR)
+        xbmc.log(
+            "ataglance.get_menu_item: Failed to load at-a-glance data", xbmc.LOGERROR
+        )
         kodiutils.show_notification("NHK World TV", "Unable to load At a Glance news.")
         return None
-    
+
     featured_news = api_result["data"][0]
     thumbnails = featured_news.get("image", {})
     menu_item.thumb = thumbnails.get("list_pc", "")
@@ -53,12 +57,16 @@ def get_episodes(max_items):
     """
 
     api_result_json = url.get_json(nhk_api.rest_url["get_news_ataglance"])
-    
+
     if api_result_json is None or "data" not in api_result_json:
-        xbmc.log("ataglance.get_episodes: Failed to load at-a-glance data", xbmc.LOGERROR)
-        kodiutils.show_notification("NHK World TV", "Unable to load At a Glance episodes.")
+        xbmc.log(
+            "ataglance.get_episodes: Failed to load at-a-glance data", xbmc.LOGERROR
+        )
+        kodiutils.show_notification(
+            "NHK World TV", "Unable to load At a Glance episodes."
+        )
         return []
-    
+
     max_row_count = max_items
     result_row_count = len(api_result_json["data"])
     episodes = []
@@ -83,7 +91,7 @@ def get_episodes(max_items):
         episode.title = title
         vod_id = row.get("id", "")
         episode.vod_id = vod_id
-        
+
         video_info = row.get("video", {})
         episode.duration = video_info.get("duration", 0)
         episode.plot_include_time_difference = True
@@ -91,13 +99,16 @@ def get_episodes(max_items):
 
         episode.video_info = kodiutils.get_sd_video_info()
         episode.is_playable = True
-        
+
         video_config = video_info.get("config", "")
         if video_config:
             episode.url = url.get_nhk_website_url(video_config)
         else:
-            xbmc.log(f"ataglance.get_episodes: No video config for item {vod_id}", xbmc.LOGWARNING)
+            xbmc.log(
+                f"ataglance.get_episodes: No video config for item {vod_id}",
+                xbmc.LOGWARNING,
+            )
             continue
-            
+
         episodes.append(episode)
     return episodes

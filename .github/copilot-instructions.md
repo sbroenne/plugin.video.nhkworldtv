@@ -78,9 +78,28 @@ rest_url = {
 
 **Python Standards**:
 
-- PEP 8 style, 4 spaces indentation, 88 char line length (Black)
+- PEP 8 style, 4 spaces indentation, 88 char line length
 - Type hints where possible
 - Docstrings for all public functions/classes
+- All configured in `pyproject.toml`
+
+**Development Tools (2025)**:
+
+- **Ruff**: Modern linter & formatter (replaces Black, isort, flake8, pylint)
+  - Run: `make format` or `pipenv run ruff format .`
+  - Auto-fix: `pipenv run ruff check --fix .`
+- **mypy**: Type checking
+  - Run: `make type-check` or `pipenv run mypy plugin.video.nhkworldtv/lib`
+- **pytest**: Testing with coverage
+  - Run: `make test` or `make test-cov`
+- **Makefile**: Quick commands for common tasks
+  - `make all` - Format, lint, type-check, and test in one command
+
+**VS Code Integration**:
+- Auto-format on save (Ruff)
+- Integrated testing (Test Explorer)
+- Type checking (mypy)
+- All configured in `.vscode/settings.json`
 
 **Kodi-Specific**:
 
@@ -168,17 +187,27 @@ xbmc.log(f"Error: {error_message}", xbmc.LOGERROR)
 **Run tests**:
 
 ```bash
+# Quick command
+make test
+
 # All tests with verbose output
 pipenv run pytest plugin.video.nhkworldtv/tests/ -v
 
 # With coverage
+make test-cov
+# or manually:
 pipenv run pytest plugin.video.nhkworldtv/tests/ --cov=plugin.video.nhkworldtv/lib --cov-report=html -v
 
 # Specific test file
 pipenv run pytest plugin.video.nhkworldtv/tests/test_lib_url.py -v
 ```
 
-**Current status**: All 57 tests passing (100%)
+**Current status**: All 178 tests passing, 76% coverage
+
+**Test organization**:
+- `test_lib_*.py` - Unit tests for each module
+- `test_integration_nhk_api.py` - Integration tests for API endpoints
+- All tests use mocking to avoid live API calls where appropriate
 
 **When debugging API issues**:
 
@@ -227,10 +256,25 @@ Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`
 
 **.vscode/** contains:
 
-- `settings.json` - Python, testing, formatting config
+- `settings.json` - Python, testing, formatting config (Ruff, mypy)
 - `launch.json` - Debug configurations
-- `tasks.json` - Common development tasks
-- `mcp.json` - MCP server configurations
+- `extensions.json` - Recommended VS Code extensions
+
+**pyproject.toml** contains:
+
+- Ruff configuration (linter & formatter rules)
+- pytest configuration
+- mypy type checking configuration
+- Coverage settings
+
+**Makefile** provides quick commands:
+
+- `make format` - Auto-format code with Ruff
+- `make lint` - Check code quality
+- `make type-check` - Run mypy type checking
+- `make test` - Run all 178 tests
+- `make test-cov` - Tests with HTML coverage report
+- `make all` - Run everything (format, lint, type-check, test)
 
 ## Quick Decision Guide
 

@@ -3,7 +3,6 @@ URL / Request handling
 """
 
 import time
-from typing import Dict, Optional, Tuple
 
 import requests
 import xbmc
@@ -21,10 +20,10 @@ URL_CACHE_MINUTES = 60
 
 # Simple in-memory cache
 # Format: {url: (response_text, expiry_timestamp)}
-_response_cache: Dict[str, Tuple[str, float]] = {}
+_response_cache: dict[str, tuple[str, float]] = {}
 
 
-def _get_cache_key(url: str, params: Optional[dict] = None) -> str:
+def _get_cache_key(url: str, params: dict | None = None) -> str:
     """Generate cache key from URL and parameters"""
     if params:
         # Sort params for consistent cache keys
@@ -33,7 +32,7 @@ def _get_cache_key(url: str, params: Optional[dict] = None) -> str:
     return url
 
 
-def _get_cached_response(url: str, params: Optional[dict] = None) -> Optional[str]:
+def _get_cached_response(url: str, params: dict | None = None) -> str | None:
     """Get cached response if available and not expired"""
     cache_key = _get_cache_key(url, params)
     if cache_key in _response_cache:
@@ -48,7 +47,7 @@ def _get_cached_response(url: str, params: Optional[dict] = None) -> Optional[st
     return None
 
 
-def _cache_response(url: str, content: str, params: Optional[dict] = None):
+def _cache_response(url: str, content: str, params: dict | None = None):
     """Cache response with expiration time"""
     cache_key = _get_cache_key(url, params)
     expiry = time.time() + (URL_CACHE_MINUTES * 60)
@@ -63,64 +62,67 @@ user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/88.0.4324.182"
 session.headers.update({"User-Agent": user_agent})
 
 
-def check_url_exists(url):
-    """Check if a URL exists of it returns a 404
+def check_url_exists(url: str) -> bool:
+    """Check if a URL exists or it returns a 404
 
     Arguments:
-        url {str} -- URL to check
+        url: URL to check
+
+    Returns:
+        False if 404, True otherwise
     """
     # Don't cache existence checks
     request = session.get(url)
-    if request.status_code == 404:
-        return False
-    else:
-        return True
+    return bool(request.status_code != 404)
 
 
-def get_json(url, cached=True):
+def get_json(url: str, cached: bool = True) -> dict | None:
     """Get JSON object from a URL with improved error handling
 
     Args:
-        url ([str]): URL to retrieve
-        cached (bool, optional): Use request_cache. Defaults to True.
+        url: URL to retrieve
+        cached: Use request_cache. Defaults to True.
 
     Returns:
-        [dict]: JSON dictionary
+        JSON dictionary or None if request fails
     """
     request = get_url(url, cached)
     if request.status_code == 200:
         try:
-            result = request.json()
+            result: dict | None = request.json()
             xbmc.log(f"Successfully loaded JSON from API: {url}")
             return result
         except ValueError:
             # Failure - no way to handle - probably an issue with the NHK API
             xbmc.log(f"Could not parse JSON from API: {url}")
+            return None
     else:
         # Failure - could not connect to site
         xbmc.log(f"Could not connect to API: {url}")
+        return None
 
 
-def get_api_request_params(url):
+def get_api_request_params(url: str) -> dict | None:
     """Returns the API request parameters for the NHK API
 
     Args:
-        url ([str]): Url
+        url: Url
+
     Returns:
-        [dict]: Empty dict for API URLs (no auth needed), None for others
+        Empty dict for API URLs (no auth needed), None for others
     """
 
     # Check if this is an NHK API URL
     if nhk_api.NHK_API_BASE in url or nhk_api.NHK_BASE in url:
         # API key is no longer required per commit 05d1548
-        request_params = {}
+        request_params: dict | None = {}
     else:
         request_params = None
 
     return request_params
 
 
-def request_url(url, cached=True):
+def request_url(url: str, cached: bool = True) -> Response:
     """HELPER: Request URL with handling basic error conditions
 
     Args:
@@ -132,7 +134,6 @@ def request_url(url, cached=True):
     """
 
     request_params = get_api_request_params(url)
-    request = Response()
 
     try:
         # Check cache first if caching is enabled
@@ -140,7 +141,11 @@ def request_url(url, cached=True):
             cached_content = _get_cached_response(url, request_params)
             if cached_content:
                 # Create a fake response object from cached content
+                request = Response()
                 request.status_code = 200
+                # Use encoding instead of direct content access
+                request.encoding = "utf-8"
+                # pylint: disable=protected-access
                 request._content = cached_content.encode("utf-8")
                 return request
 
@@ -157,20 +162,21 @@ def request_url(url, cached=True):
         return request
     except requests.ConnectionError:
         # Could not establish connection at all
+        request = Response()
         request.status_code = 10001
     return request
 
 
-def get_url(url, cached=True):
+def get_url(url: str, cached: bool = True) -> Response:
     """Get a URL with automatic retries
         NHK sometimes have intermittent problems with 502 Bad Gateway
 
     Args:
-        url ([str]): URL to retrieve
-        cached (bool, optional): Use in-memory cache. Defaults to True.
+        url: URL to retrieve
+        cached: Use in-memory cache. Defaults to True.
 
     Returns:
-        [response]: Response object
+        Response object
     """
 
     # maximum number of retries
@@ -220,7 +226,14 @@ def get_url(url, cached=True):
     return request
 
 
-def get_nhk_website_url(path):
-    """Return a full URL from the partial URLs in the JSON results"""
+def get_nhk_website_url(path: str) -> str:
+    """Return a full URL from the partial URLs in the JSON results
+
+    Args:
+        path: Partial URL path
+
+    Returns:
+        Full URL
+    """
     nhk_website = nhk_api.NHK_BASE
     return nhk_website + path

@@ -11,6 +11,36 @@ from .episode import Episode
 ADDON = xbmcaddon.Addon()
 
 
+def extract_images(images_obj):
+    """Extract thumb and fanart URLs from API image structure
+
+    Args:
+        images_obj: Image object from API (dict or list)
+
+    Returns:
+        tuple: (thumb_url, fanart_url)
+    """
+    thumb = ""
+    fanart = ""
+
+    if isinstance(images_obj, dict):
+        images = images_obj.get("landscape", [])
+        if images:
+            thumb = images[0].get("url", "")
+            fanart = images[-1].get("url", "") if len(images) > 1 else thumb
+    elif isinstance(images_obj, list) and images_obj:
+        # Some endpoints return images as array directly
+        first_img = images_obj[0] if images_obj[0] else {}
+        thumb = first_img.get("url", "")
+        if len(images_obj) > 1:
+            last_img = images_obj[-1] if images_obj[-1] else {}
+            fanart = last_img.get("url", "")
+        else:
+            fanart = thumb
+
+    return thumb, fanart
+
+
 def get_episode_list(api_method, episode_list_id, show_only_subtitle):
     """Video On Demand - Episode List
 
@@ -27,6 +57,15 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
 
     # Only format api_url when a non-0 value for id was provided
     # some APIs do not need an id
+    if api_method not in nhk_api.rest_url:
+        xbmc.log(
+            f"vod.get_episode_list: Invalid API method: {api_method}", xbmc.LOGERROR
+        )
+        kodiutils.show_notification(
+            "NHK World TV", "Unable to load episodes. Invalid API method."
+        )
+        return []
+
     if episode_list_id != "None":
         api_url = nhk_api.rest_url[api_method].format(episode_list_id)
     else:
@@ -108,25 +147,7 @@ def get_episode_list(api_method, episode_list_id, show_only_subtitle):
 
         # Get images from new API structure
         images_obj = row.get("images", {})
-        if isinstance(images_obj, dict):
-            images = images_obj.get("landscape", [])
-            if images:
-                episode.thumb = images[0].get("url", "")
-                episode.fanart = (
-                    images[-1].get("url", "") if len(images) > 1 else episode.thumb
-                )
-            else:
-                episode.thumb = ""
-                episode.fanart = ""
-        elif isinstance(images_obj, list) and images_obj:
-            # Some endpoints return images as array directly
-            episode.thumb = images_obj[0].get("url", "") if images_obj[0] else ""
-            episode.fanart = (
-                images_obj[-1].get("url", "") if len(images_obj) > 1 else episode.thumb
-            )
-        else:
-            episode.thumb = ""
-            episode.fanart = ""
+        episode.thumb, episode.fanart = extract_images(images_obj)
 
         episode.vod_id = row.get("id", "")
         episode.pgm_no = row.get("pgm_no", "")
@@ -205,25 +226,7 @@ def resolve_vod_episode(vod_id):
 
     # Get images from episode detail
     images_obj = episode_detail.get("images", {})
-    if isinstance(images_obj, dict):
-        images = images_obj.get("landscape", [])
-        if images:
-            episode.thumb = images[0].get("url", "")
-            episode.fanart = (
-                images[-1].get("url", "") if len(images) > 1 else episode.thumb
-            )
-        else:
-            episode.thumb = ""
-            episode.fanart = ""
-    elif isinstance(images_obj, list) and images_obj:
-        # Some endpoints return images as array directly
-        episode.thumb = images_obj[0].get("url", "") if images_obj[0] else ""
-        episode.fanart = (
-            images_obj[-1].get("url", "") if len(images_obj) > 1 else episode.thumb
-        )
-    else:
-        episode.thumb = ""
-        episode.fanart = ""
+    episode.thumb, episode.fanart = extract_images(images_obj)
 
     # Get duration from video info or movie_duration field
     video_info = episode_detail.get("video", {})

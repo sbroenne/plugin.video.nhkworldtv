@@ -1,0 +1,174 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plugin.video.nhkworldtv"
+version = "3.0.0"
+description = "NHK World TV Kodi Plugin"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "sbroenne"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+]
+
+dependencies = [
+    "requests==2.31.0",
+    "pytz==2023.3.0",
+    "tzlocal==5.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+]
+
+# ============================================================================
+# Ruff - The modern all-in-one linter & formatter (replaces Black, isort, flake8, pylint)
+# ============================================================================
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+indent-width = 4
+
+# Exclude directories
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "htmlcov",
+]
+
+[tool.ruff.lint]
+# Enable recommended rules + additional useful ones
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort (import sorting)
+    "N",      # pep8-naming
+    "UP",     # pyupgrade (modernize Python code)
+    "B",      # flake8-bugbear (find likely bugs)
+    "C4",     # flake8-comprehensions
+    "SIM",    # flake8-simplify
+    "PTH",    # flake8-use-pathlib
+    "RUF",    # Ruff-specific rules
+]
+
+# Ignore specific rules that conflict with Kodi or are too strict
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "PTH",    # Don't force pathlib (Kodi uses os.path)
+    "SIM108", # Use ternary operator (sometimes less readable)
+]
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "F401",   # Allow unused imports in tests
+    "F811",   # Allow redefinition in tests
+]
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+
+# Indent with spaces
+indent-style = "space"
+
+# Respect magic trailing commas
+skip-magic-trailing-comma = false
+
+# Auto-detect line ending
+line-ending = "auto"
+
+# ============================================================================
+# Pytest Configuration
+# ============================================================================
+[tool.pytest.ini_options]
+testpaths = ["plugin.video.nhkworldtv/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+    "--cov=plugin.video.nhkworldtv/lib",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:pytz",
+]
+markers = [
+    "integration: Integration tests that require network access",
+    "unit: Fast unit tests",
+]
+
+# ============================================================================
+# Coverage Configuration
+# ============================================================================
+[tool.coverage.run]
+source = ["plugin.video.nhkworldtv/lib"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+# ============================================================================
+# MyPy - Static Type Checking
+# ============================================================================
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # Gradual adoption
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+no_implicit_optional = true
+strict_optional = true
+
+# Ignore missing imports for external dependencies
+[[tool.mypy.overrides]]
+module = [
+    "xbmc.*",
+    "xbmcgui.*",
+    "xbmcplugin.*",
+    "xbmcaddon.*",
+    "xbmcvfs.*",
+    "routing.*",
+    "tzlocal.*",
+]
+ignore_missing_imports = true

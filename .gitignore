@@ -125,7 +125,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-#Custom
+
+# Ruff cache (2025)
+.ruff_cache/
+
+# Custom
 .DS_Store
 *.code-workspace
 *.sqlite
@@ -133,6 +137,5 @@ dmypy.json
 plugin.video.nhkworldtv/cov.xml
 plugin.video.nhkworldtv-*.zip
 
-# IDE and development
-.vscode/
+# IDE and development (keep .vscode for shared settings)
 test-results/

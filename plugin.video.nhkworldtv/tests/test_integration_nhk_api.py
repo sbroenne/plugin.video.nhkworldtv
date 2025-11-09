@@ -213,9 +213,12 @@ class TestImageAvailability:
 
         for episode in data["items"][:10]:  # Check first 10
             # New API uses simple 'images' array, not 'images.landscape'
-            if "images" in episode and isinstance(episode["images"], list):
-                if len(episode["images"]) > 0:
-                    episodes_with_images += 1
+            if (
+                "images" in episode
+                and isinstance(episode["images"], list)
+                and len(episode["images"]) > 0
+            ):
+                episodes_with_images += 1
 
         # At least 80% of episodes should have images
         assert episodes_with_images >= 8, (
@@ -671,16 +674,14 @@ class TestVODEpisodeResolution:
                 # Test resolution - should not crash even with no images
                 episode = vod.resolve_vod_episode(episode_id)
 
-                if episode:
+                if episode and (not images or len(images) == 0):
                     # If no images, thumb/fanart should be None or empty
-                    if not images or len(images) == 0:
-                        # Episode should still resolve (has video)
-                        assert episode.url is not None
-                        # Thumb/fanart may be None if no images
-                        # This is acceptable - we just shouldn't crash
-                        break
+                    # Episode should still resolve (has video)
+                    assert episode.url is not None
+                    # Thumb/fanart may be None if no images
+                    # This is acceptable - we just shouldn't crash
+                    break
 
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
-

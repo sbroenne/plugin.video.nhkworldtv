@@ -66,7 +66,9 @@ The plug-in is feature complete and stable.
 - Removed authentication requirements (API now public)
 - Simplified video URL resolution (URLs provided directly by API)
 - API endpoints are hardcoded constants which makes the plug-in more maintainable
-- Scheduled unit tests run on Github to alert on breaking changes
+- Comprehensive test suite: **178 tests with 76% coverage**
+- Modern development tooling: Ruff (linter/formatter), mypy (type checking)
+- Automated GitHub Actions for testing and releases
 
 The plug-in is localized but translation only exists for English (GB). It runs on Kodi Omega (v21) and Piers (v22).
 
@@ -80,7 +82,33 @@ No major feature work planned - the plugin is feature complete. If you have an i
 
 ## 1.8. Local development environment
 
-You will find scripts to build the plugin in locally in the [build](../build/) folder. [More Information](build.md)
+### Quick Start
+
+```bash
+# Install dependencies
+pipenv install --dev
+
+# Run tests
+make test
+
+# Format and lint code
+make format lint
+```
+
+### Development Tools (2025 Modern Stack)
+
+- **Ruff**: Fast linter & formatter (replaces Black, isort, flake8, pylint)
+- **mypy**: Type checking
+- **pytest**: 178 tests with 76% coverage
+- **Makefile**: Quick commands (`make format`, `make test`, `make all`)
+
+### Detailed Documentation
+
+You will find comprehensive build and development instructions in the [build](../build/) folder:
+
+- [build.md](build.md) - Complete setup, tooling, testing, and deployment guide
+- Development tooling configured in `pyproject.toml` and `.vscode/`
+- VS Code auto-format on save, integrated testing, and debugging
 
 ## 1.9. Bugs & Issues
 
