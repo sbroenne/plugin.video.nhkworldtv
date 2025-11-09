@@ -4,7 +4,7 @@ Main plugin code
 
 import random
 import sys
-from datetime import UTC
+from datetime import datetime, timezone
 
 import routing
 import xbmc
@@ -495,7 +495,7 @@ def _get_schedule_episodes(time_filter="all"):
 
     program_json = api_result["data"]
     episodes = []
-    now = datetime.now(UTC)
+    now = datetime.now(timezone.utc)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
 

@@ -3,9 +3,10 @@
 ## Project Context
 
 **What**: Kodi addon for streaming NHK World TV (live TV, on-demand videos, news)
-**Tech Stack**: Python 3.12, Kodi API (xbmc/xbmcgui/xbmcplugin), Requests with in-memory caching, Pytest
+**Tech Stack**: Python 3.11 (Kodi Omega requirement), Kodi API (xbmc/xbmcgui/xbmcplugin), Requests with in-memory caching, Pytest
 **Current Status**: Submitted to official Kodi repo - [PR #4718](https://github.com/xbmc/repo-plugins/pull/4718)
 **Kodi Versions**: Omega (v21), Piers (v22)
+**Python Version**: 3.11 (matches Kodi Omega - do NOT use Python 3.12+ features)
 
 ## Critical Rules (Always Follow)
 
@@ -36,7 +37,19 @@ The Kodi addon repository at https://mirrors.kodi.tv/addons/omega/ is the **ONLY
 - script.module.tzlocal: 5.0.1 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.tzlocal/))
 - inputstream.adaptive: 21.5.16 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/inputstream.adaptive+android-aarch64/))
 
-### 2. Error Handling Pattern
+### 2. Python 3.11 Compatibility
+
+**CRITICAL**: Kodi Omega uses Python 3.11 - do NOT use Python 3.12+ features!
+
+**Forbidden Python 3.12+ features**:
+- `datetime.UTC` (use `datetime.timezone.utc` instead - available since Python 3.2)
+- Type parameter syntax (`def func[T](x: T)`)
+- `@override` decorator
+- PEP 701 f-string improvements
+
+**Always test with Python 3.11** to catch compatibility issues before deploying to Kodi.
+
+### 3. Error Handling Pattern
 
 **ALWAYS use null-safe patterns:**
 
