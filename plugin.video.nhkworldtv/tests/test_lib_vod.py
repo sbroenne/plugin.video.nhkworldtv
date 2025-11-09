@@ -23,7 +23,7 @@ def test_extract_images_dict_single_image():
 
 def test_extract_images_dict_empty_landscape():
     """Test extract_images with empty landscape array"""
-    images_obj = {"landscape": []}
+    images_obj: dict[str, list[dict[str, str]]] = {"landscape": []}
     thumb, fanart = vod.extract_images(images_obj)
     assert thumb == ""
     assert fanart == ""
@@ -47,7 +47,7 @@ def test_extract_images_list_single():
 
 def test_extract_images_empty_list():
     """Test extract_images with empty list"""
-    images_obj = []
+    images_obj: list[dict[str, str]] = []
     thumb, fanart = vod.extract_images(images_obj)
     assert thumb == ""
     assert fanart == ""

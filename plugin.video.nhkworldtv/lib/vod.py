@@ -2,6 +2,9 @@
 Video-on-demand (VOD)
 """
 
+from collections.abc import Sequence
+from typing import Any
+
 import xbmc
 import xbmcaddon
 
@@ -11,11 +14,15 @@ from .episode import Episode
 ADDON = xbmcaddon.Addon()
 
 
-def extract_images(images_obj):
+def extract_images(
+    images_obj: (
+        dict[str, list[dict[Any, Any]]] | Sequence[dict[Any, Any] | None] | None
+    ),
+) -> tuple[str, str]:
     """Extract thumb and fanart URLs from API image structure
 
     Args:
-        images_obj: Image object from API (dict or list)
+        images_obj: Image object from API (dict or list, list may contain None)
 
     Returns:
         tuple: (thumb_url, fanart_url)
