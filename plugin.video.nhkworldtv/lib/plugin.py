@@ -762,19 +762,44 @@ def vod_programs():
 
             episode.video_info = kodiutils.get_video_info()
 
-            episodes.append(
-                (
-                    plugin.url_for(
-                        vod_episode_list,
-                        "get_programs_episode_list",
-                        program_id,
-                        1,
-                        xbmcplugin.SORT_METHOD_UNSORTED,
-                    ),
-                    episode.kodi_list_item,
-                    True,
+            # If program has only 1 episode, fetch it and make it directly playable
+            if total_episodes == 1:
+                # Get the single episode from the program
+                single_episode_list = vod.get_episode_list("get_programs_episode_list", program_id, 1)
+                if single_episode_list and len(single_episode_list) > 0:
+                    # Use the actual episode data instead of program data
+                    single_episode = single_episode_list[0]
+                    episodes.append(add_playable_episode(single_episode))
+                else:
+                    # Fallback to episode list if fetching failed
+                    episodes.append(
+                        (
+                            plugin.url_for(
+                                vod_episode_list,
+                                "get_programs_episode_list",
+                                program_id,
+                                1,
+                                xbmcplugin.SORT_METHOD_UNSORTED,
+                            ),
+                            episode.kodi_list_item,
+                            True,
+                        )
+                    )
+            else:
+                # Multiple episodes - show episode list as usual
+                episodes.append(
+                    (
+                        plugin.url_for(
+                            vod_episode_list,
+                            "get_programs_episode_list",
+                            program_id,
+                            1,
+                            xbmcplugin.SORT_METHOD_UNSORTED,
+                        ),
+                        episode.kodi_list_item,
+                        True,
+                    )
                 )
-            )
 
     if row_count > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
