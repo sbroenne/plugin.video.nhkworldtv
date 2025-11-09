@@ -4,7 +4,7 @@ Main plugin code
 
 import random
 import sys
-from datetime import datetime, timezone
+from datetime import timezone
 
 import routing
 import xbmc
@@ -381,6 +381,8 @@ def add_live_stream_menu_item():
             xbmc.LOGINFO,
         )
 
+    # Type guard: episode.url is guaranteed to be set above
+    assert episode.url is not None, "Live stream URL must be set"
     episode.video_info = kodiutils.get_video_info(episode.url)
     xbmcplugin.addDirectoryItem(
         plugin.handle, episode.url, episode.kodi_list_item, False
@@ -495,7 +497,9 @@ def _get_schedule_episodes(time_filter="all"):
 
     program_json = api_result["data"]
     episodes = []
-    now = datetime.now(timezone.utc)
+    # Note: timezone.utc is used instead of UTC for Python 3.11 compatibility
+    # (Kodi Omega's Python 3.11 doesn't have datetime.UTC constant)
+    now = datetime.now(timezone.utc)  # noqa: UP017
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = now.replace(hour=23, minute=59, second=59, microsecond=999999)
 
@@ -762,44 +766,19 @@ def vod_programs():
 
             episode.video_info = kodiutils.get_video_info()
 
-            # If program has only 1 episode, fetch it and make it directly playable
-            if total_episodes == 1:
-                # Get the single episode from the program
-                single_episode_list = vod.get_episode_list("get_programs_episode_list", program_id, 1)
-                if single_episode_list and len(single_episode_list) > 0:
-                    # Use the actual episode data instead of program data
-                    single_episode = single_episode_list[0]
-                    episodes.append(add_playable_episode(single_episode))
-                else:
-                    # Fallback to episode list if fetching failed
-                    episodes.append(
-                        (
-                            plugin.url_for(
-                                vod_episode_list,
-                                "get_programs_episode_list",
-                                program_id,
-                                1,
-                                xbmcplugin.SORT_METHOD_UNSORTED,
-                            ),
-                            episode.kodi_list_item,
-                            True,
-                        )
-                    )
-            else:
-                # Multiple episodes - show episode list as usual
-                episodes.append(
-                    (
-                        plugin.url_for(
-                            vod_episode_list,
-                            "get_programs_episode_list",
-                            program_id,
-                            1,
-                            xbmcplugin.SORT_METHOD_UNSORTED,
-                        ),
-                        episode.kodi_list_item,
-                        True,
-                    )
+            episodes.append(
+                (
+                    plugin.url_for(
+                        vod_episode_list,
+                        "get_programs_episode_list",
+                        program_id,
+                        1,
+                        xbmcplugin.SORT_METHOD_UNSORTED,
+                    ),
+                    episode.kodi_list_item,
+                    True,
                 )
+            )
 
     if row_count > 0:
         xbmcplugin.addDirectoryItems(plugin.handle, episodes, len(episodes))
@@ -943,7 +922,9 @@ def resolve_vod_episode(vod_id):
         return None
 
     # Get the URL (already upgraded to 1080p by vod.resolve_vod_episode)
+    # Type guard: episode.url is guaranteed to be set when is_playable is True
     video_url = episode.url
+    assert video_url is not None, "Playable episode must have a URL"
 
     # Check if 1080p is available, fallback to 720p
     def check_url(u):

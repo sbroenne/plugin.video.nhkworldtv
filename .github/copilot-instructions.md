@@ -30,7 +30,7 @@ The Kodi addon repository at https://mirrors.kodi.tv/addons/omega/ is the **ONLY
 - **NEVER** update dependencies based on Dependabot/security alerts without checking Kodi repo first
 - If a version doesn't exist in Kodi repo, it **cannot** be used
 
-**Current verified dependencies** (as of January 2025):
+**Current verified dependencies** (as of November 2025):
 - script.module.requests: 2.31.0 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.requests/))
 - script.module.pytz: 2023.3.0 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.pytz/))
 - script.module.routing: 0.2.3 ✅ ([verify](https://mirrors.kodi.tv/addons/omega/script.module.routing/))
@@ -41,15 +41,38 @@ The Kodi addon repository at https://mirrors.kodi.tv/addons/omega/ is the **ONLY
 
 **CRITICAL**: Kodi Omega uses Python 3.11 - do NOT use Python 3.12+ features!
 
+**Development Environment Note**: Local dev uses Python 3.12.3 but target is 3.11 - always test compatibility!
+
 **Forbidden Python 3.12+ features**:
 - `datetime.UTC` (use `datetime.timezone.utc` instead - available since Python 3.2)
+  - Suppress ruff UP017 warning with `# noqa: UP017` when using `timezone.utc`
 - Type parameter syntax (`def func[T](x: T)`)
 - `@override` decorator
 - PEP 701 f-string improvements
 
+**Required for Python 3.11**:
+- Add `from __future__ import annotations` at top of files using modern type hints
+- Modern type hints requiring this: `dict[str, int]`, `str | None`, `list[dict]`, etc.
+- Without this import, you'll get `TypeError: 'type' object is not subscriptable`
+
 **Always test with Python 3.11** to catch compatibility issues before deploying to Kodi.
 
-### 3. Error Handling Pattern
+### 3. Commit Workflow (MANDATORY)
+
+⚠️ **NEVER COMMIT WITHOUT USER APPROVAL**
+
+**Pre-commit checklist**:
+1. Fix ALL linter errors (mypy, ruff, Pylance must be clean)
+2. Run full test suite (all 178 tests must pass)
+3. Test in Kodi if functionality changed
+4. Ask user for approval before committing
+5. Use conventional commit format
+
+**Deployment to Kodi**:
+- Run from `build/` directory: `cd build && ./copy_local_wsl.sh`
+- Script uses relative paths and must be run from that location
+
+### 4. Error Handling Pattern
 
 **ALWAYS use null-safe patterns:**
 
@@ -66,9 +89,9 @@ else:
 data = url.get_json(api_url)["items"]  # Can raise TypeError!
 ```
 
-### 3. NHK API Architecture
+### 5. NHK API Architecture
 
-**Current API**: `api.nhkworld.jp/showsapi/v1/` (October 2025 migration)
+**API Base**: `api.nhkworld.jp/showsapi/v1/`
 **Authentication**: None required (public endpoints)
 **Video URLs**: Provided directly in API responses (no scraping needed)
 
@@ -87,16 +110,6 @@ rest_url = {
     'live_stream_url': "https://masterpl.hls.nhkworld.jp/hls/w/live/master.m3u8",
 }
 ```
-
-**API Response Format (New vs Old)**:
-
-| Old API         | New API         | Notes                       |
-| --------------- | --------------- | --------------------------- |
-| `data.episodes` | `items`         | Top-level array             |
-| `vod_id`        | `id`            | Episode identifier          |
-| `title_clean`   | `title`         | Episode title               |
-| Unix timestamp  | ISO 8601 string | Date format                 |
-| N/A             | `video.url`     | Video URL included directly |
 
 ## Code Style
 
@@ -158,8 +171,6 @@ plugin.video.nhkworldtv/
 ├── resources/          # Settings, translations, media
 └── main.py            # Entry point
 ```
-
-**Removed modules** (PR #140): `api_keys.py`, `nhk_api_parser.py`, `cache_api.py`, `news_programs.py`, `first_run_wizard.py`
 
 ## Common Tasks
 
