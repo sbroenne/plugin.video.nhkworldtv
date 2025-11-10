@@ -7,13 +7,13 @@ name = "plugin.video.nhkworldtv"
 version = "3.0.0"
 description = "NHK World TV Kodi Plugin"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
     {name = "sbroenne"}
 ]
 classifiers = [
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.11",
     "License :: OSI Approved :: MIT License",
 ]
 
@@ -35,7 +35,7 @@ dev = [
 # Ruff - The modern all-in-one linter & formatter (replaces Black, isort, flake8, pylint)
 # ============================================================================
 [tool.ruff]
-target-version = "py312"
+target-version = "py311"
 line-length = 88
 indent-width = 4
 
@@ -150,7 +150,7 @@ exclude_lines = [
 # MyPy - Static Type Checking
 # ============================================================================
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false  # Gradual adoption

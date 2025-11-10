@@ -12,11 +12,7 @@ mypy = "*"
 pytest = ">=8.0.0"
 pytest-cov = ">=4.1.0"
 coverage = ">=7.0.0"
-# Build tools
-setuptools = "*"
-# Kodi tools
-addon-submitter = {git = "https://github.com/xbmc/kodi-addon-submitter.git"}
-kodi-addon-checker = "*"
+# Type stubs for static analysis
 types-requests = "*"
 types-pytz = "*"
 
