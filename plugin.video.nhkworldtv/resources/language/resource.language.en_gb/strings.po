@@ -6,17 +6,8 @@ msgid ""
 msgstr ""
 
 # Settings.xml
-msgctxt "#30001"
-msgid "General"
-msgstr ""
-
-
 msgctxt "#30003"
 msgid "Display Limits"
-msgstr ""
-
-msgctxt "#30004"
-msgid "Cache NHK API results (minutes)"
 msgstr ""
 
 msgctxt "#30006"
@@ -25,10 +16,6 @@ msgstr ""
 
 msgctxt "#30007"
 msgid "Max 'At A Glance'-items"
-msgstr ""
-
-msgctxt "#30008"
-msgid "Caching"
 msgstr ""
 
 # plugin.py
@@ -40,10 +27,6 @@ msgstr ""
 
 msgctxt "#30012"
 msgid "{0}\n\n{1}"
-msgstr ""
-
-msgctxt "#30013"
-msgid "Last update at: {0})"
 msgstr ""
 
 # At A Glance
