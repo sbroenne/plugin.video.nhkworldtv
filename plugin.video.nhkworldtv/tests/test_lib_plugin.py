@@ -4,22 +4,9 @@ Unit tests for plugin.py
 Tests the main plugin routing and UI logic, focusing on testable components
 """
 
-import sys
-from unittest.mock import MagicMock
-
 import pytest
-
-# Mock Kodi modules before importing plugin
-sys.modules["xbmc"] = MagicMock()
-sys.modules["xbmcgui"] = MagicMock()
-sys.modules["xbmcplugin"] = MagicMock()
-sys.modules["xbmcaddon"] = MagicMock()
-sys.modules["xbmcvfs"] = MagicMock()
-sys.modules["routing"] = MagicMock()
-
-# Import after mocking
-from lib import plugin  # noqa: E402
-from lib.episode import Episode  # noqa: E402
+from lib import plugin
+from lib.episode import Episode
 
 
 class TestAddPlayableEpisode:
