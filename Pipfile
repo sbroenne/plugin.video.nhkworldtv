@@ -12,12 +12,7 @@ mypy = "*"
 pytest = ">=8.0.0"
 pytest-cov = ">=4.1.0"
 coverage = ">=7.0.0"
-# Build tools
-setuptools = "*"
-# Kodi tools
-# Note: kodi-addon-checker removed from here - install directly in workflows with:
-#   pip install kodi-addon-checker
-# (only needed for addon validation, not for unit tests or development)
+# Type stubs for static analysis
 types-requests = "*"
 types-pytz = "*"
 
