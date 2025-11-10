@@ -50,6 +50,10 @@ jobs:
                   sudo apt install pipenv
                   pipenv install --dev
 
+            - name: Install kodi-addon-submitter
+              run: |
+                  pipenv run pip install git+https://github.com/xbmc/kodi-addon-submitter.git
+
             - name: Build plugin ZIP archive
               id: build_plugin
               run: |
