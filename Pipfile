@@ -15,10 +15,9 @@ coverage = ">=7.0.0"
 # Build tools
 setuptools = "*"
 # Kodi tools
-# Note: addon-submitter removed from here - install directly in workflows with:
-#   pip install git+https://github.com/xbmc/kodi-addon-submitter.git
-# (has setuptools compatibility issues with Python 3.11)
-kodi-addon-checker = "*"
+# Note: kodi-addon-checker removed from here - install directly in workflows with:
+#   pip install kodi-addon-checker
+# (only needed for addon validation, not for unit tests or development)
 types-requests = "*"
 types-pytz = "*"
 
