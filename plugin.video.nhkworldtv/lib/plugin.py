@@ -2,9 +2,12 @@
 Main plugin code
 """
 
+from __future__ import annotations
+
 import random
 import sys
 from datetime import timezone
+from typing import Any
 
 import routing
 import xbmc
@@ -734,24 +737,64 @@ def vod_index():
 @plugin.route("/vod/programs/")
 def vod_programs():
     """VOD Programs (Programs Tab on NHK World Site)
+
+    Fetches all programs from the NHK API using pagination.
+    The API returns 100 programs per page using an offset parameter.
+
     Returns:
         [str] -- [Last program ID added]
     """
-    api_result = url.get_json(nhk_api.rest_url["get_programs"])
-    if api_result is None or "items" not in api_result:
-        xbmc.log("VOD Programs API call failed", xbmc.LOGERROR)
-        kodiutils.show_notification(
-            "Error", "Unable to load programs. Please try again later."
-        )
-        return None
+    # Fetch all programs using pagination
+    all_programs: list[dict[str, Any]] = []
+    offset = 0
+    page_size = 100  # API returns 100 items per page
 
-    program_json = api_result["items"]
+    xbmc.log("Fetching all VOD programs with pagination", xbmc.LOGDEBUG)
+
+    while True:
+        # Build API URL with offset parameter
+        api_url = f"{nhk_api.rest_url['get_programs']}?offset={offset}"
+        xbmc.log(f"Fetching programs at offset {offset}", xbmc.LOGDEBUG)
+
+        api_result = url.get_json(api_url)
+        if api_result is None or "items" not in api_result:
+            # If first page fails, show error and return None
+            if offset == 0:
+                xbmc.log("VOD Programs API call failed on first page", xbmc.LOGERROR)
+                kodiutils.show_notification(
+                    "Error", "Unable to load programs. Please try again later."
+                )
+                return None
+            # If subsequent page fails, log warning and break (use what we have so far)
+            xbmc.log(
+                f"VOD Programs API call failed at offset {offset}, using {len(all_programs)} programs fetched so far",
+                xbmc.LOGWARNING,
+            )
+            break
+
+        page_programs = api_result["items"]
+        all_programs.extend(page_programs)
+
+        xbmc.log(
+            f"Fetched {len(page_programs)} programs at offset {offset}, total so far: {len(all_programs)}",
+            xbmc.LOGDEBUG,
+        )
+
+        # If we got fewer than page_size items, we've reached the end
+        if len(page_programs) < page_size:
+            break
+
+        # Move to next page
+        offset += page_size
+
+    xbmc.log(f"Fetched total of {len(all_programs)} programs", xbmc.LOGINFO)
+
     row_count = 0
     episodes = []
     program_id = None
 
-    # API returns list of program objects
-    for row in program_json:
+    # Process all fetched programs
+    for row in all_programs:
         program_id = row.get("id")
         if not program_id:
             continue
